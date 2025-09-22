@@ -29,7 +29,7 @@ export async function sendToServer<T>(endpoint: string, method: string, event: H
     }
    } 
 
-  const authHeaders = signature(method, endpoint);
+  const authHeaders = config.server.hmac.enableHmac ? signature(method, endpoint) : undefined;
 
     
   const headers: Record<string, string | undefined> = {
