@@ -18,6 +18,7 @@ export const configurationSchema = z.strictObject({
          clientCertsPath: z.string(),
          clientKeyPath: z.string()
       }),
+      cryptoCookiesSecret: z.string()
    }),
 
    logLevel: z.enum(['debug', 'info', 'warn', 'error', 'fatal'])
