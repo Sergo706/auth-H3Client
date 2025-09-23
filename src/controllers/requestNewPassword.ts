@@ -26,7 +26,7 @@ log.info(`Entered sendNewPassword Post Route`)
 const contentType = event.req.headers.get('Content-Type')!;
 
 if (!contentType || contentType !== 'application/json') {
-  throwError(log, event, 'MISSING_BODY', 400, 'Invalid Content-Type', 'Content-Type must be application/json', `Received: ${contentType}`);
+  throwError(log, event, 'INVALID_CONTENT_TYPE', 400, 'Invalid Content-Type', 'Content-Type must be application/json', `Received: ${contentType}`);
 };
 
 if (!cookies.value || typeof temp !== "string" || !temp) {
