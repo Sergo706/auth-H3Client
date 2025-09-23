@@ -10,9 +10,9 @@ import { getConfiguration } from '../config/config.js'
 type Cookie = { label: string; value: any };
 type Cookies = Cookie | Cookie[];
 
-export async function sendToServer<T>(endpoint: string, method: string, event: H3Event, body: boolean, cookies?: Cookies, data?: object) {
+export async function sendToServer<T>(keepAlive: boolean, endpoint: string, method: string, event: H3Event, body: boolean, cookies?: Cookies, data?: object) {
     const config = getConfiguration()
-    const agent = getAuthAgent()
+    const agent = getAuthAgent(keepAlive)
     const logger = getLogger()
      const serverIP = config.server.auth_location.serverOrDNS;
      const API_URL = `${config.server.ssl.enableSSL ? 'https://' : 'http://'}${serverIP}`;
