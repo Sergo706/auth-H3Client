@@ -2,7 +2,13 @@ import { makeCookie } from '../utils/cookieGenerator.js'
 import { sendToServer } from '../utils/serverToServer.js'
 import { getLogger } from '../utils/logger.js';
 import { getCookie, H3Event, HTTPError, parseCookies, setResponseStatus } from 'h3';
+import throwError from './error.js';
 
+declare module 'h3' {
+  interface Request {
+    accessToken?: string;
+  }
+}
 
 export async function ensureAccessToken(event: H3Event) {
   let token = getCookie(event, '__Secure-a');
@@ -20,13 +26,7 @@ export async function ensureAccessToken(event: H3Event) {
     log.info('No access token found Generating a new one')
 
   if (!refresh || !canary) {
-   log.warn('No refresh token is found Re-authentication required.')
-   throw new HTTPError({
-    body: { date: new Date().toJSON(), code: 'AUTH_REQUIRED' },
-    status: 401,
-    statusText: 'Unauthorized',
-    message: 'Re-authentication required'
-   })
+    throwError(log, event, 'AUTH_REQUIRED', 401, 'Unauthorized','Re-authentication required', 'No refresh token is found Re-authentication required.');
    }
 
    const cookies = [
@@ -43,13 +43,7 @@ export async function ensureAccessToken(event: H3Event) {
     log.info('Sending Request To api...')
     const resp = await sendToServer(false, '/auth/refresh-access', 'POST', event, false, cookies)
         if (!resp) {
-        log.error('Api Call Failed')
-        throw new HTTPError({
-            body: { date: new Date().toJSON(), code: 'SERVER_ERROR' },
-            status: 500,
-            statusText: 'Server Error',
-            message: 'Something went wrong, please try restarting the page, and try again.' ,
-        })
+        throwError(log, event, 'SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', 'Api Call Failed');
     };
 
     const json: any  = await resp.json();
@@ -62,26 +56,14 @@ export async function ensureAccessToken(event: H3Event) {
     }
 
     if (resp.status !== 200) {
-      log.warn({code : resp.status, ServerErrorMsg: json.error, ServerResponse: json},'error code')
-      throw new HTTPError({
-        body: { date: new Date().toJSON(), code: 'AUTH_REQUIRED' },
-        status: 401,
-        statusText: json.error + resp.status,
-        message: json
-      })
+      throwError(log, event, 'AUTH_REQUIRED', 401, 'Unauthorized',`${json.error + resp.status}`, `${json}`);
     } 
  
     token = json.accessToken;
     const accessIat = json.accessIat;
 
     if (!token) {
-      log.error(`Server didn't send a token!`)
-        throw new HTTPError({
-            body: { date: new Date().toJSON(), code: 'SERVER_ERROR' },
-            status: 500,
-            statusText: 'NO TOKEN',
-            message: 'Server Error please try again later.'
-        })
+      throwError(log, event, 'SERVER_ERROR', 500, 'NO TOKEN',`Server Error please try again later`, `Server didn't send a token!`);
     }
 
     makeCookie(event, 'a-iat', accessIat, {
@@ -102,12 +84,7 @@ export async function ensureAccessToken(event: H3Event) {
     });
     log.info({server: json , code : resp.status}, 'success')
     } catch(err) {
-       throw new HTTPError({
-        body:  { date: new Date().toJSON(), code: 'SERVER_ERROR' },
-        status: 500,
-        statusText: 'Server Error',
-        message: 'Server Error please try again later.'
-       }) 
+      throwError(log, event, 'SERVER_ERROR', 500, 'Server Error',`Server Error please try again later`, `Error getting new access token`);
     }
   }
   event.context.accessToken = token; 
