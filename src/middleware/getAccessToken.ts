@@ -110,5 +110,5 @@ export async function ensureAccessToken(event: H3Event) {
        }) 
     }
   }
-  event.req.context!.accessToken = token; 
+  event.context.accessToken = token; 
 }
