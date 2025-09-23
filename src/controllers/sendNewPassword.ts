@@ -86,6 +86,7 @@ if (!password) {
             event.res.status = 429
             return {error: `To many attempts, please try again later.`};
         } 
+        
         event.res.status = 429
         return { error: `To many attempts, please try again later.`};
     };
