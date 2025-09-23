@@ -72,8 +72,7 @@ const validator = async (event: H3Event): Promise<any> => {
 
     const results = await trackRes.json(); 
     log.info({results}, `Checking completed.`);
-    event.req.context = event.req.context || {};
-    event.req.context.trackingResult = results;
+    event.context.trackingResult = results;
 
     
     makeCookie(event, COOKIE_NAME, cookieValue, {
