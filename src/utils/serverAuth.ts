@@ -4,9 +4,9 @@ import fs from 'fs';
 import { getConfiguration } from "../config/config";
 
 
-export function getAuthAgent() {
+export function getAuthAgent(botDetector: boolean) {
     const { server } = getConfiguration(); 
-    if (server.ssl.enableSSL) {
+    if (server.ssl.enableSSL && !botDetector) {
         const KEY_DIR   = server.ssl.mainDirPath;
         const cert    = fs.readFileSync(path.join(KEY_DIR, server.ssl.rootCertsPath));
         const clientCert= fs.readFileSync(path.join(KEY_DIR, server.ssl.clientCertsPath));
@@ -18,5 +18,13 @@ export function getAuthAgent() {
                 key:  clientKey, 
             }
         })
-    } 
+    }
+    if  (botDetector) {
+        return new Agent ({
+              connections: 200,          
+              pipelining: 100,         
+              keepAliveTimeout: 60_000,   
+              keepAliveMaxTimeout: 120_000,
+        })
+    }
 }
