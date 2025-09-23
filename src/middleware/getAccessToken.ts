@@ -3,6 +3,7 @@ import { sendToServer } from '../utils/serverToServer.js'
 import { getLogger } from '../utils/logger.js';
 import { getCookie, H3Event, HTTPError, parseCookies, setResponseStatus } from 'h3';
 import throwError from './error.js';
+import { getConfiguration } from '../config/config.js';
 
 declare module 'h3' {
   interface Request {
@@ -15,6 +16,7 @@ export async function ensureAccessToken(event: H3Event) {
   const canary = getCookie(event, 'canary_id');
   const accessIat = Number(getCookie(event, 'a-iat'));
   const log = getLogger().child({service: 'auth', branch: `access_tokens`, reqID: event.context.rid })
+  const config = getConfiguration();
   
   const REFRESH_THRESHOLD = 5 * 60 * 1000;
   const TTL_MS     = 1000 * 60 * 15; 
@@ -71,7 +73,7 @@ export async function ensureAccessToken(event: H3Event) {
       secure:   true,
       sameSite: 'strict',
       path:     '/',
-      domain:   'riavzon.com',
+      domain:   config.domain,
       maxAge:   16 * 60 * 1000
     });
     makeCookie(event, '__Secure-a', token, {
@@ -79,7 +81,7 @@ export async function ensureAccessToken(event: H3Event) {
       secure:   true,
       sameSite: 'strict',
       path:     '/',
-      domain:   'riavzon.com',
+      domain:   config.domain,
       maxAge:   16 * 60 * 1000
     });
     log.info({server: json , code : resp.status}, 'success')

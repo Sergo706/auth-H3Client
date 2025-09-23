@@ -3,8 +3,10 @@ import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { assertMethod, defineHandler, getCookie, getQuery, getRouterParam, readBody } from "h3";
 import throwError from "../middleware/error.js";
+import { getConfiguration } from "../config/config.js";
 
 export default defineHandler(async (event) => {
+const config = getConfiguration();
 
 assertMethod(event, "POST")
 const { temp } = getQuery(event)
@@ -74,7 +76,7 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
                sameSite: 'strict',
                secure:   true,
                path: '/',
-               domain: 'riavzon.com',
+               domain: config.domain,
                maxAge: 16 * 60 * 1000
            })
            makeCookie(event, 'a-iat', accessIat, {
@@ -82,7 +84,7 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
                 sameSite: 'strict',
                 secure:   true,
                 path: '/',
-                domain: 'riavzon.com',
+                domain: config.domain,
                 maxAge: 16 * 60 * 1000
             })
          log.info('Redirecting user...') 

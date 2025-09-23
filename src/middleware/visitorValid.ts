@@ -43,7 +43,6 @@ const validator = async (event: H3Event): Promise<any> => {
 
       const newUuid = crypto.randomBytes(32).toString("hex");
       const cookieValue = createSignedCookie(newUuid, 1000 * 60 * 60 * 2, 'normal');
-      const authHeaders = signature(event.req.method, '/check');
       log.info({cookies: parseCookies(event)},`Sending request for /check`)
  
   try {
