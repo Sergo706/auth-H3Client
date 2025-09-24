@@ -34,7 +34,7 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
 }
 
 
-const body = await readBody<{ password: string; confirmedPassword: string }>(event);
+const body = event.context.body as { password: string | undefined; confirmedPassword: string | undefined}
 
 if (!body) {
     throwError(log,event,'MISSING_BODY',400, 'Invalid request body.', 'This field is required.', 'Invalid request body.')
