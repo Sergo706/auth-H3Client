@@ -31,7 +31,7 @@ if (!contentType || contentType !== 'application/json') {
 if (!cookies.value || typeof temp !== "string" || !temp) {
     throwError(log,event,'INVALID_CREDENTIALS',403,'FORBIDDEN', 'INVALID_CREDENTIALS', 'Invalid temp link token. Or canary is possibly undefined')
  }
-    const body = await readBody<{code: string}>(event);
+    const body = event.context.body as {code: string | undefined}
 
   if (!body) {
       throwError(log,event,'MISSING_BODY',400, 'Invalid request body.', 'This field is required.', 'Invalid request body.')
