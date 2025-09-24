@@ -20,7 +20,7 @@ if (!contentType || contentType !== 'application/json') {
   throwError(log, event, 'INVALID_CONTENT_TYPE', 400, 'Invalid Content-Type', 'Content-Type must be application/json', `Received: ${contentType}`);
 };
 
-const body = await readBody<{email: string, password: string, rememberUser: string}>(event);
+const body = event.context.body as {email: string, password: string, rememberUser: string};
 
   if (!body) {
       throwError(log,event,'MISSING_BODY',400, 'Invalid request body.', 'This field is required.', 'Invalid request body.')
