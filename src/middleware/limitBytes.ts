@@ -1,0 +1,28 @@
+import { assertMethod, defineHandler, EventHandler, H3Event } from "h3";
+import throwError from "./error";
+import { getLogger } from "../utils/logger";
+
+
+export function limitBytes(maxBytes: number): EventHandler {
+    const log = getLogger().child({service: 'auth-client', branch: 'middleware', type: 'bytes-checker'})
+    return defineHandler( async (event) => {
+        assertMethod(event, "POST")
+     const header = event.req.headers?.get?.('Content-Length')
+    
+     if (header && Number.isFinite(+header) && +header > maxBytes) {
+        throwError(log,event,'INVALID_CONTENT_TYPE',403, 'Forbidden', '', `exceeded allowed posts request bytes. Allowed: ${maxBytes}, Received: ${+header}. Request has been dropped`)
+     }
+     
+     const rawBody = await event.req.arrayBuffer()
+     const bytes = rawBody.byteLength
+
+      if (bytes > maxBytes) {
+        throwError(log,event,'INVALID_CONTENT_TYPE',403, 'Forbidden', '', `exceeded allowed posts request bytes. Allowed: ${maxBytes}, Received: ${bytes}. Request has been dropped`)
+      }
+      try {
+          event.context.body = await JSON.parse(new TextDecoder().decode(rawBody))
+      } catch(err) {
+        throwError(log,event,'INVALID_CONTENT_TYPE',400,'Invalid input','','Error parsing body')
+      }
+    })
+}
