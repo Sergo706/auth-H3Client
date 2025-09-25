@@ -1,5 +1,36 @@
 import * as z from "zod";
 
+
+export const OAuthProviders = z.array(z.discriminatedUnion("kind", [
+   z.object({
+      kind: z.literal("oidc"),
+      name: z.string(),
+      issuer: z.string(),
+      clientId: z.string(),
+      clientSecret: z.string(),
+      defaultScopes: z.array(z.string()).optional(),
+      extraAuthParams: z.record(z.string(), z.string()),
+      redirectUri: z.url(),  
+      redirectUrlOnSuccess: z.url({protocol:  /^https?$/}),
+      redirectUrlOnError: z.url({protocol:  /^https?$/}),
+   }),
+   z.object({
+      kind: z.literal("oauth"),
+      name: z.string(),
+      authorizationEndpoint: z.url(), 
+      tokenEndpoint: z.url(),          
+      userInfoEndpoint: z.url(), 
+      clientId: z.string(),
+      clientSecret: z.string(),
+      redirectUri: z.url(),  
+      defaultScopes: z.array(z.string()).optional(),
+      supportPKCE: z.boolean(),
+      redirectUrlOnSuccess: z.url({protocol:  /^https?$/}),
+      redirectUrlOnError: z.url({protocol:  /^https?$/}),
+   })
+   ]
+)).optional()
+
 export const configurationSchema = z.strictObject({
    domain: z.string(),
    server: z.object({
@@ -39,17 +70,7 @@ export const configurationSchema = z.strictObject({
       cryptoCookiesSecret: z.string()
    }),
 
-   OAuthProviders: z.array(z.object({
-      name: z.string(),
-      clientId: z.string(),
-      clientSecret: z.string(),
-      providerUrlToRedirect: z.url({protocol:  /^https$/}),
-      redirectUrlOnSuccess: z.url({protocol:  /^https?$/}),
-      redirectUrlOnError: z.url({protocol:  /^https?$/}),
-      exchangeCodeUrl: z.url({protocol:  /^https?$/}),
-      verificationUrl: z.url(),
-      issuer: z.array(z.string())
-   }).optional()),
+   OAuthProviders,
 
    telegram: z.discriminatedUnion("enableTelegramLogger", [
       z.object({
@@ -69,3 +90,4 @@ export const configurationSchema = z.strictObject({
 }).strict()
 
 export type Configuration = z.infer<typeof configurationSchema>;
+export type OAuthProviders = z.infer<typeof OAuthProviders>
