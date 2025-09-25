@@ -39,6 +39,18 @@ export const configurationSchema = z.strictObject({
       cryptoCookiesSecret: z.string()
    }),
 
+   OAuthProviders: z.array(z.object({
+      name: z.string(),
+      clientId: z.string(),
+      clientSecret: z.string(),
+      providerUrlToRedirect: z.url({protocol:  /^https$/}),
+      redirectUrlOnSuccess: z.url({protocol:  /^https?$/}),
+      redirectUrlOnError: z.url({protocol:  /^https?$/}),
+      exchangeCodeUrl: z.url({protocol:  /^https?$/}),
+      verificationUrl: z.url(),
+      issuer: z.array(z.string())
+   }).optional()),
+
    telegram: z.discriminatedUnion("enableTelegramLogger", [
       z.object({
       enableTelegramLogger: z.literal(false),
