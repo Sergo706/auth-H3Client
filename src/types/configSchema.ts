@@ -9,7 +9,7 @@ export const OAuthProviders = z.array(z.discriminatedUnion("kind", [
       clientId: z.string(),
       clientSecret: z.string(),
       defaultScopes: z.array(z.string()).optional(),
-      extraAuthParams: z.record(z.string(), z.string()),
+      extraAuthParams: z.record(z.string(), z.string()).optional(),
       redirectUri: z.url(),  
       redirectUrlOnSuccess: z.url({protocol:  /^https?$/}),
       redirectUrlOnError: z.url({protocol:  /^https?$/}),

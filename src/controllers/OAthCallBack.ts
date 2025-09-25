@@ -9,46 +9,63 @@ import { makeCookie } from '../utils/cookieGenerator.js';
 
 export default defineHandler(async (event) => {
 const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-callback', reqId: event.context.rid, reqIp: getRequestIP(event)});
-const { OAuthProviders } = getConfiguration()   
+const { OAuthProviders, domain } = getConfiguration()   
 const provided = event.context.params?.provider;
+
+const clearCookies = () => {
+    deleteCookie(event,"pkce_v")
+    deleteCookie(event,"nonce")
+    deleteCookie(event,"state");
+}
 
 log.info('Entered OAuth Callback.')
 
  if (!OAuthProviders || !provided) {
+    clearCookies()
     throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Entered invalid callback uri")
  };
 
  const match = OAuthProviders.find(pro => pro.name === provided);
 
-if (!match) {
- throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Error searching for this provider, make sure the route === provider name")
-}
+  if (!match) {
+    clearCookies()
+    throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Error searching for this provider, make sure the route === provider name")
+  }
 
 const { code, state:stateFromIdP, error, iss } = getQuery(event);
 
     if (error) {
-        log.error({error},'OAth callback failed with an error');
-        redirect(event, match.redirectUrlOnError)  
+        log.error({error},'OAuth callback failed with an error');
+        clearCookies()
+        return redirect(event, match.redirectUrlOnError); 
     }
+
     const stateCookie = getCookie(event, "state");
 
-    if (!stateCookie || stateFromIdP !== stateCookie) {
-        throwError(log,event,'AUTH_CLIENT_ERROR',400,'Bad request','', 'Invalid states');
+    if (!code) {
+        clearCookies()
+        log.error({error},`OAuth callback failed. provider didn't provided code.`);
+        return redirect(event, match.redirectUrlOnError); 
     }
-    const parsedState = JSON.parse(Buffer.from(stateCookie, "base64url").toString("utf8"));
+
+    if (!stateCookie || stateFromIdP !== stateCookie) {
+        clearCookies()
+        throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','', 'Invalid states');
+    }
+    const parsedState = await JSON.parse(Buffer.from(stateCookie, "base64url").toString("utf8"));
     if (parsedState.p !== provided) {
+        clearCookies()
         throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','',"state doesn't match provided provider")
     }
 
     if (iss && match.kind === "oidc" && iss !== match.issuer) {
+        clearCookies()
         throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','',"Issuer mismatch")
     }
 
    const codeVerifier = getCookie(event, 'pkce_v');
    const nonce = getCookie(event, "nonce");
-   deleteCookie(event,"pkce_v")
-   deleteCookie(event,"nonce")
-   deleteCookie(event,"state")
+   clearCookies()
 
    log.info(`Exchanging code for token...`);
 
@@ -58,33 +75,49 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
       code: String(code),
       redirect_uri: match.redirectUri,
       client_id: match.clientId,
-      client_secret: match.clientSecret
+      client_secret: match.clientSecret,
     });
 
-    if (codeVerifier) params.set("code_verifier", codeVerifier); 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+   };
 
-    const tokenEndpoint = match.kind === "oidc" ? (await discoverOidc(match.issuer, log)).token_endpoint : match.tokenEndpoint;
-      
+    if (codeVerifier) params.set("code_verifier", codeVerifier); 
+    
+    const meta = match.kind === 'oidc' ? await discoverOidc(match.issuer, log) : undefined;
+    const tokenEndpoint = match.kind === 'oidc' ? meta!.token_endpoint : match.tokenEndpoint;
+
+    let method: 'client_secret_basic' | 'client_secret_post';
+    method = !Array.isArray(meta?.token_endpoint_auth_methods_supported) || 
+              meta!.token_endpoint_auth_methods_supported.includes('client_secret_basic') ? 
+              method = 'client_secret_basic' :
+              method = 'client_secret_post';
+
+        
+
+    if (method === 'client_secret_basic') {
+      const basic = Buffer.from(`${match.clientId}:${match.clientSecret}`).toString('base64');
+      headers.Authorization = `Basic ${basic}`;
+      params.delete('client_id');
+      params.delete('client_secret');
+    }
+
      const tokenRes = await fetch(tokenEndpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      headers,
       body: params
     });
 
     if (!tokenRes.ok) {
         log.error({tokenRes},'failed to get access token');
-        redirect(event, match.redirectUrlOnError)  
+        return redirect(event, match.redirectUrlOnError); 
     }
 
    const tokens = await tokenRes.json();
 
-   if (!tokens.id_token) {
-        log.error({tokenRes},'token exchange succeeded, but token ended up null');
-        redirect(event, match.redirectUrlOnError)  
-   }
-
     let user;
     if (match.kind === "oidc" && tokens.id_token) {
+
       const meta = await discoverOidc(match.issuer, log);
       const payload = await verifyOAthToken(tokens.id_token, meta.jwks_uri, match.issuer, match.clientId)
 
@@ -103,11 +136,22 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
             });
 
         const userinfoJson = userinfo.ok ? await userinfo.json() : {};
+
+       if (userinfo.ok && userinfoJson.sub !== payload.sub) {
+          throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','', 'userinfo.sub does not match id_token.sub');
+        }
+
         user = { ...userinfoJson, sub: payload.sub, email: payload.email, name: payload.name, picture: payload.picture };
       } else {
         user = { sub: payload.sub, email: payload.email, name: payload.name, picture: payload.picture };
       }
     } else if (match.kind === "oauth") {
+
+      if (!tokens.access_token) {
+        log.error({ status: 'missing_access_token' }, 'OAuth flow succeeded, but the required access_token was missing.');
+        return redirect(event, match.redirectUrlOnError);
+     }
+
       const info = await fetch(match.userInfoEndpoint, { 
         headers: { 
             Authorization: `Bearer ${tokens.access_token}` 
@@ -121,8 +165,6 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
         throwError(log,event,'SERVER_ERROR',500,'Server error','', 'Unexpected error')
     }
 
-    // create own session / cookies here…
-
     const canary_id = getCookie(event, 'canary_id'); 
     const cookies = [
         {
@@ -133,7 +175,7 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
 
      log.info(`Token verified, and OAuth flow completed, sending data to the server...`);
         try {
-        const sendData = await sendToServer(false, `/auth/OAth/${provided}`, 'POST', event, true, cookies, { user });
+        const sendData = await sendToServer(false, `/auth/OAuth/${provided}`, 'POST', event, true, cookies, { user });
         
         if (!sendData) {
         throwError(log,event,'SERVER_ERROR', 500, 'Server Error', 'Server error please try again later', 'Api Call Failed')
@@ -155,22 +197,21 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
                 sameSite: 'strict',
                 secure:   true,
                 path: '/',
-                domain: 'riavzon.com',
-                maxAge: 16 * 60 * 1000
+                domain: domain,
+                maxAge: 16 * 60
             })
             makeCookie(event, 'a-iat', accessIat, {
                 httpOnly: true,
                 sameSite: 'strict',
                 secure:   true,
                 path: '/',
-                domain: 'riavzon.com',
-                maxAge: 16 * 60 * 1000
+                domain: domain,
+                maxAge: 16 * 60
             })
         }   
        
             log.info({server: results},`user redirected successfully to his account.`);
-            redirect(event, match.redirectUrlOnSuccess)
-        return; 
+           return redirect(event, match.redirectUrlOnSuccess);
     } 
 
   } catch(err) {

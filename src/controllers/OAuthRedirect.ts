@@ -35,7 +35,7 @@ if (!match) {
     sameSite: "lax",
     secure: true, 
     path: '/',  
-    maxAge: 1000 * 60 * 3,
+    maxAge: 60 * 3,
    })
 
  makeCookie(event, "pkce_v", verifier, {
@@ -43,14 +43,14 @@ if (!match) {
     sameSite: "lax",
     secure: true, 
     path: '/',  
-    maxAge: 1000 * 60 * 3,
+    maxAge: 60 * 3,
   })
     makeCookie(event, "nonce", nonce, {
     httpOnly: true,
     sameSite: "lax",
     secure: true, 
     path: '/',  
-    maxAge: 1000 * 60 * 3,
+    maxAge: 60 * 3,
   })
 
     log.info('Setting params...')
@@ -63,7 +63,7 @@ if (!match) {
         url.searchParams.set("response_type", "code");
         url.searchParams.set("scope", (match.defaultScopes ?? ["openid","email","profile"]).join(" "));
         url.searchParams.set("state", state);
-        url.searchParams.set("nonce", nonce);      // OIDC nonce required to be verified later. :contentReference[oaicite:5]{index=5}
+        url.searchParams.set("nonce", nonce);
         url.searchParams.set("code_challenge", challenge);
         url.searchParams.set("code_challenge_method", "S256"); 
 
@@ -88,5 +88,5 @@ if (!match) {
             if (!url) {
                 throwError(log,event,'SERVER_ERROR',500,'SERVER_ERROR','','Error constructing the uri please check your configuration and try again.')
             }
-            redirect(event, url.toString())
+          return redirect(event, url.toString());
 })

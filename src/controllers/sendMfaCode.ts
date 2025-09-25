@@ -77,7 +77,7 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
                secure:   true,
                path: '/',
                domain: config.domain,
-               maxAge: 16 * 60 * 1000
+               maxAge: 16 * 60
            })
            makeCookie(event, 'a-iat', accessIat, {
                 httpOnly: true,
@@ -85,7 +85,7 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
                 secure:   true,
                 path: '/',
                 domain: config.domain,
-                maxAge: 16 * 60 * 1000
+                maxAge: 16 * 60
             })
          log.info('Redirecting user...') 
          event.res.status = 200

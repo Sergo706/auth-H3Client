@@ -18,7 +18,7 @@ const existing = getCookie(event, name)
     makeCookie(event, name, sign, {
         httpOnly: false,
         sameSite: "strict", 
-        maxAge: 1000 * 60 * 30,
+        maxAge: 60 * 30,
         secure: true,
       })
       log.info(`Csrf token generated`)
