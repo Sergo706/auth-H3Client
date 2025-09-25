@@ -77,7 +77,7 @@ const validator = async (event: H3Event): Promise<any> => {
     makeCookie(event, COOKIE_NAME, cookieValue, {
       httpOnly: true,
       sameSite: "strict", 
-      maxAge: 1000 * 60 * 60 * 2,
+      maxAge: 60 * 60 * 2,
       secure: true,
     })
     return;

@@ -89,7 +89,7 @@ try {
                 secure:   true,
                 path: '/',
                 domain: config.domain,
-                maxAge: 16 * 60 * 1000
+                maxAge: 16 * 60
             })
             makeCookie(event, 'a-iat', accessIat, {
                 httpOnly: true,
@@ -97,7 +97,7 @@ try {
                 secure:   true,
                 path: '/',
                 domain: config.domain,
-                maxAge: 16 * 60 * 1000
+                maxAge: 16 * 60
             })
           log.info({server: results}, `user is logged in successfully`) 
           event.res.status = 200

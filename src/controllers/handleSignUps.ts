@@ -65,7 +65,7 @@ const sendData = await sendToServer(false, `/signup`, "POST", event, true, cooki
                 secure:   true,
                 path: '/',
                 domain: config.domain,
-                maxAge: 16 * 60 * 1000
+                maxAge: 16 * 60
             })
             makeCookie(event, 'a-iat', accessIat, {
                 httpOnly: true,
@@ -73,7 +73,7 @@ const sendData = await sendToServer(false, `/signup`, "POST", event, true, cooki
                 secure:   true,
                 path: '/',
                 domain: config.domain,
-                maxAge: 16 * 60 * 1000
+                maxAge: 16 * 60
             })
         }   
         log.info({server: results}, `user is signed up successfully`) 

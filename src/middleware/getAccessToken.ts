@@ -74,7 +74,7 @@ export async function ensureAccessToken(event: H3Event) {
       sameSite: 'strict',
       path:     '/',
       domain:   config.domain,
-      maxAge:   16 * 60 * 1000
+      maxAge:   16 * 60
     });
     makeCookie(event, '__Secure-a', token, {
       httpOnly: true,
@@ -82,7 +82,7 @@ export async function ensureAccessToken(event: H3Event) {
       sameSite: 'strict',
       path:     '/',
       domain:   config.domain,
-      maxAge:   16 * 60 * 1000
+      maxAge:   16 * 60
     });
     log.info({server: json , code : resp.status}, 'success')
     } catch(err) {

@@ -2,11 +2,12 @@ import pino from "pino";
 import { getConfiguration } from "../config/config";
 import { MiniCache } from "./miniCache";
 
+const cache = new MiniCache()
+
 export async function discoverOidc(issuer: string, log: pino.Logger): Promise<any | void>{
     const {OAuthProviders} = getConfiguration()
     if (!OAuthProviders) return;
 
-    const cache = new MiniCache()
     const exists = cache.get(issuer)
 
     if (exists) return exists;
