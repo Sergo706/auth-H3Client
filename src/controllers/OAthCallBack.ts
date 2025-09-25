@@ -79,7 +79,8 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
     });
 
     const headers: Record<string, string> = {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/x-www-form-urlencoded',
+      "Accept": "application/json"
    };
 
     if (codeVerifier) params.set("code_verifier", codeVerifier); 
@@ -88,10 +89,12 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
     const tokenEndpoint = match.kind === 'oidc' ? meta!.token_endpoint : match.tokenEndpoint;
 
     let method: 'client_secret_basic' | 'client_secret_post';
-    method = !Array.isArray(meta?.token_endpoint_auth_methods_supported) || 
-              meta!.token_endpoint_auth_methods_supported.includes('client_secret_basic') ? 
-              method = 'client_secret_basic' :
-              method = 'client_secret_post';
+    const supported = meta?.token_endpoint_auth_methods_supported as string[] | undefined;
+
+    method = match.tokenAuthMethod ?? (
+      !Array.isArray(supported) || supported.includes('client_secret_basic') 
+            ? 'client_secret_basic'
+            : 'client_secret_post');
 
         
 
