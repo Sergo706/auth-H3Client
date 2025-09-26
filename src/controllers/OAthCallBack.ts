@@ -8,6 +8,8 @@ import { sendToServer } from '../utils/serverToServer.js';
 import { makeCookie } from '../utils/cookieGenerator.js';
 import { verifySignedCookie } from '../utils/cryptoCookies.js';
 import { query } from '../types/OAuthQuery.js';
+import { atHashCheck } from '../utils/atHash.js';
+import type { OidcIdTokenPayload } from '../types/oidc.js'
 
 export default defineHandler(async (event) => {
 const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-callback', reqId: event.context.rid, reqIp: getRequestIP(event)});
@@ -125,14 +127,20 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
     if (match.kind === "oidc" && tokens.id_token) {
 
       const meta = await discoverOidc(match.issuer, log);
-      const payload = await verifyOAuthToken(tokens.id_token, meta.jwks_uri, match.issuer, match.clientId)
+      const payload: OidcIdTokenPayload = await verifyOAuthToken(tokens.id_token, meta.jwks_uri, match.issuer, match.clientId)
 
       if (payload.nonce !== nonce) {
-        throwError(log,event,'INVALID_CREDENTIALS',400,'server error','','Nonce mismatch!')
+        throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','','Nonce mismatch!')
       }
     
       if (payload.azp && payload.azp !== match.clientId) {
-        throwError(log,event,'INVALID_CREDENTIALS',400,'server error','','azp mismatch!')
+        throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','','azp mismatch!')
+      }
+
+      if (payload.at_hash && typeof tokens.access_token === 'string' && typeof payload.at_hash === 'string') {
+           const valid = atHashCheck(payload.at_hash, tokens.access_token)
+           if (!valid) 
+              throwError(log, event, 'INVALID_CREDENTIALS', 400, 'Bad request', '', 'at_hash mismatch');
       }
 
       if (meta.userinfo_endpoint && tokens.access_token) {

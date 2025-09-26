@@ -1,4 +1,5 @@
 import { jwtVerify, createRemoteJWKSet } from 'jose';
+import type { OidcIdTokenPayload } from '../types/oidc.js'
 
 export async function verifyOAuthToken(id_token: string, url: string, issuer: string, clientId: string) {
     const JWKS = createRemoteJWKSet(new URL(url));
@@ -9,5 +10,5 @@ export async function verifyOAuthToken(id_token: string, url: string, issuer: st
     clockTolerance: 5
   })
     const userInfo = payload;
-    return userInfo;
+    return userInfo as OidcIdTokenPayload;
 }
