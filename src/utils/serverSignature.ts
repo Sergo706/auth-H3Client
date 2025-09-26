@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { getConfiguration } from "../config/config";
+import { getConfiguration } from "../config/config.js";
 
 export function signature(method: string, path: string): Record<string, string> {
   const {server} = getConfiguration() 

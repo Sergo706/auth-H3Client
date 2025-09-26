@@ -1,7 +1,7 @@
 import path from "path";
 import { Agent } from "undici";
 import fs from 'fs';
-import { getConfiguration } from "../config/config";
+import { getConfiguration } from "../config/config.js";
 
 
 export function getAuthAgent(botDetector: boolean) {

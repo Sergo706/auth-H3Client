@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { Buffer } from "node:buffer";
-import { getConfiguration } from "../config/config";
+import { getConfiguration } from "../config/config.js";
 
 
 

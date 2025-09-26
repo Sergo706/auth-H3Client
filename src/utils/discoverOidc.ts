@@ -1,6 +1,6 @@
 import pino from "pino";
-import { getConfiguration } from "../config/config";
-import { MiniCache } from "./miniCache";
+import { getConfiguration } from "../config/config.js";
+import { MiniCache } from "./miniCache.js";
 
 const cache = new MiniCache()
 
@@ -29,7 +29,7 @@ export async function discoverOidc(issuer: string, log: pino.Logger): Promise<an
 
          cache.set(issuer, json, 1000 * 60 * 60 * 48)
          return json;
-         
+
      } catch(err) {
         log.error({err}, `discovery failed for ${issuer}`)
         throw err;
