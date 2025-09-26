@@ -5,7 +5,7 @@ import { getConfiguration } from "../config/config.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { makePkcePair } from "../utils/pkce.js";
 import throwError from "../middleware/error.js";
-import { discoverOidc } from "../utils/discoverOidc";
+import { discoverOidc } from "../utils/discoverOidc.js";
 import { createSignedCookie } from "../utils/cryptoCookies.js";
 
 export default defineHandler(async (event) => {

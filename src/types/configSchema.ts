@@ -5,7 +5,7 @@ export const OAuthProviders = z.array(z.discriminatedUnion("kind", [
    z.object({
       kind: z.literal("oidc"),
       name: z.string(),
-      issuer: z.string(),
+      issuer: z.url(),
       clientId: z.string(),
       clientSecret: z.string(),
       defaultScopes: z.array(z.string()).optional(),
