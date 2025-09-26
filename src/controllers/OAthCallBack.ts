@@ -39,7 +39,7 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
         return redirect(event, match.redirectUrlOnError); 
     }
 
-    const stateCookie = getCookie(event, "state");
+    const stateCookie = getCookie(event, `state${match.name}`);
 
     if (!code) {
         clearCookies()
