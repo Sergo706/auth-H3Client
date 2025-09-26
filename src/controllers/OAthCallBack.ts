@@ -1,12 +1,13 @@
 import { getLogger } from '../utils/logger.js';
 import { getConfiguration } from "../config/config.js";
-import { defineHandler, deleteCookie, getCookie, getQuery, getRequestIP, redirect } from "h3";
+import { defineHandler, deleteCookie, getCookie, getQuery, getRequestIP, getValidatedQuery, redirect } from "h3";
 import throwError from "../middleware/error.js";
 import { discoverOidc } from '../utils/discoverOidc.js';
-import { verifyOAthToken } from '../utils/verifyOAuthTokens.js';
+import { verifyOAuthToken } from '../utils/verifyOAuthTokens.js';
 import { sendToServer } from '../utils/serverToServer.js';
 import { makeCookie } from '../utils/cookieGenerator.js';
 import { verifySignedCookie } from '../utils/cryptoCookies.js';
+import { query } from '../types/OAuthQuery.js';
 
 export default defineHandler(async (event) => {
 const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-callback', reqId: event.context.rid, reqIp: getRequestIP(event)});
@@ -31,7 +32,7 @@ const clearCookies = () => {
     deleteCookie(event,`state${match.name}`);
 }
 
-const { code, state:stateFromIdP, error, iss } = getQuery(event);
+const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, query);
 
     if (error) {
         log.error({error},'OAuth callback failed with an error');
@@ -124,14 +125,14 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
     if (match.kind === "oidc" && tokens.id_token) {
 
       const meta = await discoverOidc(match.issuer, log);
-      const payload = await verifyOAthToken(tokens.id_token, meta.jwks_uri, match.issuer, match.clientId)
+      const payload = await verifyOAuthToken(tokens.id_token, meta.jwks_uri, match.issuer, match.clientId)
 
       if (payload.nonce !== nonce) {
-        throwError(log,event,'INVALID_CREDENTIALS',500,'server error','','Nonce mismatch!')
+        throwError(log,event,'INVALID_CREDENTIALS',400,'server error','','Nonce mismatch!')
       }
     
       if (payload.azp && payload.azp !== match.clientId) {
-        throwError(log,event,'INVALID_CREDENTIALS',500,'server error','','azp mismatch!')
+        throwError(log,event,'INVALID_CREDENTIALS',400,'server error','','azp mismatch!')
       }
 
       if (meta.userinfo_endpoint && tokens.access_token) {
