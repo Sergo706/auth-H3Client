@@ -6,7 +6,7 @@ import { makeCookie } from "../utils/cookieGenerator.js";
 import { makePkcePair } from "../utils/pkce.js";
 import throwError from "../middleware/error.js";
 import { discoverOidc } from "../utils/discoverOidc";
-
+import { createSignedCookie } from "../utils/cryptoCookies.js";
 
 export default defineHandler(async (event) => {
 const { OAuthProviders } = getConfiguration()   
@@ -24,13 +24,13 @@ if (!match) {
  throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Error searching for this provider, make sure the route === provider name")
 }
 
-  const statePayload = { p: match.name, t: Date.now() }; 
-  const state = Buffer.from(JSON.stringify(statePayload)).toString("base64url");
+  const statePayload = JSON.stringify({ p: match.name, r: crypto.randomBytes(32).toString('hex') });
+  const state = createSignedCookie(statePayload, 1000 * 60 * 3, `auth-oauth.${match.name}`)
   const nonce = crypto.randomBytes(32).toString('base64url');
   const { verifier, challenge } = makePkcePair();
 
 
- makeCookie(event, "state", state, {
+ makeCookie(event, `state${match.name}`, state, {
     httpOnly: true,
     sameSite: "lax",
     secure: true, 
@@ -38,20 +38,25 @@ if (!match) {
     maxAge: 60 * 3,
    })
 
- makeCookie(event, "pkce_v", verifier, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: true, 
-    path: '/',  
-    maxAge: 60 * 3,
-  })
-    makeCookie(event, "nonce", nonce, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: true, 
-    path: '/',  
-    maxAge: 60 * 3,
-  })
+if (match.supportPKCE) {
+  makeCookie(event, `pkce_v${match.name}`, verifier, {
+     httpOnly: true,
+     sameSite: "lax",
+     secure: true, 
+     path: '/',  
+     maxAge: 60 * 3,
+   })
+}
+
+   if (match.kind === 'oidc')  {
+     makeCookie(event, `nonce${match.name}`, nonce, {
+     httpOnly: true,
+     sameSite: "lax",
+     secure: true, 
+     path: '/',  
+     maxAge: 60 * 3,
+   })
+   }
 
     log.info('Setting params...')
     let url: URL;

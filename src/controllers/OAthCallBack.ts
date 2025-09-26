@@ -6,6 +6,7 @@ import { discoverOidc } from '../utils/discoverOidc.js';
 import { verifyOAthToken } from '../utils/verifyOAuthTokens.js';
 import { sendToServer } from '../utils/serverToServer.js';
 import { makeCookie } from '../utils/cookieGenerator.js';
+import { verifySignedCookie } from '../utils/cryptoCookies.js';
 
 export default defineHandler(async (event) => {
 const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-callback', reqId: event.context.rid, reqIp: getRequestIP(event)});
@@ -47,24 +48,28 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
         log.error({error},`OAuth callback failed. provider didn't provided code.`);
         return redirect(event, match.redirectUrlOnError); 
     }
+    
+    if (!stateCookie || !stateFromIdP  || stateFromIdP !== stateCookie) {
+      clearCookies()
+      throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','', 'State is missing');
+    }
 
-    if (!stateCookie || stateFromIdP !== stateCookie) {
-        clearCookies()
-        throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','', 'Invalid states');
-    }
-    const parsedState = await JSON.parse(Buffer.from(stateCookie, "base64url").toString("utf8"));
-    if (parsedState.p !== provided) {
-        clearCookies()
-        throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','',"state doesn't match provided provider")
-    }
+
+    const state = verifySignedCookie(stateFromIdP, `auth-oauth.${provided}`)
+
+    if (!state.valid || state.payload?.session !== `auth-oauth.${provided}`) {
+       clearCookies()
+       throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','', 'State is not valid');
+     }
+
 
     if (iss && match.kind === "oidc" && iss !== match.issuer) {
         clearCookies()
         throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','',"Issuer mismatch")
     }
 
-   const codeVerifier = getCookie(event, 'pkce_v');
-   const nonce = getCookie(event, "nonce");
+   const codeVerifier = getCookie(event, `pkce_v${match.name}`);
+   const nonce = getCookie(event, `nonce${match.name}`);
    clearCookies()
 
    log.info(`Exchanging code for token...`);
@@ -95,7 +100,6 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
       !Array.isArray(supported) || supported.includes('client_secret_basic') 
             ? 'client_secret_basic'
             : 'client_secret_post');
-
         
 
     if (method === 'client_secret_basic') {
@@ -112,7 +116,7 @@ const { code, state:stateFromIdP, error, iss } = getQuery(event);
     });
 
     if (!tokenRes.ok) {
-        log.error({tokenRes},'failed to get access token');
+        log.error({status: 'missing_access_token' },'failed to get access token');
         return redirect(event, match.redirectUrlOnError); 
     }
 
