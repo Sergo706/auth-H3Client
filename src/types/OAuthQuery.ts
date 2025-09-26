@@ -2,8 +2,8 @@ import { z } from "zod"
 
 
 export const query = z.object({
-    code: z.string(),
-    state: z.string(),
+    code: z.union([z.string(), z.undefined()]),
+    state: z.union([z.string(), z.undefined()]),
     error: z.union([z.string(), z.undefined()]),
     iss: z.union([z.string(), z.undefined()]),
 })
