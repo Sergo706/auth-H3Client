@@ -126,7 +126,6 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
     let user;
     if (match.kind === "oidc" && tokens.id_token) {
 
-      const meta = await discoverOidc(match.issuer, log);
       const payload: OidcIdTokenPayload = await verifyOAuthToken(tokens.id_token, meta.jwks_uri, match.issuer, match.clientId)
 
       if (payload.nonce !== nonce) {
@@ -138,7 +137,7 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
       }
 
       if (payload.at_hash && typeof tokens.access_token === 'string' && typeof payload.at_hash === 'string') {
-           const valid = atHashCheck(payload.at_hash, tokens.access_token)
+           const valid = atHashCheck(payload.at_hash, tokens.access_token, tokens.id_token)
            if (!valid) 
               throwError(log, event, 'INVALID_CREDENTIALS', 400, 'Bad request', '', 'at_hash mismatch');
       }

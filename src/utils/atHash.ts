@@ -2,8 +2,8 @@ import { decodeProtectedHeader } from 'jose';
 import crypto from 'node:crypto';
 
 
-export function atHashCheck(atHash: string, accessToken: string): boolean {
-    const { alg } = decodeProtectedHeader(accessToken);
+export function atHashCheck(atHash: string, accessToken: string, idToken: string): boolean {
+    const { alg } = decodeProtectedHeader(idToken);
     if (!alg) return false;
 
     const bits = parseInt(alg.replace(/^\D+(\d+).*$/, '$1'), 10) || 256;
