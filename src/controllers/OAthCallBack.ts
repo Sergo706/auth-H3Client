@@ -13,25 +13,23 @@ const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'h
 const { OAuthProviders, domain } = getConfiguration()   
 const provided = event.context.params?.provider;
 
-const clearCookies = () => {
-    deleteCookie(event,"pkce_v")
-    deleteCookie(event,"nonce")
-    deleteCookie(event,"state");
-}
-
 log.info('Entered OAuth Callback.')
 
  if (!OAuthProviders || !provided) {
-    clearCookies()
     throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Entered invalid callback uri")
  };
 
  const match = OAuthProviders.find(pro => pro.name === provided);
 
   if (!match) {
-    clearCookies()
     throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Error searching for this provider, make sure the route === provider name")
   }
+
+const clearCookies = () => {
+    deleteCookie(event,`pkce_v${match.name}`)
+    deleteCookie(event,`nonce${match.name}`)
+    deleteCookie(event,`state${match.name}`);
+}
 
 const { code, state:stateFromIdP, error, iss } = getQuery(event);
 
