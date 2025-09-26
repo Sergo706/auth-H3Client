@@ -3,18 +3,13 @@ import { createSignedCookie } from "../utils/cryptoCookies.js"
 import { verifySignedCookie } from "../utils/cryptoCookies.js"
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { banIp } from "../utils/banIp.js";
-import { signature } from "../utils/serverSignature.js";
 import { getLogger} from "../utils/logger.js";
-import { getConfiguration } from "../config/config.js";
 import { getCookie, getRequestIP, getRequestURL, H3Event, HTTPError, parseCookies } from "h3";
 import { sendToServer } from "../utils/serverToServer.js";
 
 
 const validator = async (event: H3Event): Promise<any> => {
     const log = getLogger().child({service: `auth-client`, branch: 'BOT DETECTOR', type: 'middleware', reqID: event.context.rid})
-    const { server } = getConfiguration()
-    const serverIP = server.auth_location.serverOrDNS;
-    const API_URL = `https://${serverIP}`;
     const url = getRequestURL(event);
 
     const isPageView =
@@ -46,7 +41,7 @@ const validator = async (event: H3Event): Promise<any> => {
       log.info({cookies: parseCookies(event)},`Sending request for /check`)
  
   try {
-    const trackRes = await sendToServer(true, `${API_URL}/check`, event.req.method, event, false)
+    const trackRes = await sendToServer(true, `/check`, event.req.method, event, false)
     if (!trackRes) return;
 
     const status = trackRes.status;

@@ -1,6 +1,6 @@
 import { getLogger } from '../utils/logger.js';
 import { getConfiguration } from "../config/config.js";
-import { defineHandler, deleteCookie, getCookie, getQuery, getRequestIP, getValidatedQuery, redirect } from "h3";
+import { defineHandler, deleteCookie, getCookie, getRequestIP, getValidatedQuery, redirect } from "h3";
 import throwError from "../middleware/error.js";
 import { discoverOidc } from '../utils/discoverOidc.js';
 import { verifyOAuthToken } from '../utils/verifyOAuthTokens.js';
