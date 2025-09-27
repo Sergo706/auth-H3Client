@@ -1,5 +1,5 @@
   import { Telegraf } from 'telegraf';
-  import { getConfiguration } from '../config/config';
+  import { getConfiguration } from '../config/config.js';
 
 
   type TgCtx = {
