@@ -1,7 +1,7 @@
-import { getRequestHost, getRequestProtocol, getRequestURL, type H3Event } from 'h3'
+import { getRequestHost, getRequestIP, getRequestProtocol, getRequestURL, type H3Event } from 'h3'
 
 export function clientHeaders( event: H3Event ): Record<string, string | undefined> {
-    const clientIp = event.req.ip!
+    const clientIp = getRequestIP(event) || undefined
     const protocol = getRequestProtocol(event, {xForwardedProto: false})
     const host = getRequestHost(event, {xForwardedHost: false});
     const url = getRequestURL(event);
@@ -10,7 +10,7 @@ export function clientHeaders( event: H3Event ): Record<string, string | undefin
       const get = (name: string) => h.get(name) ?? undefined;
 
 return {
-    'User-Agent': event.req.headers.get('User-Agent') ?? '',
+    'User-Agent': h.get('User-Agent') ?? '',
     'X-Forwarded-For': clientIp,
     'X-Real-IP': clientIp,
     "Referer": `${protocol}://${host}${url}`,
