@@ -17,7 +17,7 @@ const transport = pino.transport({
       level:  'info',
       options: {
         destination: `${LOG_DIR}/info.log`,
-        mkdir:       true
+        mkdir: true
       }
     },
     {
@@ -25,7 +25,7 @@ const transport = pino.transport({
       level:  'warn',
       options: {
         destination: `${LOG_DIR}/warn.log`,
-        mkdir:       true
+        mkdir: true
       }
     },
     {
@@ -33,7 +33,7 @@ const transport = pino.transport({
       level:  'error',
       options: {
         destination: `${LOG_DIR}/errors.log`,
-        mkdir:       true
+        mkdir:true
       }
     }
   ]

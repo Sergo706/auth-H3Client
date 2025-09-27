@@ -44,13 +44,14 @@ export async function sendToServer<T>(keepAlive: boolean, endpoint: string, meth
   }
 
   log.info(`Mapped. sending Request`)
-
+  const signal =  AbortSignal.timeout(3000)
 try { 
    const response = await fetch(`${API_URL}${endpoint}`, {
          method: method,
          body: body ? JSON.stringify(data) : undefined,
          headers: headers,
-         dispatcher: agent
+         dispatcher: agent,
+         signal
     });
      log.info({code: response.status, data: response}, `Request succeeded.`)
       return response;
