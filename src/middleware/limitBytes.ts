@@ -1,6 +1,6 @@
 import { assertMethod, defineHandler, EventHandler, H3Event } from "h3";
-import throwError from "./error";
-import { getLogger } from "../utils/logger";
+import throwError from "./error.js";
+import { getLogger } from "../utils/logger.js";
 
 
 export function limitBytes(maxBytes: number): EventHandler {

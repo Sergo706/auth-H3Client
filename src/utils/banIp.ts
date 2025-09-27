@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
-import { sendLog } from './telegramLogger';
-import { getLogger } from './logger';
+import { sendLog } from './telegramLogger.js';
+import { getLogger } from './logger.js';
 const UFW = '/usr/sbin/ufw';
 
 export function banIp(ip: string): Promise<void> {

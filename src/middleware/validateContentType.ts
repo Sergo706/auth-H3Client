@@ -1,6 +1,6 @@
 import { defineHandler, EventHandler } from 'h3'
-import { getLogger } from '../utils/logger';
-import throwError from './error';
+import { getLogger } from '../utils/logger.js';
+import throwError from './error.js';
 
 
 export function contentType(expected: string): EventHandler {
