@@ -6,9 +6,10 @@ import { banIp } from "../utils/banIp.js";
 import { getLogger} from "../utils/logger.js";
 import { getCookie, getRequestIP, getRequestURL, H3Event, HTTPError, parseCookies } from "h3";
 import { sendToServer } from "../utils/serverToServer.js";
+import throwError from "./error.js";
 
 
-const validator = async (event: H3Event): Promise<any> => {
+export const validator = async (event: H3Event): Promise<any> => {
     const log = getLogger().child({service: `auth-client`, branch: 'BOT DETECTOR', type: 'middleware', reqID: event.context.rid})
     const url = getRequestURL(event);
 
@@ -42,7 +43,9 @@ const validator = async (event: H3Event): Promise<any> => {
  
   try {
     const trackRes = await sendToServer(true, `/check`, event.req.method, event, false)
-    if (!trackRes) return;
+    if (!trackRes) {
+      throwError(log,event,'AUTH_SERVER_ERROR',502,'Not reachable','','Auth server is not reachable!')
+    };
 
     const status = trackRes.status;
     
@@ -88,5 +91,5 @@ const validator = async (event: H3Event): Promise<any> => {
 }
 };
 
-export default validator;
+
 

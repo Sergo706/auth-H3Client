@@ -56,8 +56,7 @@ function levelFor(status: number, hasError: boolean): Level {
   return 'info'
 }
 
-export default defineHandler({
-    middleware: [
+export const httpLogger = (event: H3Event) => {
 
     onRequest((event) => {
     const url = getRequestURL(event);
@@ -82,7 +81,7 @@ export default defineHandler({
       const ip = getRequestIP(event) || ''
       const ua = event.req.headers.get('user-agent') || ''
       const fp = getRequestFingerprint(event)
-      const logger = pino(httpLog);
+      const logger = httpLog;
 
       event.context.log = logger.child({
         requestId,
@@ -105,9 +104,9 @@ export default defineHandler({
     }),
 
     onResponse((res: Response, event: H3Event) => {
-      const logger = pino(httpLog);
+      const logger = httpLog;
 
-         if (event.context.__skipLog) return res;
+         if (event.context.__skipLog) return;
          const log = (event.context.log as pino.Logger)  || logger;
          const ms = (performance.now() ?? Date.now()) - (event.context.time as number);
          const rid = String(event.context.rid)
@@ -144,9 +143,7 @@ export default defineHandler({
     }),
 
     onError((error, event) => {
-      const logger = pino(httpLog);
-      
-      
+      const logger = httpLog;
       
       event.context.error = error
       const ms = (performance.now() ?? Date.now()) - (event.context.time as number);
@@ -164,6 +161,4 @@ export default defineHandler({
                 stack: error.stack
              } }, 'http error')
     })
-    ],
-    handler: () => undefined
-})
+}
