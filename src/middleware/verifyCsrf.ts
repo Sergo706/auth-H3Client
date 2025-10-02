@@ -30,8 +30,7 @@ export default defineHandler( async (event) => {
         })
         }
     
-    const body = await readBody<{ csrf?: string }>(event);
-    const token = event.req.headers.get("X-CSRF-Token") || body?.csrf;
+    const token = event.req.headers.get("X-CSRF-Token");
 
     if (!token) {
     log.warn(`CSRF token not provided`)

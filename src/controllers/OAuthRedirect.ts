@@ -1,4 +1,4 @@
-import { defineHandler, getRequestIP, redirect } from "h3";
+import { defineHandler, getRequestIP, H3Event, redirect } from "h3";
 import crypto from 'crypto';
 import { getLogger } from '../utils/logger.js';
 import { getConfiguration } from "../config/config.js";
@@ -8,7 +8,7 @@ import throwError from "../middleware/error.js";
 import { discoverOidc } from "../utils/discoverOidc.js";
 import { createSignedCookie } from "../utils/cryptoCookies.js";
 
-export default defineHandler(async (event) => {
+export async function OAuthRedirect(event: H3Event) {
 const { OAuthProviders } = getConfiguration()   
 const log = 
 getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-redirect', reqId: event.context.rid, reqIp: getRequestIP(event)});
@@ -94,4 +94,4 @@ if (match.supportPKCE) {
                 throwError(log,event,'SERVER_ERROR',500,'SERVER_ERROR','','Error constructing the uri please check your configuration and try again.')
             }
           return redirect(event, url.toString());
-})
+}

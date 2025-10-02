@@ -6,16 +6,24 @@ import  login  from "../controllers/handleLogin.js";
 import { H3 } from "h3";
 import { limitBytes } from "../middleware/limitBytes.js";
 
-const router = new H3();
 
 
-router.post('/signup', signup,
-  { middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)] },
-)
+export function useAuthRoutes(router: H3) {
 
-router.post('/login', login,
-{middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)]}
-)
+  router.on("GET", '/test', (event) => {
+  event.res.status = 200
+  return {ok: true, date: new Date().toISOString()}
+  })
 
-export default router
+  router.post('/signup', signup,
+    { middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)] },
+  )
+  
+  router.post('/login', login,
+  {middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)]}
+  )
+
+}
+
+export default useAuthRoutes
 

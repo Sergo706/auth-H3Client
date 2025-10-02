@@ -31,7 +31,7 @@ h2 { font-size: 20px; margin: 0 0 12px; }
   margin: 16px 0;
 }
 label { display: block; margin: 8px 0; }
-input {
+input:not([type='checkbox']):not([type='radio']) {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #374151;
@@ -39,6 +39,14 @@ input {
   background: #0b1220;
   color: var(--fg);
 }
+
+input[type='checkbox'], input[type='radio'] { 
+  width: auto; padding: 0;
+  margin-right: 8px;
+  accent-color: var(--accent);
+  vertical-align: middle; 
+}
+
 .row { display: flex; align-items: center; gap: 12px; }
 button {
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
