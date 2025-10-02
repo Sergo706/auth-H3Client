@@ -9,35 +9,42 @@ import { defineHandler, H3 } from "h3";
 import { limitBytes } from "../middleware/limitBytes.js";
 
 
-const router = new H3();
 
 const noStore = defineHandler((event) => {
   event.res.headers.set('Cache-Control', 'no-store')
 })
 
-router
+export function magicLinksRouter(router: H3) {
+    router
 
-.get("/auth/verify-mfa/:visitor", verifyLink,
-    {middleware: [noStore, csrfToken]}
-)
-.post('/auth/verify-mfa/:visitor', sendCode, 
-    {middleware: [verifyLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
-);
-
-
-router.post('/auth/password-reset',initPasswordReset,
-    {middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)]}
-)
+    .get("/auth/verify-mfa/:visitor", verifyLink,
+        {middleware: [noStore, csrfToken]}
+    )
+    .post('/auth/verify-mfa/:visitor', sendCode, 
+        {middleware: [verifyLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
+    );
 
 
-router
+    router.post('/auth/password-reset',initPasswordReset,
+        {middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)]}
+    )
 
-.get("/auth/reset-password/:visitor", verifyLink, 
-    {middleware: [noStore, csrfToken]}
-)
 
-.post("/auth/reset-password/:visitor", sendNewPassword,
-    {middleware: [verifyLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
-)
+    router
+    
+    .get("/auth/reset-password/:visitor", verifyLink, 
+        {middleware: [noStore, csrfToken]}
+    )
+    
+    .post("/auth/reset-password/:visitor", sendNewPassword,
+        {middleware: [verifyLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
+    )
 
-export default router; 
+}
+
+
+
+
+
+
+export default magicLinksRouter; 

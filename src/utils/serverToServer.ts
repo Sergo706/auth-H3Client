@@ -5,20 +5,32 @@ import { fetch } from 'undici'
 import { getLogger } from './logger.js'
 import type { H3Event } from 'h3'
 import { getConfiguration } from '../config/config.js' 
-
+import { getBaseUrl } from './buildBaseUrl.js'
 
 type Cookie = { label: string; value: any };
 type Cookies = Cookie | Cookie[];
 
-export async function sendToServer<T>(keepAlive: boolean, endpoint: string, method: string, event: H3Event, body: boolean, cookies?: Cookies, data?: object) {
+export async function sendToServer<T>(keepAlive: boolean, endpoint: string, method: string, event: H3Event, body: boolean, cookies?: Cookies, data?: object, token?: string) {
     const config = getConfiguration()
     const agent = getAuthAgent(keepAlive)
     const logger = getLogger()
-     const serverIP = config.server.auth_location.serverOrDNS;
-     const API_URL = `${config.server.ssl.enableSSL ? 'https://' : 'http://'}${serverIP}`;
+    const url = getBaseUrl(config)
+    const targetURL = new URL(endpoint, url);
 
     let identifiers: string | undefined;
-    const log = logger.child({service: 'utils', type: `BFF TO API`, cookies: cookies, Endpoint: endpoint, Method: method, body: body, data: data})
+
+    const log = logger.child({
+      service: 'utils',
+      type: `BFF TO API`,
+      cookies: cookies,
+      Endpoint: endpoint,
+      Method: method,
+      body: body,
+      data: data,
+      targetURL: targetURL.href,
+      protocol: targetURL.protocol,
+      host: targetURL.host,
+    })
     log.info(`Mapping cookies and headers...`)
     
     if (cookies) { 
@@ -36,28 +48,34 @@ export async function sendToServer<T>(keepAlive: boolean, endpoint: string, meth
     ...authHeaders,
     ...clientHeaders(event),
     Cookie: identifiers,
-    'authorization': `Bearer ${endpoint}`,
+    'authorization': `Bearer ${token}`,
   };
 
     if (body) {
     headers['Content-Type'] = 'application/json';
   }
 
-  log.info(`Mapped. sending Request`)
-  const signal =  AbortSignal.timeout(3000)
+  log.info(`Mapped. About to fetch`)
+  const signal = AbortSignal.timeout(3000)
 try { 
-   const response = await fetch(`${API_URL}${endpoint}`, {
+   const response = await fetch(targetURL, {
          method: method,
          body: body ? JSON.stringify(data) : undefined,
          headers: headers,
          dispatcher: agent,
          signal
     });
-     log.info({code: response.status, data: response}, `Request succeeded.`)
+
+    if (!response.ok || response.status >= 399) {
+      log.error({code: response.status, data: await response.json()}, `Request failed.`)
+      return;
+    }
+
+      log.info({code: response.status, data: response}, `Request succeeded.`)
       return response;
     } catch(err) {
       log.fatal({ err }, `Request failed.`)
-      return
+      return;
     }
     
 }

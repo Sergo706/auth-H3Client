@@ -7,7 +7,7 @@ export default defineHandler(async (event) => {
 const {server} = getConfiguration()
 const log = getLogger().child({service: 'auth', type: 'dataAccess'});
 
-    const token = event.context.accessToken;
+    const token = event.context.accessToken as string;
 
     const cookies = [{
         label: 'session',
@@ -19,7 +19,7 @@ const log = getLogger().child({service: 'auth', type: 'dataAccess'});
  }
 ]
 
-    const response = await sendToServer(false, '/secret/data', 'GET', event, false, cookies)
+    const response = await sendToServer(false, '/secret/data', 'GET', event, false, cookies, {}, token)
     
     if (!response) return;
 
@@ -46,8 +46,8 @@ const log = getLogger().child({service: 'auth', type: 'dataAccess'});
     return {
         Authorized: true,
         when: new Date().toISOString(),
-        content: '<h1> Yay! your got an account! </h1>'
+        content: '<h1> Yay! your got an account! </h1>', 
+        server: json
     }
 
-    return;
 })

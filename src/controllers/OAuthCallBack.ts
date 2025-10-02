@@ -1,6 +1,6 @@
 import { getLogger } from '../utils/logger.js';
 import { getConfiguration } from "../config/config.js";
-import { defineHandler, deleteCookie, getCookie, getRequestIP, getValidatedQuery, redirect } from "h3";
+import { defineHandler, deleteCookie, getCookie, getRequestIP, getValidatedQuery, H3Event, redirect } from "h3";
 import throwError from "../middleware/error.js";
 import { discoverOidc } from '../utils/discoverOidc.js';
 import { verifyOAuthToken } from '../utils/verifyOAuthTokens.js';
@@ -11,7 +11,8 @@ import { query } from '../types/OAuthQuery.js';
 import { atHashCheck } from '../utils/atHash.js';
 import type { OidcIdTokenPayload } from '../types/oidc.js'
 
-export default defineHandler(async (event) => {
+
+export async function OAuthCallback(event: H3Event) {
 const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-callback', reqId: event.context.rid, reqIp: getRequestIP(event)});
 const { OAuthProviders, domain } = getConfiguration()   
 const provided = event.context.params?.provider;
@@ -230,4 +231,4 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
   } catch(err) {
     throwError(log,event,'AUTH_SERVER_ERROR',500,'SERVER_ERROR','',`${err},Unexpected error`)
   }
-})
+}
