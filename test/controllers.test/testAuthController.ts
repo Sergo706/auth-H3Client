@@ -39,9 +39,6 @@ const log = getLogger().child({service: 'auth', type: 'dataAccess'});
     
     // Add also for 202
     // Add rotation for canary id, it triggers mfa every time it expired.
-    // RBAC
-    // DB Adapters
-    // OAuth Deep intergration
     event.res.status = 200
     return {
         Authorized: true,

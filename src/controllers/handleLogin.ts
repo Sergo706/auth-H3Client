@@ -1,7 +1,6 @@
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from '../utils/logger.js';
-import { banIp } from "../utils/banIp.js";
 import { assertMethod, defineHandler, getRequestIP, readBody } from "h3";
 import { getConfiguration } from "../config/config.js";
 import throwError from "../middleware/error.js";

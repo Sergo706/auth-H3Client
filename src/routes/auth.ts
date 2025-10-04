@@ -2,7 +2,7 @@ import signup from "../controllers/handleSignUps.js";
 import { contentType } from "../middleware/validateContentType.js";
 import checkCsrf from "../middleware/verifyCsrf.js"
 import  login  from "../controllers/handleLogin.js";
-
+import { handleLogout } from "../controllers/handleLogout.js";
 import { H3 } from "h3";
 import { limitBytes } from "../middleware/limitBytes.js";
 
@@ -19,6 +19,10 @@ export function useAuthRoutes(router: H3) {
     { middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)] },
   )
   
+  router.post('/logout', handleLogout, 
+    {middleware: [checkCsrf, limitBytes(0)]}
+  )
+
   router.post('/login', login,
   {middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)]}
   )

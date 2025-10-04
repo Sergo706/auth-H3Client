@@ -16,6 +16,11 @@ export function limitBytes(maxBytes: number): EventHandler {
      const rawBody = await event.req.arrayBuffer()
      const bytes = rawBody.byteLength
 
+      if (bytes === 0) { 
+        event.context.body = undefined; 
+        return; 
+      }
+
       if (bytes > maxBytes) {
         throwError(log,event,'INVALID_CONTENT_TYPE',403, 'Forbidden', '', `exceeded allowed posts request bytes. Allowed: ${maxBytes}, Received: ${bytes}. Request has been dropped`)
       }

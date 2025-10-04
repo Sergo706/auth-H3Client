@@ -1,4 +1,4 @@
-import type { Configuration } from "../src/types/configSchema.js";
+import type { Configuration } from "../../src/types/configSchema.js";
 
 export const config: Configuration = {
     domain: 'localhost',

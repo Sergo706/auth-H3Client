@@ -1,7 +1,7 @@
 import { H3, serve } from 'h3'
 import  csrfToken  from '../src/middleware/csrf.js';
 import { configuration } from '../src/config/config.js'
-import { config } from './config.test.js'
+import { config } from './setup/config.js'
 import {validator} from '../src/middleware/visitorValid.js'
 import isValidIP from '../src/middleware/isValidIP.js'
 import {httpLogger} from '../src/middleware/httpLogger.js'
