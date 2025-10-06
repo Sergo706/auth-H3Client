@@ -11,7 +11,7 @@ const log = getLogger().child({service: 'auth', type: 'dataAccess'});
 
     const cookies = [{
         label: 'session',
-        value: getCookie(event, 'session')
+        value: event.context.session
     },
  {
         label: 'canary_id',

@@ -6,11 +6,12 @@ import { getLogger } from './logger.js'
 import type { H3Event } from 'h3'
 import { getConfiguration } from '../config/config.js' 
 import { getBaseUrl } from './buildBaseUrl.js'
-
+import { parseResponseContentType } from './checkResponseType.js'
+import type { Response } from 'undici'
 type Cookie = { label: string; value: any };
 type Cookies = Cookie | Cookie[];
 
-export async function sendToServer<T>(keepAlive: boolean, endpoint: string, method: string, event: H3Event, body: boolean, cookies?: Cookies, data?: object, token?: string) {
+export async function sendToServer<T>(keepAlive: boolean, endpoint: string, method: string, event: H3Event, body: boolean, cookies?: Cookies, data?: object, token?: string): Promise<Response|void> {
     const config = getConfiguration()
     const agent = getAuthAgent(keepAlive)
     const logger = getLogger()
@@ -48,12 +49,11 @@ export async function sendToServer<T>(keepAlive: boolean, endpoint: string, meth
     ...authHeaders,
     ...clientHeaders(event),
     Cookie: identifiers,
-    'authorization': `Bearer ${token}`,
+    Accept: 'application/json'
   };
-
-    if (body) {
-    headers['Content-Type'] = 'application/json';
-  }
+  
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (body) headers['Content-Type'] = 'application/json';
 
   log.info(`Mapped. About to fetch`)
   const signal = AbortSignal.timeout(3000)
@@ -67,8 +67,9 @@ try {
     });
 
     if (!response.ok || response.status >= 399) {
-      log.error({code: response.status, data: await response.json()}, `Request failed.`)
-      return;
+      const cType = await parseResponseContentType(log, response)
+      log.error({code: response.status, data: response}, `Request failed.`)
+      return response;
     }
 
       log.info({code: response.status, data: response}, `Request succeeded.`)
@@ -77,5 +78,4 @@ try {
       log.fatal({ err }, `Request failed.`)
       return;
     }
-    
 }
