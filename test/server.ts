@@ -6,9 +6,9 @@ import {validator} from '../src/middleware/visitorValid.js'
 import isValidIP from '../src/middleware/isValidIP.js'
 import {httpLogger} from '../src/middleware/httpLogger.js'
 import {useAuthRoutes} from '../src/routes/auth.js';
-import {useStaticRoutes} from './controllers.test/static.js';
+import {useStaticRoutes} from './smoke/controllers.test/static.js';
 import {magicLinksRouter} from '../src/routes/magicLinks.js';
-import {testApp} from './controllers.test/test.js';
+import {testApp} from './smoke/controllers.test/test.js';
 import { OAuthCallback } from '../src/controllers/OAuthCallBack.js';
 import { OAuthRedirect } from '../src/controllers/OAuthRedirect.js';
 

@@ -1,4 +1,4 @@
-import { defineHandler, H3, serveStatic } from 'h3'
+import { H3, serveStatic } from 'h3'
 
 import path from 'node:path'
 import { readFile, stat } from 'node:fs/promises'; 
