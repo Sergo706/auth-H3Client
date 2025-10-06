@@ -3,7 +3,7 @@ import { getLogger } from "../utils/logger.js";
 import { sendToServer } from "../utils/serverToServer.js";
 import throwError from "../middleware/error.js";
 import { getConfiguration } from "../config/config.js";
-
+import { cache } from "../utils/getAuthorizedMetaData.js";
 
 export async function handleLogout(event: H3Event) {
     assertMethod(event, "POST")
@@ -66,6 +66,7 @@ export async function handleLogout(event: H3Event) {
         deleteCookie(event, 'a-iat', { path: '/', domain });
         deleteCookie(event, 'session', { path: '/', domain });
         deleteCookie(event, 'iat', { path: '/', domain });
+        if (cache.get(token)) cache.del(token);
         log.info(`User logged out successfully`);
 
         return {

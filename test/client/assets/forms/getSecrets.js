@@ -4,13 +4,18 @@ export async function getSecretData() {
     const btn = document.getElementById("get-secret");
     const panel = document.getElementById("secret-output")
     const status = document.getElementById("secret-status")
+    const btn2 = document.getElementById("get-secret2");
 
-    btn.addEventListener("click", async () => {
+
+
+    const request = async (useFirst) => {
         status.textContent = "Pending";
         status.style.color = "orange";
+        const path = useFirst ? "/secret/data" : "/secret/data2";
+
 
         try {
-            const res = await fetch('/secret/data', {
+            const res = await fetch(path, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,5 +36,8 @@ export async function getSecretData() {
             status.style.color = "red";
             throw err;
         }
-    })
+    }
+    btn.addEventListener("click", () => request(true));
+    btn2.addEventListener("click", () => request(false));
 }
+

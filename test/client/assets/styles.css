@@ -66,3 +66,15 @@ pre {
   border-radius: 6px;
 }
 
+.secret-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.secret-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+#secret-status { margin-top: 8px; display: inline-block; }

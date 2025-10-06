@@ -1,4 +1,4 @@
-import { defineHandler, EventHandler, H3Event, HTTPError } from "h3";
+import { H3Event, HTTPError } from "h3";
 import pino from "pino";
 
 type AppCode = 
