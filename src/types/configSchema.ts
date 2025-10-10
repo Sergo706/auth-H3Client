@@ -1,5 +1,9 @@
 import * as z from "zod";
 
+type EmailCB = (accessToken: string) => Promise<string>;
+type ExtraCB = (accessToken: string) => Promise<Record<string, unknown>>;
+const emailCB = z.custom<EmailCB>((v) => typeof v === "function");
+const extraCB = z.custom<ExtraCB>((v) => typeof v === "function");
 
 export const OAuthProviders = z.array(z.discriminatedUnion("kind", [
    z.object({
@@ -22,6 +26,8 @@ export const OAuthProviders = z.array(z.discriminatedUnion("kind", [
       authorizationEndpoint: z.url(), 
       tokenEndpoint: z.url(),          
       userInfoEndpoint: z.url(), 
+      emailCallBack: emailCB.optional(),
+      extraUserInfoCallBacks: z.array(extraCB).optional(), 
       clientId: z.string(),
       clientSecret: z.string(),
       tokenAuthMethod: z.enum(["client_secret_basic","client_secret_post"]).optional(),

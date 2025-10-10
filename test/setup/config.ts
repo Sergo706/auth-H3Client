@@ -1,5 +1,5 @@
 import type { Configuration } from "../../src/types/configSchema.js";
-
+import { githubEmailCallBack } from "./github.callback.js";
 export const config: Configuration = {
     domain: 'localhost',
     server: {
@@ -18,7 +18,39 @@ export const config: Configuration = {
     },
     cryptoCookiesSecret: `strong_random_cryptography_generated_key`,
     },
-    
+    OAuthProviders: [{
+        kind: 'oidc',
+        name: 'google',
+        issuer: 'https://accounts.google.com',
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        defaultScopes: ["openid","email","profile"], 
+        extraAuthParams: {
+            access_type: "offline",
+            prompt: "consent",
+            include_granted_scopes: "true"
+        },
+        redirectUri: "http://localhost:3000/oauth/callback/google",
+        supportPKCE: true,
+        redirectUrlOnSuccess: "http://localhost:3000/secret/data",
+        redirectUrlOnError: 'http://localhost:3000/'
+    },
+    {
+       kind: 'oauth',
+       name: 'github',
+       authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+       tokenEndpoint: 'https://github.com/login/oauth/access_token',
+       userInfoEndpoint: 'https://api.github.com/user',
+       emailCallBack: githubEmailCallBack,
+       clientId: process.env.GITHUB_CLIENT_ID!,
+       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+       redirectUri: 'http://localhost:3000/oauth/callback/github',
+       defaultScopes: ['read:user', 'user:email'],
+       supportPKCE: true,
+       redirectUrlOnSuccess: "http://localhost:3000/secret/data",
+       redirectUrlOnError: 'http://localhost:3000/'
+    }
+],
     telegram: {
         enableTelegramLogger: false,
     },

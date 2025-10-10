@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node --esm test/server.ts",
-    "build": "tsc && cp -r ./test/client ./dist/test/client",
+    "build": "tsc && cp -r ./test/smoke/client ./dist/test/smoke/client",
+    "logs:http": "tail -n 0 -f ./dist/logs/http.log | jq .",
+    "logs:app": "tail -n 0 -f ./dist/logs/info.log | jq .",
     "start": "node dist/test/server.js"
   },
   "keywords": [],

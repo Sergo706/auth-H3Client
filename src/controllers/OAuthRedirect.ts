@@ -1,4 +1,4 @@
-import { defineHandler, getRequestIP, H3Event, redirect } from "h3";
+import { getRequestIP, H3Event, redirect } from "h3";
 import crypto from 'crypto';
 import { getLogger } from '../utils/logger.js';
 import { getConfiguration } from "../config/config.js";
@@ -21,8 +21,10 @@ const provided = event.context.params?.provider;
 const match = OAuthProviders.find(pro => pro.name === provided);
 
 if (!match) {
- throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Error searching for this provider, make sure the route === provider name")
+   throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Error searching for this provider, make sure the route === provider name")
 }
+
+   log.info(`Entered OAuth flow for ${match.name}`)
 
   const statePayload = JSON.stringify({ p: match.name, r: crypto.randomBytes(32).toString('hex') });
   const state = createSignedCookie(statePayload, 1000 * 60 * 3, `auth-oauth.${match.name}`)
