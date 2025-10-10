@@ -1,23 +1,20 @@
 import { getLogger } from '../utils/logger.js';
 import { getConfiguration } from "../config/config.js";
-import { defineHandler, deleteCookie, getCookie, getRequestIP, getValidatedQuery, H3Event, redirect } from "h3";
-import throwError from "../middleware/error.js";
+import { deleteCookie, getCookie, getRequestIP, getValidatedQuery, H3Event, redirect } from "h3";
+import throwError from "./error.js";
 import { discoverOidc } from '../utils/discoverOidc.js';
 import { verifyOAuthToken } from '../utils/verifyOAuthTokens.js';
-import { sendToServer } from '../utils/serverToServer.js';
-import { makeCookie } from '../utils/cookieGenerator.js';
 import { verifySignedCookie } from '../utils/cryptoCookies.js';
 import { query } from '../types/OAuthQuery.js';
 import { atHashCheck } from '../utils/atHash.js';
 import type { OidcIdTokenPayload } from '../types/oidc.js'
 
 
-export async function OAuthCallback(event: H3Event) {
-const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-callback', reqId: event.context.rid, reqIp: getRequestIP(event)});
-const { OAuthProviders, domain } = getConfiguration()   
+export async function OAuthTokensValidations(event: H3Event) {
+const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-callback-middleware', reqId: event.context.rid, reqIp: getRequestIP(event)});
+const { OAuthProviders } = getConfiguration()   
 const provided = event.context.params?.provider;
 
-log.info('Entered OAuth Callback.')
 
  if (!OAuthProviders || !provided) {
     throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Entered invalid callback uri")
@@ -29,6 +26,7 @@ log.info('Entered OAuth Callback.')
     throwError(log,event,'NOT_FOUND',404,'NOT_FOUND',"This page doesn't exists", "Error searching for this provider, make sure the route === provider name")
   }
 
+log.info(`Entered OAuth Callback. for ${match.name}`)
 const clearCookies = () => {
     deleteCookie(event,`pkce_v${match.name}`)
     deleteCookie(event,`nonce${match.name}`)
@@ -139,6 +137,7 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
 
       if (payload.at_hash && typeof tokens.access_token === 'string' && typeof payload.at_hash === 'string') {
            const valid = atHashCheck(payload.at_hash, tokens.access_token, tokens.id_token)
+
            if (!valid) 
               throwError(log, event, 'INVALID_CREDENTIALS', 400, 'Bad request', '', 'at_hash mismatch');
       }
@@ -154,10 +153,10 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
        if (userinfo.ok && userinfoJson.sub !== payload.sub) {
           throwError(log,event,'INVALID_CREDENTIALS',400,'Bad request','', 'userinfo.sub does not match id_token.sub');
         }
-
+        
         user = { ...userinfoJson, sub: payload.sub, email: payload.email, name: payload.name, picture: payload.picture };
       } else {
-        user = { sub: payload.sub, email: payload.email, name: payload.name, picture: payload.picture };
+        user = { ...payload, sub: payload.sub, email: payload.email, name: payload.name, picture: payload.picture };
       }
     } else if (match.kind === "oauth") {
 
@@ -179,56 +178,7 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
         throwError(log,event,'SERVER_ERROR',500,'Server error','', 'Unexpected error')
     }
 
-    const canary_id = getCookie(event, 'canary_id'); 
-    const cookies = [
-        {
-      label: 'canary_id',
-      value: canary_id
-    }
-]
-
-     log.info(`Token verified, and OAuth flow completed, sending data to the server...`);
-        try {
-        const sendData = await sendToServer(false, `/auth/OAuth/${provided}`, 'POST', event, true, cookies, { user });
-        
-        if (!sendData) {
-        throwError(log,event,'SERVER_ERROR', 500, 'Server Error', 'Server error please try again later', 'Api Call Failed')
-      };
-    
-     const results = await sendData.json() as any;
-
-    if (sendData.status === 201 || sendData.status === 200) {
-        log.info(`Verification succeeded! Redirecting user...`);
-
-        const cookies = sendData.headers.getSetCookie();
-        const accessToken = results.accessToken;    
-        const accessIat = results.accessIat;    
-
-        cookies.forEach(line => event.res.headers.append('Set-Cookie', line));
-        if (accessToken) {
-            makeCookie(event, '__Secure-a', accessToken, {
-                httpOnly: true,
-                sameSite: 'strict',
-                secure:   true,
-                path: '/',
-                domain: domain,
-                maxAge: 16 * 60
-            })
-            makeCookie(event, 'a-iat', accessIat, {
-                httpOnly: true,
-                sameSite: 'strict',
-                secure:   true,
-                path: '/',
-                domain: domain,
-                maxAge: 16 * 60
-            })
-        }   
-       
-            log.info({server: results},`user redirected successfully to his account.`);
-           return redirect(event, match.redirectUrlOnSuccess);
-    } 
-
-  } catch(err) {
-    throwError(log,event,'AUTH_SERVER_ERROR',500,'SERVER_ERROR','',`${err},Unexpected error`)
-  }
+  event.context.provider = match.name;
+  event.context.userData = user;
+  event.context.accessToken = tokens.access_token;
 }

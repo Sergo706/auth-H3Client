@@ -15,7 +15,8 @@ export const validator = async (event: H3Event): Promise<any> => {
 
     const isPageView =
     !url.pathname.match(/\.(css|js|png|jpe?g|svg|ico|woff2?|ttf|map|webp|json)$/i);
-    if (!isPageView) return;
+    const isOAuth = url.pathname.startsWith("/oauth/");
+    if (!isPageView || isOAuth) return;
     
     const COOKIE_NAME = "__Host-dr_i_n";
     const canary = getCookie(event, 'canary_id')

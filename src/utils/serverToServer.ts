@@ -67,7 +67,6 @@ try {
     });
 
     if (!response.ok || response.status >= 399) {
-      const cType = await parseResponseContentType(log, response)
       log.error({code: response.status, data: response}, `Request failed.`)
       return response;
     }
