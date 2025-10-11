@@ -171,7 +171,8 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
         }});
 
       if (!info.ok) {
-        throwError(log,event,'MISSING_BODY',500,'Server error','', 'failed to get user info')
+         const err = await info.json();
+        throwError(log,event,'MISSING_BODY',500,'Server error','', `failed to get user info. Provider Response: ${JSON.stringify(err)}`)
       }
       user = await info.json();
     } else {

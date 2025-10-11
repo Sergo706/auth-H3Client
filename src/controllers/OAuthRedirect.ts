@@ -71,13 +71,7 @@ if (match.supportPKCE) {
         url.searchParams.set("scope", (match.defaultScopes ?? ["openid","email","profile"]).join(" "));
         url.searchParams.set("state", state);
         url.searchParams.set("nonce", nonce);
-        url.searchParams.set("code_challenge", challenge);
-        url.searchParams.set("code_challenge_method", "S256"); 
 
-        if (match.extraAuthParams) {
-            log.info('Setting extra params')
-            for (const [key,value] of Object.entries(match.extraAuthParams)) url.searchParams.set(key, value);
-        }
         } else {
             url = new URL(match.authorizationEndpoint);
             url.searchParams.set("client_id", match.clientId);
@@ -85,14 +79,19 @@ if (match.supportPKCE) {
             url.searchParams.set("response_type", "code");
             url.searchParams.set("scope", (match.defaultScopes ?? []).join(" "));
             url.searchParams.set("state", state);
+         }
 
-             if (match.supportPKCE) {
-                url.searchParams.set("code_challenge", challenge);
-                url.searchParams.set("code_challenge_method", "S256");
-              }
+         if (match.supportPKCE) {
+            url.searchParams.set("code_challenge", challenge);
+            url.searchParams.set("code_challenge_method", "S256");
+          }
 
-            }
-            if (!url) {
+        if (match.extraAuthParams) {
+            log.info('Setting extra params')
+            for (const [key,value] of Object.entries(match.extraAuthParams)) url.searchParams.set(key, value);
+        }
+
+         if (!url) {
                 throwError(log,event,'SERVER_ERROR',500,'SERVER_ERROR','','Error constructing the uri please check your configuration and try again.')
             }
           return redirect(event, url.toString());

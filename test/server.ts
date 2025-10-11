@@ -29,4 +29,8 @@ testApp(app)
 useStaticRoutes(app)
 useOAuthRoutes(app)
 
-serve(app, { port: Number(process.env.PORT || 3000), hostname: process.env.HOST || '0.0.0.0' })
+serve(app, { 
+  port: Number(process.env.PORT || 3000), 
+  hostname: process.env.HOST || '0.0.0.0',
+  tls: { cert: "./share-ad1ae22.com+2.pem", key: "./share-ad1ae22.com+2-key.pem" }, 
+})
