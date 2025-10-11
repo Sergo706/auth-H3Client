@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Auth-H3Client Test</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Auth-H3Client Test Page</h1>
+      <section class="card">
+        <h2>CSRF Token</h2>
+        <div class="row csrf-row">
+          <button id="get-csrf">Get CSRF Cookie</button>
+          <span id="csrf-status" class="muted">Not requested</span>
+        </div>
+        <pre id="csrf-output"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Login (Demo)</h2>
+        <form id="login-form">
+          <label>
+            Email
+            <input type="email" name="email" id="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            Password
+            <input type="password" name="password" id="password" placeholder="••••••••" required />
+          </label>
+           <label>
+            Remember user?
+            <input type="checkbox" name="rememberUser" id="checkbox" required />
+          </label>
+          <div class="row">
+            <button type="submit" id="login-btn">Login</button>
+            <span id="login-status" class="muted">Idle</span>
+          </div>
+          <pre id="login-data"></pre>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Signup (Demo)</h2>
+        <form id="signup-form">
+          <label>
+            Name
+            <input type="name" id="su-name" placeholder="bob" name="Name" required />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" id="su-email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            Password
+            <input type="password" name="password" id="su-password" placeholder="••••••••" required />
+          </label>
+          <label>
+            Confirm Password
+            <input type="password" id="su-password2" name="confirmedPassword" placeholder="••••••••" required />
+          </label>
+          <label>
+            Remember user?
+            <input type="checkbox" name="rememberUser" id="rememberUser" required />
+          </label>
+            <label>
+            Terms Consent
+            <input type="checkbox" id="termsConsent" name="termsConsent" required />
+          </label>
+          <div class="row">
+            <button type="submit" id="signup-btn">Create Account</button>
+            <span id="signup-status" class="muted">Idle</span>
+          </div>
+            <pre id="signup-data"></pre>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Fetch Secret (Demo)</h2>
+        <div class="secret-controls">
+          <div class="secret-group">
+            <button id="get-secret">GET /secret/data</button>
+            <span class="muted">Default path</span>
+          </div>
+          <div class="secret-group">
+            <span class="muted">Try both token rotation path</span>
+            <button id="get-secret2">GET /secret/data2</button>
+          </div>
+        </div>
+        <span id="secret-status" class="muted">Idle</span>
+        <pre id="secret-output"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Logout (Demo)</h2>
+        <div class="row">
+          <button id="logout">Logout</button>
+          <span id="logout-status" class="muted">Idle</span>
+        </div>
+        <pre id="logout-output"></pre>
+      </section>
+
+      
+      <section class="card">
+        <h2>OAuth (Demo)</h2>
+        <label>
+          Base path to OAuth redirect route
+          <input id="oauth-base" placeholder="/oauth/" value="/oauth/" />
+        </label>
+        <div class="row">
+          <button id="oauth-google">Continue with Google</button>
+          <button id="oauth-github">Continue with GitHub</button>
+          <button id="oauth-x">Continue with X</button>
+          <button id="oauth-linkedin">Continue with Linkedin</button>
+        </div>
+        <p class="muted">Note: configure or implement the matching routes.</p>
+      </section>
+
+    </main>
+
+    <script type="module" src="/assets/app.js"></script>
+  </body>
+  </html>

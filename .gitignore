@@ -137,6 +137,5 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-index.html
 share-ad1ae22.com+2-key.pem
 share-ad1ae22.com+2.pem
