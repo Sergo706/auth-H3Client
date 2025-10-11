@@ -13,7 +13,8 @@ export async function discoverOidc(issuer: string, log: pino.Logger): Promise<an
     if (exists) return exists;
 
      try {
-         const res = await fetch(new URL("/.well-known/openid-configuration", issuer))   
+         const discoveryUrl = new URL(".well-known/openid-configuration", issuer.endsWith("/") ? issuer : issuer + "/").toString();
+         const res = await fetch(discoveryUrl) 
          const json = await res.json()
 
          if (!res.ok || res.status !== 200) {

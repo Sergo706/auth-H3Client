@@ -23,5 +23,8 @@
     "ts-node": "^10.9.2",
     "undici": "^7.16.0",
     "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3"
   }
 }

@@ -6,6 +6,7 @@ import { sendToServer } from "../utils/serverToServer.js";
 import { parseResponseContentType } from "../utils/checkResponseType.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { safeObjectMerge } from "../utils/safeMerge.js";
+import { findStringsInObject } from "../utils/findObjectValues.js";
 
 
 
@@ -76,6 +77,37 @@ export async function OAuthCallback(event: H3Event) {
       }
    }
 
+   if (!user.email && match.kind === 'oauth') {
+      const data = user as any;
+      const regex = /^(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i;
+      let email: string | null = null;
+
+      for (const [key,value] of Object.entries(data)) {
+       const found = key.toLowerCase().includes('email');
+       const valueMatch = typeof value === 'string' && regex.test(value.trim());
+
+       if (found && valueMatch) {
+          email = value.trim();
+          break;
+        }
+      }
+
+    if (!email) {
+      email = findStringsInObject(data, undefined, {
+        keyToSearch: 'email',
+        value: regex
+      });
+      if (email) log.info("Email found");
+    }
+
+    if (email) {
+      user.email = email;
+    } else {
+      throwError(log,event,'MISSING_BODY',400,'Missing Email','',`${contexts.provider}, missing an email   address, and the callback couldn't find one. 
+          Consider providing a callback that return an email address.
+      `)   
+      }
+   }
 
 const canary_id = getCookie(event, 'canary_id'); 
 const cookies = [
@@ -84,9 +116,11 @@ const cookies = [
       value: canary_id
     }
 ]
+const { data, ...restUser } = user as any;
+const normalized = data ? { ...restUser, ...data } : restUser;
 
  try {
-    const sendData = await sendToServer(false, `/auth/OAuth/${contexts.provider}`, 'POST', event, true, cookies, user);
+    const sendData = await sendToServer(false, `/auth/OAuth/${contexts.provider}`, 'POST', event, true, cookies, normalized);
     if (!sendData) {
             throwError(log,event,'SERVER_ERROR', 500, 'Server Error', 'Server error please try again later', 'Api Call Failed')
           };

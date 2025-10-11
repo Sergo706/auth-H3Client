@@ -1,7 +1,10 @@
 import type { Configuration } from "../../src/types/configSchema.js";
 import { githubEmailCallBack } from "./github.callback.js";
+import dotenv from 'dotenv'
+dotenv.config({ debug: true })
+
 export const config: Configuration = {
-    domain: 'localhost',
+    domain: 'share-ad1ae22.com',
     server: {
         auth_location: {
             serverOrDNS: "127.0.0.1",
@@ -30,10 +33,10 @@ export const config: Configuration = {
             prompt: "consent",
             include_granted_scopes: "true"
         },
-        redirectUri: "http://localhost:3000/oauth/callback/google",
+        redirectUri: "https://share-ad1ae22.com:3000/oauth/callback/google",
         supportPKCE: true,
-        redirectUrlOnSuccess: "http://localhost:3000/secret/data",
-        redirectUrlOnError: 'http://localhost:3000/'
+        redirectUrlOnSuccess: "https://share-ad1ae22.com:3000/secret/data",
+        redirectUrlOnError: 'https://share-ad1ae22.com:3000/'
     },
     {
        kind: 'oauth',
@@ -44,11 +47,40 @@ export const config: Configuration = {
        emailCallBack: githubEmailCallBack,
        clientId: process.env.GITHUB_CLIENT_ID!,
        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-       redirectUri: 'http://localhost:3000/oauth/callback/github',
+       redirectUri: 'https://share-ad1ae22.com:3000/oauth/callback/github',
        defaultScopes: ['read:user', 'user:email'],
        supportPKCE: true,
-       redirectUrlOnSuccess: "http://localhost:3000/secret/data",
-       redirectUrlOnError: 'http://localhost:3000/'
+       redirectUrlOnSuccess: "https://share-ad1ae22.com:3000/secret/data",
+       redirectUrlOnError: 'https://share-ad1ae22.com:3000/'
+    },
+    {
+      kind: 'oauth',
+      name: 'x',
+      authorizationEndpoint: 'https://x.com/i/oauth2/authorize',
+      tokenEndpoint: 'https://api.x.com/2/oauth2/token',
+      userInfoEndpoint: 'https://api.x.com/2/users/me?user.fields=id,is_identity_verified,location,name,verified,confirmed_email,created_at,profile_image_url', 
+      clientId: process.env.X_CLIENT_ID!,
+      clientSecret: process.env.X_CLIENT_SECRET!,
+      redirectUri: 'https://share-ad1ae22.com:3000/oauth/callback/x',
+      defaultScopes: ["users.email", "users.read", "tweet.read"],
+      supportPKCE: true,
+      redirectUrlOnSuccess: "https://share-ad1ae22.com:3000/secret/data",
+      redirectUrlOnError: 'https://share-ad1ae22.com:3000/'
+    },
+    {
+      kind: 'oauth',
+      name: 'linkedin',
+      authorizationEndpoint: 'https://www.linkedin.com/oauth/v2/authorization',
+      tokenEndpoint: 'https://www.linkedin.com/oauth/v2/accessToken',
+      userInfoEndpoint: 'https://api.linkedin.com/v2/userinfo',
+      clientId: process.env.LINKEDIN_CLIENT_ID!,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,  
+      defaultScopes: ['openid', 'profile', 'email'],
+      tokenAuthMethod: 'client_secret_post',
+      redirectUri: "https://share-ad1ae22.com:3000/oauth/callback/linkedin",
+      supportPKCE: false,
+      redirectUrlOnSuccess: "https://share-ad1ae22.com:3000/secret/data",
+      redirectUrlOnError: 'https://share-ad1ae22.com:3000/'
     }
 ],
     telegram: {
