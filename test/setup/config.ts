@@ -4,7 +4,6 @@ import dotenv from 'dotenv'
 dotenv.config({ debug: true })
 
 export const config: Configuration = {
-    domain: 'share-ad1ae22.com',
     server: {
         auth_location: {
             serverOrDNS: "127.0.0.1",
@@ -21,6 +20,7 @@ export const config: Configuration = {
     },
     cryptoCookiesSecret: `strong_random_cryptography_generated_key`,
     },
+    onSuccessRedirect: 'https://share-ad1ae22.com:3000/secret/data',
     OAuthProviders: [{
         kind: 'oidc',
         name: 'google',

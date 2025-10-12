@@ -1,9 +1,12 @@
 import { makeCookie } from '../utils/cookieGenerator.js'
 import { sendToServer } from '../utils/serverToServer.js'
 import { getLogger } from '../utils/logger.js';
-import { getCookie, H3Event, HTTPError, parseCookies, setResponseStatus } from 'h3';
+import { getCookie, H3Event, HTTPError } from 'h3';
 import throwError from './error.js';
-import { getConfiguration } from '../config/config.js';
+import { parseResponseContentType } from '../utils/checkResponseType.js';
+import { getMetadata } from '../utils/getAuthorizedMetaData.js';
+import { cache } from "../utils/getAuthorizedMetaData.js";
+import { getOperationalConfig } from '../utils/getRemoteConfig.js';
 
 declare module 'h3' {
   interface Request {
@@ -12,82 +15,134 @@ declare module 'h3' {
 }
 
 export async function ensureAccessToken(event: H3Event) {
-  let token = getCookie(event, '__Secure-a');
-  const canary = getCookie(event, 'canary_id');
-  const accessIat = Number(getCookie(event, 'a-iat'));
-  const log = getLogger().child({service: 'auth', branch: `access_tokens`, reqID: event.context.rid })
-  const config = getConfiguration();
-  
-  const REFRESH_THRESHOLD = 5 * 60 * 1000;
-  const TTL_MS     = 1000 * 60 * 15; 
-  const expiresAt   = (accessIat + TTL_MS);
-  const msUntilExp  = expiresAt - Date.now();
+  const log = getLogger().child({service: 'auth', branch: `access_tokens_rotations`, reqID: event.context.rid })
+  const { domain, accessTokenTTL } = await getOperationalConfig(event)
 
-  if (!token || msUntilExp <= REFRESH_THRESHOLD) {
-    const refresh = getCookie(event, 'session');  
-    log.info('No access token found Generating a new one')
+  let currentToken = getCookie(event, '__Secure-a');
+  const canary = getCookie(event, 'canary_id');
+  const refresh = getCookie(event, 'session');  
 
   if (!refresh || !canary) {
     throwError(log, event, 'AUTH_REQUIRED', 401, 'Unauthorized','Re-authentication required', 'No refresh token is found Re-authentication required.');
    }
 
-   const cookies = [
-        {
-          label: `canary_id`,
-          value: canary
-        },
-        {
-          label: `session`,
-          value: refresh
-        },
-      ]
+ const rotate = async () => {
+    log.info('No access token found Generating a new token')
+     const cookies = [
+        {label: `canary_id`,  value: canary},
+        {label: `session`, value: refresh},
+      ]    
+
+       try {
+          log.info('Sending Request To api...')
+          const res = await sendToServer(false, '/auth/refresh-access', 'POST', event, false, cookies)
+            
+          if (!res) {
+            throwError(log, event, 'SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', 'Api Call Failed');
+          }
+          const json = await parseResponseContentType(log, res);
+
+        if (res.status === 429) {
+            log.warn(`User rate limited`);  
+            const retrySec = res.headers.get('Retry-After');
+
+            if (retrySec) {
+                event.res.headers.append('Retry-After', retrySec)
+                event.res.status = 429
+                return {error: `To many attempts, please try again later.`};
+            } 
+
+                event.res.status = 429
+                return {error: `To many attempts, please try again later.`};
+        };
+
+        if (res.status === 401) {
+          throwError(log, event, 'AUTH_REQUIRED', 401, 'Unauthorized','Re-authentication required', `Re-authentication required. \n ${json.message} \n ${json.error}`);
+        }
+
+        if (res.status === 202) {
+           event.res.status = 202;
+           event.res.statusText = "OK"; 
+           return {
+            text: 'MFA required',
+            message: json.message
+           }
+        }
+
+        if (res.status === 500 || !res.ok || res.status !== 200) {
+            throwError(log, event, 'AUTH_SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', 
+                `Api Call Failed \n ${json.error}`);
+        }
+
+        const newToken = json.accessToken as string;
+        const accessIat = json.accessIat as string;
+
+        if (!accessIat || !newToken) {
+          throwError(log, event, 'AUTH_SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', `New access token and related cookies ended up null`);
+        }
+
+      makeCookie(event, '__Secure-a', newToken, {
+          httpOnly: true,
+          sameSite: 'strict',
+          secure:   true,
+          path: '/',
+          domain: domain,
+          maxAge: accessTokenTTL
+      })
+      makeCookie(event, 'a-iat', accessIat, {
+          httpOnly: true,
+          sameSite: 'strict',
+          secure:   true,
+          path: '/',
+          domain: domain,
+          maxAge: accessTokenTTL
+      })
+
+        event.context.accessToken = newToken; 
+       } catch(err) {
+         if (err instanceof HTTPError) throw err;
+         throwError(log, event, 'SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', `Unexpected error type. ${err}`);
+       }
+    }
+
+  if (!currentToken) {
+        log.info('No access token; rotating both tokens');
+        return await rotate();
+   }
+
       try {
-    log.info('Sending Request To api...')
-    const resp = await sendToServer(false, '/auth/refresh-access', 'POST', event, false, cookies)
-        if (!resp) {
-        throwError(log, event, 'SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', 'Api Call Failed');
-    };
+           const meta = await getMetadata(log, false, currentToken, refresh, canary, event);
+           
+           if ("serverError" in meta && meta.serverError) {
+               log.info('Meta resolved with an error; rotating access token');
+               cache.del(currentToken);
+               return await rotate();
+           }
+   
+           if ("mfa" in meta && meta.mfa) {
+              event.res.status = 202;
+              event.res.statusText = "OK"; 
+              return {
+               text: 'MFA required'
+              }
+           }
+   
+           if ("authorized" in meta && !meta.authorized) {
+               log.info('Meta not authorized; rotating access token');
+               cache.del(currentToken);
+               return await rotate();
+           }
+   
+           if ("shouldRotate" in meta && meta.shouldRotate) {
+               log.info({ msUntilExp: meta.msUntilExp }, 'Meta suggests rotation; rotating access token');
+               cache.del(currentToken);
+               return await rotate();
+           }
 
-    const json: any  = await resp.json();
-
-
-    if (resp.status === 202) {
-       log.info({code : resp.status, ServerResponse: json}, '2MFA is required')
-       event.res.status = 202
-       event.res.statusText = "2MFA is required";
-    }
-
-    if (resp.status !== 200) {
-      throwError(log, event, 'AUTH_REQUIRED', 401, 'Unauthorized',`${json.error + resp.status}`, `${json}`);
-    } 
- 
-    token = json.accessToken;
-    const accessIat = json.accessIat;
-
-    if (!token) {
-      throwError(log, event, 'SERVER_ERROR', 500, 'NO TOKEN',`Server Error please try again later`, `Server didn't send a token!`);
-    }
-
-    makeCookie(event, 'a-iat', accessIat, {
-      httpOnly: true,
-      secure:   true,
-      sameSite: 'strict',
-      path:     '/',
-      domain:   config.domain,
-      maxAge:   16 * 60
-    });
-    makeCookie(event, '__Secure-a', token, {
-      httpOnly: true,
-      secure:   true,
-      sameSite: 'strict',
-      path:     '/',
-      domain:   config.domain,
-      maxAge:   16 * 60
-    });
-    log.info({server: json , code : resp.status}, 'success')
-    } catch(err) {
-      throwError(log, event, 'SERVER_ERROR', 500, 'Server Error',`Server Error please try again later`, `Error getting new access token`);
-    }
-  }
-  event.context.accessToken = token; 
+           event.context.accessToken = currentToken;
+       }  catch (err) {
+           log.warn({ err }, 'Meta check failed; rotating both tokens');
+           cache.del(currentToken);
+           return await rotate();
+       }
 }

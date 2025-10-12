@@ -1,15 +1,17 @@
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from '../utils/logger.js';
-import { assertMethod, defineHandler, getRequestIP, readBody } from "h3";
-import { getConfiguration } from "../config/config.js";
+import { assertMethod, defineHandler, getRequestIP, readBody, redirect } from "h3";
 import throwError from "../middleware/error.js";
+import { getOperationalConfig } from "../utils/getRemoteConfig.js";
+import { getConfiguration } from "../config/config.js";
 
 export default defineHandler(async (event) => {
 
 assertMethod(event, "POST")
 const log = getLogger().child({service: 'auth', branch: 'classic', type: 'login', ip: getRequestIP(event)});
-const config = getConfiguration()
+const { domain, accessTokenTTL } = await getOperationalConfig(event)
+const { onSuccessRedirect } = getConfiguration()
 
 log.info(`Got user data sending to server....`);
 
@@ -65,8 +67,8 @@ try {
     };
 
     if (sendData.status === 500) {
-    throwError(log, event, 'SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', 
-                  `API / Server Error`);
+    throwError(log, event, 'AUTH_SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', 
+                  `API Server Error`);
     }
 
      log.info(`User validated, parsing...`);  
@@ -87,23 +89,30 @@ try {
                 sameSite: 'strict',
                 secure:   true,
                 path: '/',
-                domain: config.domain,
-                maxAge: 16 * 60
+                domain: domain,
+                maxAge: accessTokenTTL
             })
             makeCookie(event, 'a-iat', accessIat, {
                 httpOnly: true,
                 sameSite: 'strict',
                 secure:   true,
                 path: '/',
-                domain: config.domain,
-                maxAge: 16 * 60
+                domain: domain,
+                maxAge: accessTokenTTL
             })
-          log.info({server: results}, `user is logged in successfully`) 
-          event.res.status = 200
-          return {
+        log.info({server: results}, `user is logged in successfully`)     
+        const wantsJSON = event.req.headers.get('accept')?.includes('application/json');
+
+        if (wantsJSON) { 
+         event.res.status = 200; 
+         return { 
             ok: true,
-            receivedAt: new Date().toISOString()
+            redirectTo: onSuccessRedirect 
           }
+        }
+        
+        return redirect(event, onSuccessRedirect, 303);
+
 } catch(err) {
     throwError(log,event,'SERVER_ERROR',500,`Unexpected error`,`An error occurred please try again later.`,`Unexpected error ${err}`)    
 }

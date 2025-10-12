@@ -3,15 +3,18 @@ import { banIp } from "../utils/banIp.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from '../utils/logger.js';
-import { assertMethod, defineHandler, getCookie, getRequestIP, readBody } from "h3";
-import { getConfiguration } from "../config/config.js";
+import { assertMethod, defineHandler, getCookie, getRequestIP, redirect } from "h3";
 import throwError from "../middleware/error.js";
+import { getOperationalConfig } from "../utils/getRemoteConfig.js";
+import { getConfiguration } from "../config/config.js";
 
 
 export default defineHandler(async (event) => {
 
 const log = getLogger().child({service: 'auth', branch: 'classic', type: 'signup'});
-const config = getConfiguration()
+const { domain, accessTokenTTL } = await getOperationalConfig(event)
+const { onSuccessRedirect } = getConfiguration()
+
 assertMethod(event, "POST")
 
 
@@ -64,24 +67,28 @@ const sendData = await sendToServer(false, `/signup`, "POST", event, true, cooki
                 sameSite: 'strict',
                 secure:   true,
                 path: '/',
-                domain: config.domain,
-                maxAge: 16 * 60
+                domain: domain,
+                maxAge: accessTokenTTL
             })
             makeCookie(event, 'a-iat', accessIat, {
                 httpOnly: true,
                 sameSite: 'strict',
                 secure:   true,
                 path: '/',
-                domain: config.domain,
-                maxAge: 16 * 60
+                domain: domain,
+                maxAge: accessTokenTTL
             })
         }   
         log.info({server: results}, `user is signed up successfully`) 
-        event.res.status = 201
-        return {
+        const wantsJSON = event.req.headers.get('accept')?.includes('application/json');
+        if (wantsJSON) { 
+         event.res.status = 201; 
+         return { 
             ok: true,
-            receivedAt: new Date().toISOString()
+            redirectTo: onSuccessRedirect 
+          }
         }
+        return redirect(event, onSuccessRedirect, 303);
     } 
 
     if (sendData.status === 403 && results.banned) {
@@ -119,13 +126,8 @@ const sendData = await sendToServer(false, `/signup`, "POST", event, true, cooki
     }
        
      if (sendData.status === 500) {
-        log.info({error: 500}, `Server Error`)
-        event.res.status = 500
-        return {
-            ok: false,
-            receivedAt: new Date().toISOString(), 
-            error: 'Server Error' 
-        }
+          throwError(log, event, 'AUTH_SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', 
+                  `API Server Error`);
      }   
         
 }  catch(err) {

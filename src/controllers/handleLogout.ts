@@ -1,15 +1,15 @@
-import { assertMethod, deleteCookie, getCookie, getQuery, getRequestIP, H3Event } from "h3";
+import { assertMethod, deleteCookie, getCookie, getQuery, getRequestIP, getRequestProtocol, H3Event, redirect } from "h3";
 import { getLogger } from "../utils/logger.js";
 import { sendToServer } from "../utils/serverToServer.js";
 import throwError from "../middleware/error.js";
-import { getConfiguration } from "../config/config.js";
 import { cache } from "../utils/getAuthorizedMetaData.js";
+import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 
 export async function handleLogout(event: H3Event) {
     assertMethod(event, "POST")
     const body = event.context.body;
-    const { domain } = getConfiguration();
-
+    const { domain } = await getOperationalConfig(event)
+    
     const log = getLogger().child({service: 'auth', branch: 'classic', type: 'logout', ip: getRequestIP(event)});
     const canary = getCookie(event, 'canary_id');
     const token = getCookie(event, '__Secure-a');
@@ -68,11 +68,17 @@ export async function handleLogout(event: H3Event) {
         deleteCookie(event, 'iat', { path: '/', domain });
         if (cache.get(token)) cache.del(token);
         log.info(`User logged out successfully`);
+        const url = `${getRequestProtocol(event)}://${domain}`
 
-        return {
-            success: true,
-            msg: msg.message
-        };
+        const wantsJSON = event.req.headers.get('accept')?.includes('application/json');
+        if (wantsJSON) { 
+         event.res.status = 200; 
+         return { 
+            ok: true,
+            redirectTo: '/' 
+          }
+        }
+        return redirect(event, url, 303)
 
     }  catch(err) {
         log.error({err}, `Couldn't log user out. server error`);

@@ -1,12 +1,14 @@
 import { getLogger } from "../utils/logger.js";
 import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
-import { assertMethod, defineHandler, getCookie, getQuery, getRouterParam, readBody } from "h3";
+import { assertMethod, defineHandler, getCookie, getQuery, getRouterParam, readBody, redirect } from "h3";
 import throwError from "../middleware/error.js";
+import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "../config/config.js";
 
 export default defineHandler(async (event) => {
-const config = getConfiguration();
+const { domain, accessTokenTTL } = await getOperationalConfig(event)
+const { onSuccessRedirect } = getConfiguration()
 
 assertMethod(event, "POST")
 const { temp } = getQuery(event)
@@ -76,23 +78,27 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
                sameSite: 'strict',
                secure:   true,
                path: '/',
-               domain: config.domain,
-               maxAge: 16 * 60
+               domain: domain,
+               maxAge: accessTokenTTL
            })
            makeCookie(event, 'a-iat', accessIat, {
                 httpOnly: true,
                 sameSite: 'strict',
                 secure:   true,
                 path: '/',
-                domain: config.domain,
-                maxAge: 16 * 60
+                domain: domain,
+                maxAge: accessTokenTTL
             })
          log.info('Redirecting user...') 
-         event.res.status = 200
-         return {
-            success: true,
-            ans: 'Verification succeeded!'
-         }
+        const wantsJSON = event.req.headers.get('accept')?.includes('application/json');
+        if (wantsJSON) { 
+         event.res.status = 200; 
+         return { 
+            ok: true,
+            redirectTo: onSuccessRedirect 
+          }
+        }
+        return redirect(event, onSuccessRedirect, 303);
        }  
 
     log.warn({serverResponse: json, status: serverResponse.status},'Something went wrong')
