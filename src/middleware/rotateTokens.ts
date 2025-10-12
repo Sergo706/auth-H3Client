@@ -1,6 +1,5 @@
 import { deleteCookie, getCookie, H3Event } from "h3";
 import { getLogger } from "../utils/logger.js";
-import { getConfiguration } from "../config/config.js";
 import throwError from "./error.js";
 import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
@@ -8,10 +7,11 @@ import { getMetadata } from "../utils/getAuthorizedMetaData.js";
 import { cache } from "../utils/getAuthorizedMetaData.js";
 import { parseResponseContentType } from "../utils/checkResponseType.js";
 import { HTTPError } from 'h3';
+import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 
   export async function ensureValidCredentials(event: H3Event) {
     const log = getLogger().child({service: 'auth', branch: `TokensRotation`, reqID: event.context.rid })
-    const config = getConfiguration();
+    const { domain, accessTokenTTL } = await getOperationalConfig(event)
     
     let currentToken = getCookie(event, '__Secure-a');
     let refresh = getCookie(event, 'session');
@@ -78,8 +78,8 @@ import { HTTPError } from 'h3';
           throwError(log, event, 'AUTH_SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', `New refresh token and related cookies ended up null`);
         }
 
-      deleteCookie(event, 'session', {domain: config.domain, path: '/'})
-      deleteCookie(event, 'iat', {domain: config.domain, path: '/'})
+      deleteCookie(event, 'session', {domain: domain, path: '/'})
+      deleteCookie(event, 'iat', {domain: domain, path: '/'})
       rawSetCookie.forEach(line => event.res.headers.append('Set-Cookie', line));
 
       const sessionLine = rawSetCookie.find(c => c.trim().startsWith('session=')) ?? '';
@@ -91,16 +91,16 @@ import { HTTPError } from 'h3';
           sameSite: 'strict',
           secure:   true,
           path: '/',
-          domain: config.domain,
-          maxAge: 16 * 60
+          domain: domain,
+          maxAge: accessTokenTTL
       })
       makeCookie(event, 'a-iat', accessIat, {
           httpOnly: true,
           sameSite: 'strict',
           secure:   true,
           path: '/',
-          domain: config.domain,
-          maxAge: 16 * 60
+          domain: domain,
+          maxAge: accessTokenTTL
       })
 
         event.context.session = refresh;

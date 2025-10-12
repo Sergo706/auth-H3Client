@@ -7,13 +7,16 @@ import { parseResponseContentType } from "../utils/checkResponseType.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { safeObjectMerge } from "../utils/safeMerge.js";
 import { findStringsInObject } from "../utils/findObjectValues.js";
+import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 
 
 
 export async function OAuthCallback(event: H3Event) {
 
     const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-success-callback', reqId: event.context.rid, reqIp: getRequestIP(event)});
-    const { OAuthProviders, domain } = getConfiguration()   
+    const { OAuthProviders } = getConfiguration()   
+    const { domain, accessTokenTTL } = await getOperationalConfig(event)
+    
     const provided = event.context.params?.provider; 
 
  if (!OAuthProviders || !provided) {
@@ -142,7 +145,7 @@ const normalized = data ? { ...restUser, ...data } : restUser;
                      secure:   true,
                      path: '/',
                      domain: domain,
-                     maxAge: 16 * 60
+                     maxAge: accessTokenTTL
                  })
                  makeCookie(event, 'a-iat', accessIat, {
                      httpOnly: true,
@@ -150,7 +153,7 @@ const normalized = data ? { ...restUser, ...data } : restUser;
                      secure:   true,
                      path: '/',
                      domain: domain,
-                     maxAge: 16 * 60
+                     maxAge: accessTokenTTL
                  })
              }  
 
@@ -164,7 +167,7 @@ const normalized = data ? { ...restUser, ...data } : restUser;
               <html>
                 <head>
                 <meta http-equiv="refresh" content="0;url=${match.redirectUrlOnSuccess}">
-            <script>window.location.replace(${match.redirectUrlOnSuccess});</script>
+            <script>window.location.replace('${match.redirectUrlOnSuccess}');</script>
                 </head>
                 <body>
                 </body>

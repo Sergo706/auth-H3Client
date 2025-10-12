@@ -41,8 +41,13 @@ export const OAuthProviders = z.array(z.discriminatedUnion("kind", [
    ]
 )).optional()
 
-export const configurationSchema = z.strictObject({
+
+export const sharedSettings = z.strictObject({
    domain: z.string(),
+   accessTokenTTL: z.number(),
+})
+
+export const configurationSchema = z.strictObject({
    server: z.object({
       auth_location: z.object({
          serverOrDNS: z.string(),
@@ -80,6 +85,7 @@ export const configurationSchema = z.strictObject({
       cryptoCookiesSecret: z.string()
    }),
 
+   onSuccessRedirect: z.url(),
    OAuthProviders,
 
    telegram: z.discriminatedUnion("enableTelegramLogger", [
@@ -99,5 +105,6 @@ export const configurationSchema = z.strictObject({
    logLevel: z.enum(['debug', 'info', 'warn', 'error', 'fatal'])
 }).strict()
 
+export type RemoteConfig = z.infer<typeof sharedSettings>;
 export type Configuration = z.infer<typeof configurationSchema>;
 export type OAuthProviders = z.infer<typeof OAuthProviders>

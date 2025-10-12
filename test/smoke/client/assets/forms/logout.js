@@ -25,7 +25,10 @@ export async function logout() {
                 const json = await res.json();
                 status.textContent = "Success";
                 status.style.color = "green";
-                panel.textContent =  JSON.stringify(json);
+                    if (json.redirectTo) {
+                        window.location.assign(json.redirectTo);
+                    }
+                panel.textContent =  JSON.stringify(json);       
                 return;
             }
         } catch(err) {
