@@ -55,7 +55,7 @@ export const config: Configuration = {
     },
     {
       kind: 'oauth',
-      name: 'x',
+      name: 'x',    
       authorizationEndpoint: 'https://x.com/i/oauth2/authorize',
       tokenEndpoint: 'https://api.x.com/2/oauth2/token',
       userInfoEndpoint: 'https://api.x.com/2/users/me?user.fields=id,is_identity_verified,location,name,verified,confirmed_email,created_at,profile_image_url', 
