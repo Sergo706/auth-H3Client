@@ -4,6 +4,17 @@ import { MiniCache } from "./miniCache.js";
 
 const cache = new MiniCache()
 
+/**
+ * Fetches and caches the OIDC discovery document for the provided issuer,
+ * validating the issuer match before returning metadata.
+ *
+ * @param issuer - Base issuer URL configured for the provider.
+ * @param log - Pino logger used for diagnostics.
+ * @returns Parsed discovery metadata.
+ *
+ * @example
+ * const meta = await discoverOidc(provider.issuer, log);
+ */
 export async function discoverOidc(issuer: string, log: pino.Logger): Promise<any | void>{
     const {OAuthProviders} = getConfiguration()
     if (!OAuthProviders) return;

@@ -56,6 +56,16 @@ function levelFor(status: number, hasError: boolean): Level {
   return 'info'
 }
 
+/**
+ * H3 plugin that attaches structured request/response logging, request IDs,
+ * and error reporting using the shared Pino transport.
+ *
+ * @param app - H3 application instance to instrument.
+ * @returns void
+ *
+ * @example
+ * app.use(httpLogger);
+ */
 export const httpLogger = definePlugin(app => {
    app.use(onRequest((event) => {
   const url = getRequestURL(event);
@@ -171,5 +181,3 @@ export const httpLogger = definePlugin(app => {
   }))
 
 })
-
-

@@ -3,13 +3,21 @@ type CacheEntry<T> = {
   expiry: number;
 };
 
+/**
+ * Small in-memory TTL cache supporting LRU-style eviction using insertion order.
+ *
+ * @typeParam T - Stored value type.
+ */
 export class MiniCache<T = any> {
   private store = new Map<string, CacheEntry<T>>();
   private maxEntries: number;
   private sweepTimer: NodeJS.Timeout;
 
   /**
-   *@param maxEntries  maximum number of entries before evicting oldest
+   * Creates a new cache instance.
+   *
+   * @param maxEntries - Maximum number of entries before evicting the oldest.
+   * @param sweepIntervalMs - Interval used to remove expired items.
    */
   constructor(maxEntries = Infinity, sweepIntervalMs = 60_000) {
     this.maxEntries = maxEntries;
@@ -85,4 +93,3 @@ export class MiniCache<T = any> {
     this.store.clear();
   }
 }
-

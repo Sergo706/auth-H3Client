@@ -1,6 +1,16 @@
 import crypto from "node:crypto";
 import { getConfiguration } from "../config/config.js";
 
+/**
+ * Generates HMAC-based request signature headers for server-to-server authentication.
+ *
+ * @param method - HTTP method used for the request.
+ * @param path - Request path (including query string) to sign.
+ * @returns Header map containing client ID, timestamp, request ID, and signature.
+ *
+ * @example
+ * const headers = signature('POST', '/auth/login');
+ */
 export function signature(method: string, path: string): Record<string, string> {
   const {server} = getConfiguration() 
 

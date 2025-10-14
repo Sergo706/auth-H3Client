@@ -6,6 +6,16 @@ import throwError from '../middleware/error.js';
 
 
 
+/**
+ * Submits a new password for visitors who passed link validation, enforcing payload rules
+ * and translating auth server responses into user-facing results.
+ *
+ * @param event - H3 event for the password reset completion request.
+ * @returns JSON payload confirming the reset or detailing validation issues.
+ *
+ * @example
+ * router.post('/auth/reset-password/:visitor', sendNewPassword, { middleware: [...] });
+ */
 export default defineHandler (async (event) => {
 
 assertMethod(event, "POST")

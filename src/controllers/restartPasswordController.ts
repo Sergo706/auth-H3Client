@@ -7,6 +7,16 @@ import throwError from '../middleware/error.js';
 
 
 
+/**
+ * Initiates a password reset by validating the email payload and forwarding the
+ * request to the auth server, translating responses into rate limit or success messages.
+ *
+ * @param event - H3 event representing the password-reset initiation request.
+ * @returns JSON payload indicating whether the email was dispatched.
+ *
+ * @example
+ * router.post('/auth/password-reset', initPasswordReset, { middleware: [...] });
+ */
 export default defineHandler(async (event) => {
 
   const log = getLogger().child({service: 'auth', branch: 'password-reset'})

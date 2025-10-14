@@ -9,6 +9,16 @@ import { sendToServer } from "../utils/serverToServer.js";
 import throwError from "./error.js";
 
 
+/**
+ * Validates visitor canary cookies, bootstrapping tracking metadata and banning
+ * suspicious clients via the auth server when anomalies are detected.
+ *
+ * @param event - H3 event for the incoming page request.
+ * @returns void Resolves when validation completes; throws on suspicious activity.
+ *
+ * @example
+ * await validator(event);
+ */
 export const validator = async (event: H3Event): Promise<any> => {
     const log = getLogger().child({service: `auth-client`, branch: 'BOT DETECTOR', type: 'middleware', reqID: event.context.rid})
     const url = getRequestURL(event);
@@ -91,6 +101,4 @@ export const validator = async (event: H3Event): Promise<any> => {
   };
 }
 };
-
-
 

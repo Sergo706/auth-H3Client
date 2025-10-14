@@ -1,4 +1,17 @@
 
+/**
+ * Recursively searches an object tree for strings matching the provided key and value constraints.
+ *
+ * @param input - Object to search.
+ * @param visited - Internal set preventing circular references.
+ * @param searchTerms - Criteria describing keys/values to match.
+ * @param depth - Current recursion depth.
+ * @param maxDepth - Maximum depth to traverse.
+ * @returns Matching string when located; otherwise `null`.
+ *
+ * @example
+ * const email = findStringsInObject(payload, new Set(), { keyToSearch: 'email', value: emailRegex });
+ */
 export function findStringsInObject(
   input: object,
   visited = new Set<object>(),

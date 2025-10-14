@@ -4,6 +4,15 @@ import { defineHandler, getCookie } from 'h3'
 import { makeCookie } from '../utils/cookieGenerator.js'
 import { getLogger } from '../utils/logger.js'
 
+/**
+ * Ensures a CSRF cookie exists for the current request, minting and signing a new one when absent.
+ *
+ * @param event - H3 event representing the incoming request.
+ * @returns void
+ *
+ * @example
+ * router.use(csrfTokenMiddleware);
+ */
 export default defineHandler( (event) => {
 const name = '__Host-csrf'
 const log = getLogger().child({service: `csrf`, branch: `general`})

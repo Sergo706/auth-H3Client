@@ -2,6 +2,17 @@ import { decodeProtectedHeader } from 'jose';
 import crypto from 'node:crypto';
 
 
+/**
+ * Verifies that the `at_hash` claim matches the given access token according to OIDC rules.
+ *
+ * @param atHash - `at_hash` claim from the ID token.
+ * @param accessToken - Access token returned alongside the ID token.
+ * @param idToken - Raw ID token, used to inspect the signing algorithm.
+ * @returns `true` when the claim matches the access token, otherwise `false`.
+ *
+ * @example
+ * if (!atHashCheck(payload.at_hash, accessToken, idToken)) throw new Error('Mismatch');
+ */
 export function atHashCheck(atHash: string, accessToken: string, idToken: string): boolean {
     const { alg } = decodeProtectedHeader(idToken);
     if (!alg) return false;
@@ -16,4 +27,3 @@ export function atHashCheck(atHash: string, accessToken: string, idToken: string
 
     return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
-

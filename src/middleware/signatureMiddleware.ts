@@ -4,6 +4,15 @@ import { getConfiguration } from "../config/config.js";
 import { getLogger } from "../utils/logger.js";
 
 
+/**
+ * Generates signed headers for outbound server-to-server calls and stores them on the request context.
+ *
+ * @param event - H3 event whose request information seeds the signature.
+ * @returns void
+ *
+ * @example
+ * router.use(signatureMiddleware);
+ */
 export default defineHandler((event) => {
     const { server } = getConfiguration()
      const log = getLogger().child({server: 'auth-client', branch: 'Hmac', type: 'middleware'})

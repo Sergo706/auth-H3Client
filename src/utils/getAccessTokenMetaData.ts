@@ -3,11 +3,25 @@ import pino from 'pino';
 import { H3Event } from 'h3';
 import { MiniCache } from "./miniCache.js";
 import type { ServerAccessTokenMetaData } from "../types/ServerMetaData.js";
-
  export const cache = new MiniCache(200)
 
  type ErrorReason = {mfa?: boolean, userNotFound?: boolean, unAuthorized?: boolean, serverError?: boolean} 
 
+/**
+ * Retrieves access-token metadata from the auth server, optionally using cached entries,
+ * and normalizes error scenarios into structured flags.
+ *
+ * @param log - Scoped Pino logger.
+ * @param getFresh - When true, bypasses cache and fetches a new copy.
+ * @param accessToken - Access token whose metadata should be inspected.
+ * @param refreshToken - Refresh token used for authentication.
+ * @param canary - Canary cookie value used for session validation.
+ * @param event - H3 event supplying request context for upstream calls.
+ * @returns Token metadata on success or an error descriptor.
+ *
+ * @example
+ * const meta = await getMetadata(log, false, accessToken, refreshToken, canary, event);
+ */
  export async function getMetadata(log: pino.Logger, getFresh: boolean, accessToken: string, refreshToken: string, canary: string, event: H3Event): Promise<ServerAccessTokenMetaData | ErrorReason> {
     log.info(`Getting metadata...`)
 
@@ -40,7 +54,7 @@ import type { ServerAccessTokenMetaData } from "../types/ServerMetaData.js";
 
        if (response.status === 404) {
             log.error('Error getting meta data. no such user')
-            return {userNotFound: true};``
+            return {userNotFound: true};
         }
 
         if (response.status === 202) {

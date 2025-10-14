@@ -3,11 +3,24 @@ import pino from 'pino';
 import { H3Event } from 'h3';
 import { MiniCache } from "./miniCache.js";
 import type { ServerRefreshTokenMetaData } from "../types/ServerMetaData.js";
-
  export const cache = new MiniCache(200)
 
  type ErrorReason = { unAuthorized?: boolean, serverError?: boolean, } 
 
+/**
+ * Retrieves refresh-token metadata, caching results and mapping failures to structured flags.
+ *
+ * @param log - Scoped Pino logger.
+ * @param getFresh - Indicates whether to bypass cached data.
+ * @param refreshToken - Refresh token whose metadata should be validated.
+ * @param canary - Canary cookie associated with the session.
+ * @param iatCookie - Issued-at cookie for the refresh token.
+ * @param event - H3 event providing request context.
+ * @returns Token metadata or an error descriptor.
+ *
+ * @example
+ * const meta = await getMetadata(log, false, refreshToken, canary, iat, event);
+ */
  export async function getMetadata(log: pino.Logger, getFresh: boolean, refreshToken: string, canary: string, iatCookie: number, event: H3Event): Promise<ServerRefreshTokenMetaData | ErrorReason> {
     log.info(`Getting metadata...`)
 

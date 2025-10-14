@@ -4,6 +4,15 @@ import fs from 'fs';
 import { getConfiguration } from "../config/config.js";
 
 
+/**
+ * Creates an Undici agent configured for authenticated server-to-server calls or bot detection.
+ *
+ * @param botDetector - When true, returns an agent tuned for bot-detection polling.
+ * @returns Configured Undici `Agent` instance or `undefined` when not required.
+ *
+ * @example
+ * const agent = getAuthAgent(false);
+ */
 export function getAuthAgent(botDetector: boolean) {
     const { server } = getConfiguration(); 
     if (server.ssl.enableSSL && !botDetector) {

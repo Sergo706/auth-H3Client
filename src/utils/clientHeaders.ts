@@ -1,5 +1,14 @@
 import { getRequestHost, getRequestIP, getRequestProtocol, getRequestURL, type H3Event } from 'h3'
 
+/**
+ * Builds a sanitized set of client headers to forward to upstream auth services.
+ *
+ * @param event - Current H3 event providing request metadata.
+ * @returns Dictionary of headers safe to forward upstream.
+ *
+ * @example
+ * const headers = clientHeaders(event);
+ */
 export function clientHeaders( event: H3Event ): Record<string, string | undefined> {
     const clientIp = getRequestIP(event) || undefined
     const protocol = getRequestProtocol(event, {xForwardedProto: false})

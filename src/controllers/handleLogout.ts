@@ -6,6 +6,16 @@ import { cache as accessTokenCache } from "../utils/getAccessTokenMetaData.js";
 import { cache as refreshTokenCache } from "../utils/getRefreshTokenMetaData.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 
+/**
+ * Logs the user out by validating the request, notifying the auth server,
+ * clearing session cookies, and purging cached tokens.
+ *
+ * @param event - H3 event carrying the logout request.
+ * @returns Redirect response to the site root or a JSON acknowledgement when requested.
+ *
+ * @example
+ * router.post('/logout', handleLogout, { middleware: [...] });
+ */
 export async function handleLogout(event: H3Event) {
     assertMethod(event, "POST")
     const body = event.context.body;

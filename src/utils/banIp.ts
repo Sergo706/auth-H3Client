@@ -3,6 +3,15 @@ import { sendLog } from './telegramLogger.js';
 import { getLogger } from './logger.js';
 const UFW = '/usr/sbin/ufw';
 
+/**
+ * Executes a UFW rule to block the provided IP address and reports the outcome via logging.
+ *
+ * @param ip - The IPv4 or IPv6 address to block.
+ * @returns Promise resolved when the rule is inserted.
+ *
+ * @example
+ * await banIp('203.0.113.42');
+ */
 export function banIp(ip: string): Promise<void> {
   const log = getLogger().child({service: 'auth-client', branch: 'utils', type: 'UFW-BANS', ipAddress: ip}) 
   log.info(`About to ban IP ${ip}, On frontend server.`);

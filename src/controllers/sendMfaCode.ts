@@ -6,6 +6,16 @@ import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "../config/config.js";
 
+/**
+ * Validates MFA code submissions by proxying them to the auth server, managing session cookies,
+ * and returning appropriate redirect or error responses.
+ *
+ * @param event - H3 event wrapping the MFA verification request.
+ * @returns Redirect to the configured success URL or JSON error feedback.
+ *
+ * @example
+ * router.post('/auth/verify-mfa/:visitor', sendCode, { middleware: [...] });
+ */
 export default defineHandler(async (event) => {
 const { domain, accessTokenTTL } = await getOperationalConfig(event)
 const { onSuccessRedirect } = getConfiguration()
@@ -107,6 +117,4 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
      error: 'Invalid or expired code'
     }
 })
-
-
 
