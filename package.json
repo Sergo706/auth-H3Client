@@ -2,13 +2,25 @@
   "name": "auth-h3client",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/main.d.ts",
+      "import": "./dist/main.js",
+      "default": "./dist/main.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/main.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node --esm test/server.ts",
-    "build": "tsc && cp -r ./test/smoke/client ./dist/test/smoke/client",
+    "build:test": "tsc && cp -r ./test/smoke/client ./dist/test/smoke/client",
     "logs:http": "tail -n 0 -f ./dist/logs/http.log | jq .",
     "logs:app": "tail -n 0 -f ./dist/logs/info.log | jq .",
+    "build": "tsc -p tsconfig.json",
+    "prepack": "npm run build",
     "start": "node dist/test/server.js"
   },
   "keywords": [],
