@@ -14,13 +14,22 @@ app.use(generateCsrfCookie);
 router.post('/signup', handler, { middleware: [verifyCsrfCookie] });
 ```
 
-## Visitor validator (canary)
+## Visitor validator (canary) / Bot detector
 
-- `validator` (src/middleware/visitorValid.ts) sets a signed canary cookie for page views.
-- Calls `/check` on the auth service; bans IPs on malicious signals.
+- `validator` (src/middleware/visitorValid.ts) integrates with the auth service's botDetector module.
+- It sets a signed canary cookie for page views and calls the auth service's `/check` endpoint.
+- When the upstream service flags a visitor as malicious, the middleware bans the IP and throws 403.
 
-Notes:
+Important:
 
-- Skips static assets and `/.well-known/*` paths.
-- Throws 403 on suspected tampering.
+- Only wire this middleware if your auth service is configured with the botDetector enabled and exposes `/check`.
+- Place it early in your middleware chain so it runs before CSRF and route handlers.
+- For performance, it uses a keep‑alive `undici` Agent (see `getAuthAgent(true)`).
 
+Wiring example:
+
+```ts
+import { botDetectorMiddleware as validator } from 'auth-h3client';
+
+app.use(validator); // enable when /check is enabled on the auth service
+```

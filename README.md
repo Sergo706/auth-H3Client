@@ -242,6 +242,7 @@ configuration(/* ...config object from above... */);
 const app = new H3();
 app.register(httpLogger());
 app.use(isIPValid);
+// Wire the bot detector only if your auth service enables it (/check endpoint)
 app.use(botDetectorMiddleware);
 app.use(generateCsrfCookie);
 
