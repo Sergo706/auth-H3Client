@@ -220,7 +220,7 @@ export const config: Configuration = {
 
 See `test/setup/config.ts` for a complete example with multiple OAuth providers.
 
-## Wiring an H3 Application
+## H3 Application
 
 The library exports controllers, middlewares, and route registrars. A typical setup looks like:
 
@@ -302,3 +302,12 @@ Provide the configuration via `test/setup/config.ts` (environment variables for 
 - `MiniCache`: lightweight TTL cache useful for memoizing remote lookups.
 
 Refer to the TSDoc comments across `src/` for parameter descriptions and usage samples.
+
+## Further reading
+
+- [Token rotation and metadata](docs/token-rotation.md)
+- [OAuth/OIDC flow](docs/oauth.md)
+- [CSRF and visitor validation](docs/csrf-and-visitor.md)
+- [Routes and controllers](docs/routes-and-controllers.md)
+- [Server-to-server requests](docs/server-to-server.md)
+- [Logging and error handling](docs/logging-and-errors.md)
