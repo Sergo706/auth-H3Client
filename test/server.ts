@@ -14,7 +14,6 @@ const app = new H3()
 configuration(config)
 
 
-
 app.register(httpLogger())
 app.use(isValidIP)
 app.use(validator)
