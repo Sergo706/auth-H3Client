@@ -23,11 +23,6 @@ import { limitBytes } from "../middleware/limitBytes.js";
  */
 export function useAuthRoutes(router: H3) {
 
-  router.on("GET", '/test', (event) => {
-  event.res.status = 200
-  return {ok: true, date: new Date().toISOString()}
-  })
-
   router.post('/signup', signup,
     { middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)] },
   )

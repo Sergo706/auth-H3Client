@@ -58,3 +58,4 @@ export { signature } from "./utils/serverSignature.js";
 export { sendToServer as serviceToService} from "./utils/serverToServer.js";
 export { sendLog as sendTelegramMessage } from "./utils/telegramLogger.js";
 export { verifyOAuthToken } from "./utils/verifyOAuthTokens.js";
+export { startService } from "./nitroPluginStarter.js";
