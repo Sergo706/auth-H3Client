@@ -14,6 +14,16 @@ declare module 'h3' {
   }
 }
 
+/**
+ * Guarantees that a valid access token exists for the request, rotating tokens via the auth
+ * server when necessary and caching rotation results.
+ *
+ * @param event - H3 event containing the current request context.
+ * @returns A JSON payload describing MFA or rotation results, or void on success.
+ *
+ * @example
+ * await ensureAccessToken(event);
+ */
 export async function ensureAccessToken(event: H3Event) {
   const log = getLogger().child({service: 'auth', branch: `access_tokens_rotations`, reqID: event.context.rid })
   const { domain, accessTokenTTL } = await getOperationalConfig(event)

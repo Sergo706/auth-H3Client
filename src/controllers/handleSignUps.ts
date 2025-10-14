@@ -8,7 +8,16 @@ import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "../config/config.js";
 
-
+/**
+ * Handles user signup by validating the payload, delegating to the auth server,
+ * managing issued cookies, and translating server responses into structured errors.
+ *
+ * @param event - H3 event for the signup request.
+ * @returns Redirect to the success URL or a JSON error payload.
+ *
+ * @example
+ * router.post('/signup', signupHandler, { middleware: [...] });
+ */
 export default defineHandler(async (event) => {
 
 const log = getLogger().child({service: 'auth', branch: 'classic', type: 'signup'});

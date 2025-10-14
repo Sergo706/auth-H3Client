@@ -7,6 +7,16 @@ import { getOperationalConfig } from '../utils/getRemoteConfig.js';
 import { getMetadata } from '../utils/getRefreshTokenMetaData.js';
 import { cache } from '../utils/getRefreshTokenMetaData.js';
 
+/**
+ * Validates and refreshes the session cookie when required, coordinating with the auth server
+ * and cache to keep refresh tokens current.
+ *
+ * @param event - H3 event for the incoming request.
+ * @returns A JSON payload describing MFA requirements, or void when the session remains valid.
+ *
+ * @example
+ * await ensureRefreshCookie(event);
+ */
 export async function ensureRefreshCookie(event: H3Event) { 
 
   let refresh = getCookie(event, 'session');

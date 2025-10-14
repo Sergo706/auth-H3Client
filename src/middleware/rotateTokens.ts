@@ -9,6 +9,16 @@ import { parseResponseContentType } from "../utils/checkResponseType.js";
 import { HTTPError } from 'h3';
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 
+/**
+ * Ensures both access and refresh credentials remain valid by consulting cached metadata
+ * and rotating tokens through the auth server when required.
+ *
+ * @param event - H3 event containing the current session context.
+ * @returns JSON payload describing MFA or rotation responses, or void when tokens remain valid.
+ *
+ * @example
+ * await ensureValidCredentials(event);
+ */
   export async function ensureValidCredentials(event: H3Event) {
     const log = getLogger().child({service: 'auth', branch: `TokensRotation`, reqID: event.context.rid })
     const { domain, accessTokenTTL } = await getOperationalConfig(event)

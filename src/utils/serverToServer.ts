@@ -11,6 +11,24 @@ import type { Response } from 'undici'
 type Cookie = { label: string; value: any };
 type Cookies = Cookie | Cookie[];
 
+/**
+ * Sends a request to the auth server with client context headers, optional cookies,
+ * and HMAC signatures, returning the upstream response.
+ *
+ * @typeParam T - Shape of the JSON payload being submitted.
+ * @param keepAlive - Whether to use the high-concurrency agent for bot-detector traffic.
+ * @param endpoint - Relative endpoint path to call on the auth server.
+ * @param method - HTTP method to use.
+ * @param event - H3 event providing request context for header propagation.
+ * @param body - When true, serializes `data` as a JSON request body.
+ * @param cookies - Cookies to forward to the auth server.
+ * @param data - Optional JSON body payload.
+ * @param token - Optional bearer token injected as `Authorization`.
+ * @returns Upstream `Response` or `void` when the fetch fails before receiving a response.
+ *
+ * @example
+ * const res = await sendToServer(true, '/auth/login', 'POST', event, true, cookies, payload);
+ */
 export async function sendToServer<T>(keepAlive: boolean, endpoint: string, method: string, event: H3Event, body: boolean, cookies?: Cookies, data?: object, token?: string): Promise<Response|void> {
     const config = getConfiguration()
     const agent = getAuthAgent(keepAlive)

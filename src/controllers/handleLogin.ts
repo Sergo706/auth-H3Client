@@ -6,6 +6,17 @@ import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "../config/config.js";
 
+/**
+ * Handles login submissions by validating payloads, proxying the request to the
+ * authentication server, and setting issued cookies or reporting validation errors.
+ *
+ * @param event - Incoming H3 event containing the request context.
+ * @returns A redirect response or JSON result describing the login outcome.
+ *
+ * @example
+ * // In an H3 router:
+ * router.post('/login', loginHandler, { middleware: [...] });
+ */
 export default defineHandler(async (event) => {
 
 assertMethod(event, "POST")

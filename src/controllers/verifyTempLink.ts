@@ -5,6 +5,16 @@ import { defineHandler, getCookie, getQuery, getRequestURL, getRouterParam, H3Ev
 import throwError from "../middleware/error.js";
 
 
+/**
+ * Validates temporary links (MFA or password reset) by confirming signed tokens with the auth server
+ * and returning structured metadata or falling back to not-found responses.
+ *
+ * @param event - H3 event for the temporary link verification request.
+ * @returns JSON metadata with the link action or redirects/not-found when invalid.
+ *
+ * @example
+ * router.get('/auth/verify-mfa/:visitor', verifyLink);
+ */
 export default defineHandler(async (event) => {
 
 const { temp } = getQuery(event)
@@ -62,5 +72,3 @@ const cookies = {
     log.info( {Response: serverResponse, Status: serverResponse.status},`link verification failed: invalid link`)
     return notFoundHandler(event);
 })
-
-

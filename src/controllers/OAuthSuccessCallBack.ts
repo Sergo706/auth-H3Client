@@ -10,7 +10,16 @@ import { findStringsInObject } from "../utils/findObjectValues.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 
 
-
+/**
+ * Completes the OAuth/OIDC login by enriching the provider payload, ensuring a usable email,
+ * notifying the auth server, and setting session cookies before redirecting the user.
+ *
+ * @param event - H3 event for the OAuth callback request.
+ * @returns HTML redirect shim or throws an HTTP error when validation fails.
+ *
+ * @example
+ * router.get('/oauth/callback/:provider', OAuthCallback, { middleware: [OAuthTokensValidations] });
+ */
 export async function OAuthCallback(event: H3Event) {
 
     const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-success-callback', reqId: event.context.rid, reqIp: getRequestIP(event)});

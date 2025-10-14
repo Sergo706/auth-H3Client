@@ -10,6 +10,16 @@ import { atHashCheck } from '../utils/atHash.js';
 import type { OidcIdTokenPayload } from '../types/oidc.js'
 
 
+/**
+ * Validates the OAuth/OIDC callback query, exchanges codes for tokens, and stores provider
+ * metadata on the request context for downstream handlers.
+ *
+ * @param event - H3 event representing the OAuth callback.
+ * @returns void
+ *
+ * @example
+ * router.get('/oauth/callback/:provider', OAuthCallback, { middleware: [OAuthTokensValidations] });
+ */
 export async function OAuthTokensValidations(event: H3Event) {
 const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-callback-middleware', reqId: event.context.rid, reqIp: getRequestIP(event)});
 const { OAuthProviders } = getConfiguration()   

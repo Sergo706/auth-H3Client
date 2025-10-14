@@ -9,6 +9,15 @@ import { MiniCache } from "./miniCache.js";
 import { getConfiguration } from "../config/config.js";
 const cache = new MiniCache<RemoteConfig>(100)
 
+/**
+ * Fetches operational configuration from the auth server, caching the normalized results per host.
+ *
+ * @param event - H3 event used to perform the outbound request.
+ * @returns Normalized remote configuration including domain and access token TTL.
+ *
+ * @example
+ * const { domain, accessTokenTTL } = await getOperationalConfig(event);
+ */
 export async function getOperationalConfig(event: H3Event): Promise<RemoteConfig> {
     const log = getLogger().child({service: 'utils', type: '/operational/config'})
     const config = getConfiguration()

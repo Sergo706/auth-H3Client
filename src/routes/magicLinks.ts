@@ -14,6 +14,21 @@ const noStore = defineHandler((event) => {
   event.res.headers.set('Cache-Control', 'no-store')
 })
 
+/**
+ * Attaches magic-link, MFA verification, and password reset routes to the provided router.
+ * Routes ensure proper caching headers, CSRF verification, and payload validation while
+ * delegating business logic to the respective controllers.
+ *
+ * @param router - The H3 router that receives the MFA and password-reset routes.
+ * @returns void
+ *
+ * @example
+ * import { createRouter } from 'h3';
+ * import { magicLinksRouter } from './routes/magicLinks';
+ *
+ * const router = createRouter();
+ * magicLinksRouter(router);
+ */
 export function magicLinksRouter(router: H3) {
     router
 

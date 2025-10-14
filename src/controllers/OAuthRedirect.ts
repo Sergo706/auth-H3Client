@@ -8,6 +8,16 @@ import throwError from "../middleware/error.js";
 import { discoverOidc } from "../utils/discoverOidc.js";
 import { createSignedCookie } from "../utils/cryptoCookies.js";
 
+/**
+ * Initiates the OAuth/OIDC authorization flow for the requested provider by
+ * preparing state, PKCE values, and redirecting the user to the provider's login page.
+ *
+ * @param event - H3 event for the OAuth redirect request.
+ * @returns Redirect response pointing to the provider authorization endpoint.
+ *
+ * @example
+ * router.get('/oauth/:provider', OAuthRedirect);
+ */
 export async function OAuthRedirect(event: H3Event) {
 const { OAuthProviders } = getConfiguration()   
 const log = 

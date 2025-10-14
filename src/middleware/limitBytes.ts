@@ -3,6 +3,16 @@ import throwError from "./error.js";
 import { getLogger } from "../utils/logger.js";
 
 
+/**
+ * Middleware factory that enforces maximum request body size for POST requests
+ * and parses JSON payloads into the request context.
+ *
+ * @param maxBytes - Maximum accepted payload size in bytes.
+ * @returns H3 event handler enforcing the size limit and JSON parsing.
+ *
+ * @example
+ * router.post('/endpoint', handler, { middleware: [limitBytes(1024)] });
+ */
 export function limitBytes(maxBytes: number): EventHandler {
     const log = getLogger().child({service: 'auth-client', branch: 'middleware', type: 'bytes-checker'})
     return defineHandler( async (event) => {

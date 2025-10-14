@@ -3,6 +3,16 @@ import { defineHandler, getCookie, HTTPError, readBody } from 'h3'
 import { getLogger } from "../utils/logger.js";
 
 
+/**
+ * Validates the CSRF cookie and header token pair, rejecting requests when the signature is missing or invalid.
+ *
+ * @param event - H3 event representing the incoming state-changing request.
+ * @returns void
+ * @throws HTTPError When the CSRF token is missing or invalid.
+ *
+ * @example
+ * router.post('/dangerous', handler, { middleware: [verifyCsrf] });
+ */
 export default defineHandler( async (event) => {
 
     const log = getLogger().child({service: `csrf`, branch: `general`})
