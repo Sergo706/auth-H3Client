@@ -12,7 +12,10 @@
     "resolveJsonModule": true,  
     "isolatedModules": true,                         
     "skipLibCheck": true,
-    "noEmitOnError": true                      
+    "noEmitOnError": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
   },
   "include": ["src/**/*", "test", "src/utils", "test/testAuthController.ts", "test/smoke/controllers.test/test.ts"],
   "exclude": ["node_modules"]

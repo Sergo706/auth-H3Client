@@ -16,7 +16,7 @@ function sign(value: string): string {
   return crypto.createHmac("sha256", Key()).update(value).digest("hex");
 }
 
-function isSame(a: string, b: string) {
+export function isSame(a: string, b: string) {
   const A = Buffer.from(a, "hex");
   const B = Buffer.from(b, "hex");
   if (A.length !== B.length) return false;
@@ -31,7 +31,7 @@ export function createSignedCookie(raw: string, ttlMs: number, session:string): 
   return `${body}.${sign(body)}`;
 }
 
-interface VerifiedCookie {
+export interface VerifiedCookie {
   valid: boolean;
   payload?: { 
   value: string;
