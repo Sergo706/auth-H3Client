@@ -1,5 +1,5 @@
     
-   export interface ServerMetaData {
+   export interface ServerAccessTokenMetaData {
         authorized: boolean,
         ipAddress: string,
         userAgent: string,
@@ -18,5 +18,16 @@
             iat?: number | undefined;
             jti?: string | undefined;
         }
+    }
+    
+    export interface ServerRefreshTokenMetaData {
+        authorized: boolean,
+        ipAddress: string,
+        userAgent: string,
+        date: string,
+        msUntilExp: number,
+        refreshThreshold: number,
+        shouldRotate: boolean,
+        msUntilSessionMaxLife: number
     }
     
