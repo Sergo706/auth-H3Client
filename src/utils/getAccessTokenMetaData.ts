@@ -1,17 +1,17 @@
-import {sendToServer} from "../../src/utils/serverToServer.js"
+import {sendToServer} from "./serverToServer.js"
 import pino from 'pino';
 import { H3Event } from 'h3';
 import { MiniCache } from "./miniCache.js";
-import type { ServerMetaData } from "../types/ServerMetaData.js";
+import type { ServerAccessTokenMetaData } from "../types/ServerMetaData.js";
 
  export const cache = new MiniCache(200)
 
  type ErrorReason = {mfa?: boolean, userNotFound?: boolean, unAuthorized?: boolean, serverError?: boolean} 
 
- export async function getMetadata(log: pino.Logger, getFresh: boolean, accessToken: string, refreshToken: string, canary: string, event: H3Event): Promise<ServerMetaData | ErrorReason> {
+ export async function getMetadata(log: pino.Logger, getFresh: boolean, accessToken: string, refreshToken: string, canary: string, event: H3Event): Promise<ServerAccessTokenMetaData | ErrorReason> {
     log.info(`Getting metadata...`)
 
-    const exists = cache.get(accessToken) as (ServerMetaData) | undefined;
+    const exists = cache.get(accessToken) as (ServerAccessTokenMetaData) | undefined;
 
     if (exists && !getFresh) {
         log.info(`This meta already cached, returning cached data.`)
@@ -26,7 +26,7 @@ import type { ServerMetaData } from "../types/ServerMetaData.js";
 
     log.info(`Getting new metadata...`)
     try {
-        const response = await sendToServer(false, '/secret/metadata', 'GET', event, false, cookies, {}, token)
+        const response = await sendToServer(false, '/secret/accesstoken/metadata', 'GET', event, false, cookies, {}, token)
 
         if (!response) {
             log.error('Error getting meta data.')
@@ -40,7 +40,7 @@ import type { ServerMetaData } from "../types/ServerMetaData.js";
 
        if (response.status === 404) {
             log.error('Error getting meta data. no such user')
-            return {userNotFound: true};
+            return {userNotFound: true};``
         }
 
         if (response.status === 202) {
@@ -53,7 +53,7 @@ import type { ServerMetaData } from "../types/ServerMetaData.js";
             return {serverError: true};
         }
 
-        const json = await response.json() as ServerMetaData;
+        const json = await response.json() as ServerAccessTokenMetaData;
 
         const ttl = Math.max(0, json.msUntilExp - json.refreshThreshold - 5000);
         if (ttl > 0) cache.set(accessToken, json , ttl);

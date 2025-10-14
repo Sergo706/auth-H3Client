@@ -4,8 +4,8 @@ import { getLogger } from '../utils/logger.js';
 import { getCookie, H3Event, HTTPError } from 'h3';
 import throwError from './error.js';
 import { parseResponseContentType } from '../utils/checkResponseType.js';
-import { getMetadata } from '../utils/getAuthorizedMetaData.js';
-import { cache } from "../utils/getAuthorizedMetaData.js";
+import { getMetadata } from '../utils/getAccessTokenMetaData.js';
+import { cache } from "../utils/getAccessTokenMetaData.js";
 import { getOperationalConfig } from '../utils/getRemoteConfig.js';
 
 declare module 'h3' {
