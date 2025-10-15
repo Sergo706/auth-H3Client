@@ -1,4 +1,4 @@
-import { defineHandler, HTTPError } from 'h3'
+import { defineHandler, getRequestIP, HTTPError } from 'h3'
 import { isIP } from 'node:net';
 
 /**
@@ -9,7 +9,7 @@ import { isIP } from 'node:net';
  * @throws HTTPError When the IP is missing or malformed.
  */
 export default defineHandler((event) => {
-  const ipAddress = event.req.ip
+  const ipAddress = getRequestIP(event)
     if (!ipAddress || isIP(ipAddress) === 0) {
         throw new HTTPError({
            body: { date: new Date().toJSON(), code: 'BAD_CLIENT' },
