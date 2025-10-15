@@ -27,5 +27,8 @@ export async function startService(config: Configuration) {
         event.res.status = 200
         return {msg: 'IT WORKS'}
     })
-    return app.handler;
+    return {
+        handler: app.handler,
+        fetchHandler: app.fetch
+    };
 }
