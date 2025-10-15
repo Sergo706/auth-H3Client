@@ -12,7 +12,7 @@ import type { Configuration }  from "./types/configSchema.js"
 
 export async function startService(config: Configuration) {
     configuration(config)
-    
+    console.log('auth called')
     const app = new H3();
 
     app.register(httpLogger());
@@ -23,6 +23,9 @@ export async function startService(config: Configuration) {
     useAuthRoutes(app)
     magicLinksRouter(app)
     useOAuthRoutes(app)
-    
+    app.get(`/test`, (event) => {
+        event.res.status = 200
+        return {msg: 'IT WORKS'}
+    })
     return app.handler;
 }
