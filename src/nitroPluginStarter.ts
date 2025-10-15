@@ -13,7 +13,7 @@ import type { Configuration }  from "./types/configSchema.js"
 export async function startService(app: H3, config: Configuration) {
     configuration(config)
     
-    app.register(httpLogger())
+    httpLogger()(app)
     app.use(isValidIP)
     app.use(validator)
     app.use(csrfToken)
