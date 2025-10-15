@@ -10,10 +10,12 @@ import { useOAuthRoutes } from './routes/OAuth.js';
 import type { Configuration }  from "./types/configSchema.js"
 
 
-export async function startService(app: H3, config: Configuration) {
+export async function startService(config: Configuration) {
     configuration(config)
     
-    httpLogger()(app)
+    const app = new H3();
+
+    app.register(httpLogger());
     app.use(isValidIP)
     app.use(validator)
     app.use(csrfToken)
@@ -21,4 +23,6 @@ export async function startService(app: H3, config: Configuration) {
     useAuthRoutes(app)
     magicLinksRouter(app)
     useOAuthRoutes(app)
+    
+    return app.handler;
 }
