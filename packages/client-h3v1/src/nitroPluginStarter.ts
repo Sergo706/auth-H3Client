@@ -1,4 +1,4 @@
-import { App, Router, setResponseStatus } from 'h3'
+import { App, Router, setResponseStatus,  createRouter } from 'h3'
 import  csrfToken  from './middleware/csrf.js';
 import { configuration } from './config/config.js'
 import {validator} from './middleware/visitorValid.js'
@@ -10,7 +10,7 @@ import { useOAuthRoutes } from './routes/OAuth.js';
 import type { Configuration }  from "./types/configSchema.js"
 
 
-export async function startService(config: Configuration, app: App, router: Router) {
+export async function startService(config: Configuration, app: App, router?: Router) {
     try {
     configuration(config)
     console.log('auth called')
@@ -19,7 +19,8 @@ export async function startService(config: Configuration, app: App, router: Rout
     app.use(isValidIP)
     app.use(validator)
     app.use(csrfToken)
-    
+    const r = router ?? createRouter()
+
     useAuthRoutes(router)
     magicLinksRouter(router)
     useOAuthRoutes(router)
@@ -29,7 +30,7 @@ export async function startService(config: Configuration, app: App, router: Rout
         return {msg: 'IT WORKS'}
     })
 
-    app.use(router)
+    if (!router) app.use(r)
     } catch (err) {
         throw err;
     }
