@@ -1,7 +1,7 @@
 import { getLogger } from "../utils/logger.js";
 import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
-import { assertMethod, defineHandler, getCookie, getQuery, getRouterParam, readBody, redirect } from "h3";
+import { appendHeader, assertMethod, defineEventHandler, getCookie, getHeader, getQuery, getRouterParam, readBody, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "../config/config.js";
@@ -16,7 +16,7 @@ import { getConfiguration } from "../config/config.js";
  * @example
  * router.post('/auth/verify-mfa/:visitor', sendCode, { middleware: [...] });
  */
-export default defineHandler(async (event) => {
+export default defineEventHandler(async (event) => {
 const { domain, accessTokenTTL } = await getOperationalConfig(event)
 const { onSuccessRedirect } = getConfiguration()
 
@@ -34,7 +34,7 @@ const log = getLogger().child({service: `auth`, branch: 'mfa', reqID: event.cont
 
 log.info(`Entered sendCode Post Route`)
 
-const contentType = event.req.headers.get('Content-Type')!;
+const contentType = getHeader(event, 'Content-Type')!;
 
 if (!contentType || contentType !== 'application/json') {
   throwError(log, event, 'INVALID_CONTENT_TYPE', 400, 'Invalid Content-Type', 'Content-Type must be application/json', `Received: ${contentType}`);
@@ -66,7 +66,7 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
 
     if (!serverResponse.ok) {
         log.warn({serverResponse: await serverResponse.json(), code: serverResponse.status},'Bad MFA code.')
-        event.res.status = 401
+        setResponseStatus(event,401)
         return {
             error: 'Invalid or expired code',
         }
@@ -82,7 +82,7 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
         log.info({serverResponse: json, code: serverResponse.status},'MFA verification completed.')
 
        if (setCookies && accessToken) {
-           setCookies.forEach(line => event.res.headers.append('Set-Cookie', line));
+           setCookies.forEach(line => appendHeader(event, 'Set-Cookie', line));
            makeCookie(event, '__Secure-a', accessToken, {
                httpOnly: true,
                sameSite: 'strict',
@@ -100,19 +100,19 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
                 maxAge: accessTokenTTL
             })
          log.info('Redirecting user...') 
-        const wantsJSON = event.req.headers.get('accept')?.includes('application/json');
+        const wantsJSON = getHeader(event, 'accept')?.includes('application/json');
         if (wantsJSON) { 
-         event.res.status = 200; 
+         setResponseStatus(event, 200)
          return { 
             ok: true,
             redirectTo: onSuccessRedirect 
           }
         }
-        return redirect(event, onSuccessRedirect, 303);
+        return sendRedirect(event, onSuccessRedirect, 303);
        }  
 
     log.warn({serverResponse: json, status: serverResponse.status},'Something went wrong')
-    event.res.status = 400
+    setResponseStatus(event, 400)
     return {
      error: 'Invalid or expired code'
     }

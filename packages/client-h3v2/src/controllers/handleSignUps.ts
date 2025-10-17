@@ -97,7 +97,7 @@ const sendData = await sendToServer(false, `/signup`, "POST", event, true, cooki
             redirectTo: onSuccessRedirect 
           }
         }
-        return redirect(event, onSuccessRedirect, 303);
+        return redirect(onSuccessRedirect, 303);
     } 
 
     if (sendData.status === 403 && results.banned) {

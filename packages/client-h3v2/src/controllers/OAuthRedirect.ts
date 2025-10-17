@@ -104,5 +104,5 @@ if (match.supportPKCE) {
          if (!url) {
                 throwError(log,event,'SERVER_ERROR',500,'SERVER_ERROR','','Error constructing the uri please check your configuration and try again.')
             }
-          return redirect(event, url.toString());
+          return redirect(url.toString());
 }
