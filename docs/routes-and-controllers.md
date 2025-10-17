@@ -28,3 +28,23 @@ router.post('/signup', signUpHandler, {
 });
 ```
 
+## Version notes (H3 v1 vs v2)
+
+Route-level middleware attachment differs by H3 version:
+
+- H3 v1
+  ```ts
+  router.use('/login', verifyCsrfCookie)
+  router.use('/login', contentType('application/json'))
+  router.use('/login', limitBytes(1024))
+  router.post('/login', loginHandler)
+  ```
+
+- H3 v2
+  ```ts
+  router.post('/login', loginHandler, {
+    middleware: [verifyCsrfCookie, contentType('application/json'), limitBytes(1024)]
+  })
+  ```
+
+For a complete overview, see docs/h3-v1-v2.md.

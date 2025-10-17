@@ -1,7 +1,7 @@
 import { sendToServer } from "../utils/serverToServer.js";
 import { getLogger } from "../utils/logger.js";
 import { notFoundHandler } from "../middleware/notFound.js"
-import { defineHandler, getCookie, getQuery, getRequestURL, getRouterParam, H3Event, redirect } from "h3";
+import { defineEventHandler, getCookie, getQuery, getRequestURL, getRouterParam, H3Event, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
 
 
@@ -15,7 +15,7 @@ import throwError from "../middleware/error.js";
  * @example
  * router.get('/auth/verify-mfa/:visitor', verifyLink);
  */
-export default defineHandler(async (event) => {
+export default defineEventHandler(async (event) => {
 
 const { temp } = getQuery(event)
 const visitor = getRouterParam(event, "visitor");
@@ -39,7 +39,7 @@ const cookies = {
 
     if (!cookies.value || typeof temp !== "string" || !temp) {
        log.warn('Invalid temp link token. Or canary is possibly undefined')
-       return redirect(event, '/auth');
+       return sendRedirect(event, '/auth');
     }
     const url = getRequestURL(event).pathname;
     const getAction    = /^\/auth\/([^/]+)\/[^?]+\?temp=/;
@@ -57,15 +57,13 @@ const cookies = {
 
     if (serverResponse.ok && event.req.method === 'GET') { 
         log.info(`Link verified with a GET reqs`);
-        event.res.status = 200
-        event.res.statusText = 'Link verified'
+        setResponseStatus(event,200,'Link verified')
         return {
             action,
             linkType
         }
     }
-
-    if (serverResponse.ok && event.req.method === 'POST') {
+    if (serverResponse.ok && event.method === 'POST') {
         log.info(`Link verified with a POST reqs`)
         return;
     }

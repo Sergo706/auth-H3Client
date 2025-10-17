@@ -17,6 +17,47 @@ npm install auth-h3client
 yarn add auth-h3client
 ```
 
+### H3 v1 vs v2
+
+This package supports both H3 v1 and H3 v2. Choose the matching entry point for your H3 version:
+
+- H3 v1 (default): import from `auth-h3client` or `auth-h3client/v1` (peer: `h3@^1.15.4`).
+- H3 v2: import from `auth-h3client/v2` (peer: `h3@^2.0.0-beta.4`).
+
+Quick wiring examples:
+
+- H3 v1
+  ```ts
+  import { createApp, createRouter } from 'h3'
+  import { configuration, httpLogger, isIPValid, botDetectorMiddleware, generateCsrfCookie, useAuthRoutes, magicLinksRouter, useOAuthRoutes } from 'auth-h3client/v1'
+  configuration({ /* ... */ })
+  const app = createApp()
+  httpLogger()(app)
+  app.use(isIPValid)
+  app.use(botDetectorMiddleware)
+  app.use(generateCsrfCookie)
+  const router = createRouter()
+  useAuthRoutes(router); magicLinksRouter(router); useOAuthRoutes(router)
+  app.use(router)
+  ```
+
+- H3 v2
+  ```ts
+  import { createApp, createRouter } from 'h3'
+  import { configuration, httpLogger, isIPValid, botDetectorMiddleware, generateCsrfCookie, useAuthRoutes, magicLinksRouter, useOAuthRoutes } from 'auth-h3client/v2'
+  configuration({ /* ... */ })
+  const app = createApp()
+  app.use(httpLogger)
+  app.use(isIPValid)
+  app.use(botDetectorMiddleware)
+  app.use(generateCsrfCookie)
+  const router = createRouter()
+  useAuthRoutes(router); magicLinksRouter(router); useOAuthRoutes(router)
+  app.use(router)
+  ```
+
+See docs/h3-v1-v2.md for more details, including route-level middleware and handler differences.
+
 ## Configuring the Library
 
 Before using any exported handlers you must call the `configuration` function exactly once at boot. The settings mirror `Configuration` from `src/types/configSchema.ts`.
@@ -312,3 +353,4 @@ Refer to the TSDoc comments across `src/` for parameter descriptions and usage s
 - [Routes and controllers](docs/routes-and-controllers.md)
 - [Server-to-server requests](docs/server-to-server.md)
 - [Logging and error handling](docs/logging-and-errors.md)
+- [H3 v1 vs v2 guide](docs/h3-v1-v2.md)
