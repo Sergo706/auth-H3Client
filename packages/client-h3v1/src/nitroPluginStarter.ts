@@ -21,11 +21,11 @@ export async function startService(config: Configuration, app: App, router?: Rou
     app.use(csrfToken)
     const r = router ?? createRouter()
 
-    useAuthRoutes(router)
-    magicLinksRouter(router)
-    useOAuthRoutes(router)
+    useAuthRoutes(r)
+    magicLinksRouter(r)
+    useOAuthRoutes(r)
 
-    router.get(`/test`, (event) => {
+    r.get(`/test`, (event) => {
         setResponseStatus(event, 200)
         return {msg: 'IT WORKS'}
     })
