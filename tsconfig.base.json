@@ -2,9 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",                                 
     "module": "nodenext",                                
-     "rootDir": "./src",                                  
      "moduleResolution": "nodenext",                    
-    "outDir": "./dist",                                  
      "allowSyntheticDefaultImports": true,            
     "esModuleInterop": true,                           
     "forceConsistentCasingInFileNames": true,           
@@ -16,7 +14,5 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
-  },
-  "include": ["src/**/*", "test", "src/utils", "test/testAuthController.ts", "test/smoke/controllers.test/test.ts"],
-  "exclude": ["node_modules", "test"]
+  }
 }

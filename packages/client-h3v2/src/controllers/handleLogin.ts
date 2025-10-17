@@ -1,7 +1,7 @@
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from '../utils/logger.js';
-import { assertMethod, defineHandler, getRequestIP, readBody, redirect } from "h3";
+import { assertMethod, defineHandler, getRequestIP, redirect } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "../config/config.js";
@@ -122,7 +122,7 @@ try {
           }
         }
         
-        return redirect(event, onSuccessRedirect, 303);
+        return redirect(onSuccessRedirect, 303);
 
 } catch(err) {
     throwError(log,event,'SERVER_ERROR',500,`Unexpected error`,`An error occurred please try again later.`,`Unexpected error ${err}`)    
