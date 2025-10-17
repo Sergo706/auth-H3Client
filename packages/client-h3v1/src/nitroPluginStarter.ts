@@ -11,6 +11,7 @@ import type { Configuration }  from "./types/configSchema.js"
 
 
 export async function startService(config: Configuration, app: App, router: Router) {
+    try {
     configuration(config)
     console.log('auth called')
 
@@ -29,4 +30,7 @@ export async function startService(config: Configuration, app: App, router: Rout
     })
 
     app.use(router)
+    } catch (err) {
+        throw err;
+    }
 }
