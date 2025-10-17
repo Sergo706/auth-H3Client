@@ -3,33 +3,52 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "files": [
-    "dist/**/*",
-    "README.md"
-  ],
+
+  "main": "./packages/client-h3v1/dist/main.js",
+  "types": "./packages/client-h3v1/dist/main.d.ts",
+
   "exports": {
-    ".": {
-      "types": "./dist/main.d.ts",
-      "import": "./dist/main.js",
-      "default": "./dist/main.js"
+     ".": "./packages/client-h3v1/dist/main.js",
+     "./v1": {
+      "types": "./packages/client-h3v1/dist/main.d.ts",
+      "import": "./packages/client-h3v1/dist/main.js",
+      "default": "./packages/client-h3v1/dist/main.js"
     },
+
+    "./v2": {
+      "types": "./packages/client-h3v2/dist/main.d.ts",
+      "import": "./packages/client-h3v2/dist/main.js",
+      "default": "./packages/client-h3v2/dist/main.js"
+    },
+
     "./package.json": "./package.json"
   },
-  "types": "./dist/main.d.ts",
+
+  "typesVersions": {
+    "*": {
+      "v1": ["packages/client-h3v1/dist/main.d.ts"],
+      "v2": ["packages/client-h3v2/dist/main.d.ts"],
+      "*": ["packages/client-h3v1/dist/main.d.ts"]
+    }
+  },
+  "files": ["packages/**/dist/**/*", "README.md"],
   "scripts": {
     "build:test": "tsc && cp -r ./test/smoke/client ./dist/test/smoke/client",
     "logs:http": "tail -n 0 -f ./dist/logs/http.log | jq .",
     "logs:app": "tail -n 0 -f ./dist/logs/info.log | jq .",
-    "build": "tsc -p tsconfig.json",
-    "prepare": "npm run build", 
-    "prepack": "npm run build",
+    "install:subs": "npm --prefix packages/client-h3v1 install --no-package-lock --silent && npm --prefix packages/client-h3v2 install --no-package-lock --silent",
+    "build": "npm --prefix packages/client-h3v1 run build && npm --prefix packages/client-h3v2 run build",
+    "prepare": "npm run install:subs && npm run build",
+    "prepack": "npm run install:subs && npm run build",
     "start": "node dist/test/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "peerDependencies": { 
+    "h3": "^2.0.0-beta.4 || ^1.15.4" 
+},
   "dependencies": {
-    "h3": "^2.0.0-beta.4",
     "jose": "^6.1.0",
     "pino": "^9.11.0",
     "telegraf": "^4.16.3",
@@ -38,6 +57,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "typescript": "^5.6.3"
   }
 }

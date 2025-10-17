@@ -1,4 +1,4 @@
-import { assertMethod, deleteCookie, getCookie, getQuery, getRequestIP, getRequestProtocol, H3Event, redirect } from "h3";
+import { assertMethod, deleteCookie, getCookie, getHeader, getQuery, getRequestIP, getRequestProtocol, H3Event, sendRedirect, setResponseStatus } from "h3";
 import { getLogger } from "../utils/logger.js";
 import { sendToServer } from "../utils/serverToServer.js";
 import throwError from "../middleware/error.js";
@@ -24,7 +24,7 @@ export async function handleLogout(event: H3Event) {
     const log = getLogger().child({service: 'auth', branch: 'classic', type: 'logout', ip: getRequestIP(event)});
     const canary = getCookie(event, 'canary_id');
     const token = getCookie(event, '__Secure-a');
-    const contentType = event.req.headers.get('Content-Type');
+    const contentType = getHeader(event, 'Content-Type');
 
     if (Object.keys(getQuery(event)).length !== 0) {
         throwError(log,event,'FORBIDDEN', 400,'Bad Request','','Query string not allowed')
@@ -82,15 +82,15 @@ export async function handleLogout(event: H3Event) {
         log.info(`User logged out successfully`);
         const url = `${getRequestProtocol(event)}://${domain}`
 
-        const wantsJSON = event.req.headers.get('accept')?.includes('application/json');
+        const wantsJSON = getHeader(event, 'accept')?.includes('application/json');
         if (wantsJSON) { 
-         event.res.status = 200; 
+         setResponseStatus(event, 200) 
          return { 
             ok: true,
             redirectTo: '/' 
           }
         }
-        return redirect(event, url, 303)
+        return sendRedirect(event, url, 303)
 
     }  catch(err) {
         log.error({err}, `Couldn't log user out. server error`);

@@ -97,8 +97,28 @@ Errors are thrown via `throwError(log, event, ...)` or, when acceptable, surface
 
 ## Example usage
 
+- H3 v1
+
 ```ts
+import { defineEventHandler } from 'h3'
+
 router.get('/protected', defineEventHandler(async (event) => {
+  const mfa = await ensureValidCredentials(event);
+  if (mfa && 'text' in mfa) {
+    event.res.statusCode = 202;
+    return mfa;
+  }
+  // Safe to call upstream with event.context.accessToken
+  return { ok: true };
+}));
+```
+
+- H3 v2
+
+```ts
+import { defineHandler } from 'h3'
+
+router.get('/protected', defineHandler(async (event) => {
   const mfa = await ensureValidCredentials(event);
   if (mfa && 'text' in mfa) {
     event.res.status = 202;

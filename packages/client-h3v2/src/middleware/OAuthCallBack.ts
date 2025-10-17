@@ -48,7 +48,7 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
     if (error) {
         log.error({error},'OAuth callback failed with an error');
         clearCookies()
-        return redirect(event, match.redirectUrlOnError); 
+        return redirect( match.redirectUrlOnError); 
     }
 
     const stateCookie = getCookie(event, `state${match.name}`);
@@ -56,7 +56,7 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
     if (!code) {
         clearCookies()
         log.error({error},`OAuth callback failed. provider didn't provided code.`);
-        return redirect(event, match.redirectUrlOnError); 
+        return redirect( match.redirectUrlOnError); 
     }
     
     if (!stateCookie || !stateFromIdP  || stateFromIdP !== stateCookie) {
@@ -127,7 +127,7 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
 
     if (!tokenRes.ok) {
         log.error({status: 'missing_access_token' },'failed to get access token');
-        return redirect(event, match.redirectUrlOnError); 
+        return redirect( match.redirectUrlOnError); 
     }
 
    const tokens = await tokenRes.json();
@@ -172,7 +172,7 @@ const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, 
 
       if (!tokens.access_token) {
         log.error({ status: 'missing_access_token' }, 'OAuth flow succeeded, but the required access_token was missing.');
-        return redirect(event, match.redirectUrlOnError);
+        return redirect( match.redirectUrlOnError);
      }
 
       const info = await fetch(match.userInfoEndpoint, { 
