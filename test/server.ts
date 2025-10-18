@@ -1,15 +1,15 @@
 import { H3, serve } from 'h3'
-import  csrfToken  from '../src/middleware/csrf.js';
-import { configuration } from '../src/config/config.js'
+import  csrfToken  from '../packages/client-h3v2/src/middleware/csrf.js';
+import { configuration } from '../packages/client-h3v2/src/config/config.js'
 import { config } from './setup/config.js'
-import {validator} from '../src/middleware/visitorValid.js'
-import isValidIP from '../src/middleware/isValidIP.js'
-import {httpLogger} from '../src/middleware/httpLogger.js'
-import {useAuthRoutes} from '../src/routes/auth.js';
+import {validator} from '../packages/client-h3v2/src/middleware/visitorValid.js'
+import isValidIP from '../packages/client-h3v2/src/middleware/isValidIP.js'
+import {httpLogger} from '../packages/client-h3v2/src/middleware/httpLogger.js'
+import {useAuthRoutes} from '../packages/client-h3v2/src/routes/auth.js';
 import {useStaticRoutes} from './smoke/controllers.test/static.js';
-import {magicLinksRouter} from '../src/routes/magicLinks.js';
+import {magicLinksRouter} from '../packages/client-h3v2/src/routes/magicLinks.js';
 import {testApp} from './smoke/controllers.test/test.js';
-import { useOAuthRoutes } from '../src/routes/OAuth.js';
+import { useOAuthRoutes } from '../packages/client-h3v2/src/routes/OAuth.js';
 const app = new H3()
 configuration(config)
 

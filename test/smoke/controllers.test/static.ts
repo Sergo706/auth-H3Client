@@ -29,7 +29,7 @@ export function useStaticRoutes(router: H3) {
              return { size: stats.size, mtime: stats.mtimeMs }
         },
       });
-      if (served === false) return next();
+      if (!served) return next();
       
       return served;
     },

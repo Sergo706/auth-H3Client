@@ -1,7 +1,7 @@
-import { getLogger } from '../../../src/utils/logger.js'
-import { getConfiguration } from "../../../src/config/config.js"
+import { getLogger } from '../../../packages/client-h3v2/src/utils/logger.js'
+import { getConfiguration } from "../../../packages/client-h3v2/src/config/config.js"
 import { defineHandler, getCookie } from "h3"
-import {sendToServer} from "../../../src/utils/serverToServer.js"
+import {sendToServer} from "../../../packages/client-h3v2/src/utils/serverToServer.js"
 
 export default defineHandler(async (event) => {
 const {server} = getConfiguration()
