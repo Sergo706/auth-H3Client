@@ -1,4 +1,4 @@
-import type { Configuration } from "../../src/types/configSchema.js";
+import type { Configuration } from "../../packages/client-h3v2/src/types/configSchema.js"
 import { githubEmailCallBack } from "./github.callback.js";
 import dotenv from 'dotenv'
 dotenv.config({ debug: true })
