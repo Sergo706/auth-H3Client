@@ -14,12 +14,12 @@ export async function startService(config: Configuration, app: App, router?: Rou
     try {
     configuration(config)
     console.log('auth called')
+    const r = router ?? createRouter()
 
     httpLogger()(app)
-    app.use(isValidIP)
-    app.use(validator)
-    app.use(csrfToken)
-    const r = router ?? createRouter()
+    r.use(isValidIP)
+    r.use(validator)
+    r.use(csrfToken)
 
     useAuthRoutes(r)
     magicLinksRouter(r)
