@@ -87,7 +87,7 @@ export const configurationSchema = z.strictObject({
 
    onSuccessRedirect: z.url(),
    OAuthProviders,
-
+   enableFireWallBans: z.boolean(),
    telegram: z.discriminatedUnion("enableTelegramLogger", [
       z.object({
       enableTelegramLogger: z.literal(false),

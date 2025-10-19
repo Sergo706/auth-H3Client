@@ -7,7 +7,7 @@ import { getLogger} from "../utils/logger.js";
 import { getCookie, getRequestIP, getRequestURL, H3Event, HTTPError, parseCookies } from "h3";
 import { sendToServer } from "../utils/serverToServer.js";
 import throwError from "./error.js";
-
+import { getConfiguration } from "../main.js";
 
 /**
  * Validates visitor canary cookies, bootstrapping tracking metadata and banning
@@ -22,7 +22,7 @@ import throwError from "./error.js";
 export const validator = async (event: H3Event): Promise<any> => {
     const log = getLogger().child({service: `auth-client`, branch: 'BOT DETECTOR', type: 'middleware', reqID: event.context.rid})
     const url = getRequestURL(event);
-
+    const {enableFireWallBans} = getConfiguration()
     const isPageView =
     !url.pathname.match(/\.(css|js|png|jpe?g|svg|ico|woff2?|ttf|map|webp|json)$/i);
     const isOAuth = url.pathname.startsWith("/oauth/");
@@ -63,7 +63,9 @@ export const validator = async (event: H3Event): Promise<any> => {
     if (status === 403) {
     const message = await trackRes.text();
      log.info('Detected malicious user starting banning');
-     banIp(getRequestIP(event)!);
+     if (enableFireWallBans) {
+       banIp(getRequestIP(event)!);
+     }
      log.info('Banning completed');
      throw new HTTPError({
         body: { date: new Date().toJSON(), code: 'NOT_ALLOWED' },
