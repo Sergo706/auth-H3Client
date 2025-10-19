@@ -10,10 +10,11 @@ import { getRequestHost, getRequestIP, getRequestProtocol, getRequestURL, type H
  * const headers = clientHeaders(event);
  */
 export function clientHeaders( event: H3Event ): Record<string, string | undefined> {
-    const clientIp = getRequestIP(event) || undefined
-    const protocol = getRequestProtocol(event, {xForwardedProto: false})
-    const host = getRequestHost(event, {xForwardedHost: false});
-    const url = getRequestURL(event);
+    const xReal = event.req.headers.get('x-real-ip')
+    const clientIp = xReal || getRequestIP(event, {xForwardedFor: true}) || undefined
+    const protocol = getRequestProtocol(event, {xForwardedProto: true})
+    const host = getRequestHost(event, {xForwardedHost: true});
+    const url = getRequestURL(event,{xForwardedHost: true, xForwardedProto:true});
 
       const h = event.req.headers as Headers;
       const get = (name: string) => h.get(name) ?? undefined;
