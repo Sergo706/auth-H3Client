@@ -1,5 +1,7 @@
-import { defineHandler, getRequestIP, HTTPError } from 'h3'
+import { defineHandler, getRequestIP } from 'h3'
 import { isIP } from 'node:net';
+import throwError from './error.js';
+import { getLogger } from '../main.js';
 
 /**
  * Rejects requests lacking a valid client IP by throwing a 403 HTTPError.
@@ -10,11 +12,10 @@ import { isIP } from 'node:net';
  */
 export default defineHandler((event) => {
   const ipAddress = getRequestIP(event)
+  const log = getLogger().child({service: 'auth-client', branch: 'entry', type: 'middleware'})
     if (!ipAddress || isIP(ipAddress) === 0) {
-        throw new HTTPError({
-           body: { date: new Date().toJSON(), code: 'BAD_CLIENT' },
-            status: 403,
-            statusText: "Forbidden",
-        })
+      throwError(log, event, 'AUTH_SERVER_ERROR', 403, 'Forbidden', 'BAD_CLIENT', `
+        Bad client ip address ${ipAddress}
+        `)
     }
 })
