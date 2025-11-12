@@ -1,4 +1,4 @@
-import { defineEventHandler, getRequestIP } from 'h3';
+import { defineEventHandler, getRequestIP, setResponseStatus } from 'h3';
 import throwError from './error.js';
 import { isIP } from 'node:net';
 import { getLogger } from "../utils/logger.js";
@@ -16,13 +16,11 @@ export default defineEventHandler((event) => {
                     
   const log = getLogger().child({service: 'auth-client', branch: 'entry', type: 'middleware'})
 
-      if (!ipAddress) {
-        return;
-      // throwError(log,event,'FORBIDDEN', 403, 'Forbidden', 'BAD_CLIENT', `
-      //   No ipAddress is provided.
-      //   ${ipAddress}
-      //   `)
-    }
+    if (!ipAddress) {
+      log.warn(`NULL ip address ${ipAddress}`);
+      setResponseStatus(event, 403);
+      return;
+    };
 
     if (isIP(ipAddress) === 0) {
       throwError(log, event, 'AUTH_SERVER_ERROR', 403, 'Forbidden', 'BAD_CLIENT', `
