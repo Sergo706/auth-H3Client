@@ -11,9 +11,18 @@ import { getLogger } from '../main.js';
  * @throws HTTPError When the IP is missing or malformed.
  */
 export default defineHandler((event) => {
-  const ipAddress = getRequestIP(event)
+  const ipAddress = getRequestIP(event) ?? getRequestIP(event, { xForwardedFor: true }) ??
+                    event.runtime?.node?.req.headers['x-real-ip'] as string | undefined;
+
   const log = getLogger().child({service: 'auth-client', branch: 'entry', type: 'middleware'})
-    if (!ipAddress || isIP(ipAddress) === 0) {
+
+    if (!ipAddress) {
+      throwError(log,event,'FORBIDDEN', 403, 'Forbidden', 'BAD_CLIENT', `
+        No ipAddress is provided.
+        ${ipAddress}
+        `)
+    }
+    if (isIP(ipAddress) === 0) {
       throwError(log, event, 'AUTH_SERVER_ERROR', 403, 'Forbidden', 'BAD_CLIENT', `
         Bad client ip address ${ipAddress}
         `)
