@@ -17,10 +17,11 @@ export default defineEventHandler((event) => {
   const log = getLogger().child({service: 'auth-client', branch: 'entry', type: 'middleware'})
 
       if (!ipAddress) {
-      throwError(log,event,'FORBIDDEN', 403, 'Forbidden', 'BAD_CLIENT', `
-        No ipAddress is provided.
-        ${ipAddress}
-        `)
+        return;
+      // throwError(log,event,'FORBIDDEN', 403, 'Forbidden', 'BAD_CLIENT', `
+      //   No ipAddress is provided.
+      //   ${ipAddress}
+      //   `)
     }
 
     if (isIP(ipAddress) === 0) {
