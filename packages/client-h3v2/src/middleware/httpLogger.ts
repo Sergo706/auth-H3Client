@@ -5,7 +5,6 @@ import { randomUUID } from 'crypto';
 import { fileURLToPath } from 'url';
 import { 
   H3Event, 
-  getRequestURL,
   getRequestIP,
   parseCookies,
   onRequest,
@@ -15,6 +14,7 @@ import {
   onError,
   definePlugin,
 } from 'h3';
+import { getSafeUrl } from '../utils/getSafeUrl.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,7 +68,7 @@ function levelFor(status: number, hasError: boolean): Level {
  */
 export const httpLogger = definePlugin(app => {
    app.use(onRequest((event) => {
-  const url = getRequestURL(event);
+  const url = getSafeUrl(event);
   const isAsset = url.pathname.match(/\.(css|js|png|jpe?g|svg|ico|woff2?|ttf|map|webp|json)$/i);
   const isDevTools = url.pathname.startsWith('/.well-known/');
   
@@ -123,7 +123,7 @@ export const httpLogger = definePlugin(app => {
        const hasError = Boolean(event.context.error)
        
        if (rid) event.res.headers.set('x-request-id', rid);
-      const url = getRequestURL(event)
+      const url = getSafeUrl(event);
       const host = getRequestHost(event) || event.req.headers.get('host') || '';
       const fullUrl = `${host}${url.pathname}`
       let msg: string
