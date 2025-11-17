@@ -78,7 +78,7 @@ export const httpLogger = () => {
   app.options.onRequest = async (event: H3Event) => {
       await prevOnRequest?.(event);
 
-  const url = getRequestURL(event);
+  const url = getRequestURL(event, {xForwardedHost: true, xForwardedProto: true});
   const isAsset = url.pathname.match(/\.(css|js|png|jpe?g|svg|ico|woff2?|ttf|map|webp|json)$/i);
   const isDevTools = url.pathname.startsWith('/.well-known/');
   
