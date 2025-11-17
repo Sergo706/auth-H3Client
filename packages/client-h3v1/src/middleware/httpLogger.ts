@@ -18,6 +18,7 @@ import {
   getResponseStatusText,
 } from 'h3';
 import { getSafeUrl } from '../utils/getSafeUrl.js';
+import { getConfiguration } from '../main.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,12 +78,15 @@ export const httpLogger = () => {
 
   app.options.onRequest = async (event: H3Event) => {
 
-    if (!event.node.req.headers.host) {
-            event.node.req.headers.host = 'localhost';
-    }
-
-      await prevOnRequest?.(event);
-
+      if (!event.node.req.headers.host) {
+                    const cfg = getConfiguration();
+                    const host = cfg.server.auth_location.serverOrDNS;
+                    const usingSSL = !!cfg.server.ssl.enableSSL; 
+                    const port = cfg.server.auth_location.port ?? (usingSSL ? 443 : 80);
+                    event.node.req.headers.host = port === 80 || port === 443 ? host : `${host}:${port}`;
+          }
+          
+  await prevOnRequest?.(event);
   const url = getSafeUrl(event);
   const isAsset = url.pathname.match(/\.(css|js|png|jpe?g|svg|ico|woff2?|ttf|map|webp|json)$/i);
   const isDevTools = url.pathname.startsWith('/.well-known/');
