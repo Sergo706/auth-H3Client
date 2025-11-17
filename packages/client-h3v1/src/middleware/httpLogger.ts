@@ -76,6 +76,11 @@ export const httpLogger = () => {
           const prevOnError = app.options.onError;
 
   app.options.onRequest = async (event: H3Event) => {
+
+    if (!event.node.req.headers.host) {
+            event.node.req.headers.host = 'localhost';
+    }
+
       await prevOnRequest?.(event);
 
   const url = getSafeUrl(event);
