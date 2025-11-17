@@ -5,7 +5,6 @@ import { randomUUID } from 'crypto';
 import { fileURLToPath } from 'url';
 import { 
   H3Event, 
-  getRequestURL,
   getRequestIP,
   parseCookies,
   getRequestHost,
@@ -18,6 +17,7 @@ import {
   getResponseHeaders,
   getResponseStatusText,
 } from 'h3';
+import { getSafeUrl } from '../utils/getSafeUrl.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,7 +78,7 @@ export const httpLogger = () => {
   app.options.onRequest = async (event: H3Event) => {
       await prevOnRequest?.(event);
 
-  const url = getRequestURL(event, {xForwardedHost: true, xForwardedProto: true});
+  const url = getSafeUrl(event);
   const isAsset = url.pathname.match(/\.(css|js|png|jpe?g|svg|ico|woff2?|ttf|map|webp|json)$/i);
   const isDevTools = url.pathname.startsWith('/.well-known/');
   
@@ -130,7 +130,7 @@ export const httpLogger = () => {
        const log = (event.context.log as pino.Logger)  || logger;
        const ms = (performance.now() ?? Date.now()) - (event.context.time as number);
 
-       const url = getRequestURL(event, {xForwardedHost: true, xForwardedProto: true})
+       const url = getSafeUrl(event);
        const host = getRequestHost(event) || getRequestHeader(event, 'host') || '';
        const fullUrl = `${host}${url.pathname}`
        const status = getResponseStatus(event);
