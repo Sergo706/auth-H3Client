@@ -130,7 +130,7 @@ export const httpLogger = () => {
        const log = (event.context.log as pino.Logger)  || logger;
        const ms = (performance.now() ?? Date.now()) - (event.context.time as number);
 
-       const url = getRequestURL(event)
+       const url = getRequestURL(event, {xForwardedHost: true, xForwardedProto: true})
        const host = getRequestHost(event) || getRequestHeader(event, 'host') || '';
        const fullUrl = `${host}${url.pathname}`
        const status = getResponseStatus(event);
