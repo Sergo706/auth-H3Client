@@ -38,13 +38,13 @@ if (!contentType || contentType !== 'application/json') {
 const body = event.context.body
 
   if (!body) {
-      throwError(log,event,'MISSING_BODY',400, 'Invalid request body.', 'This field is required.', 'Invalid request body.')
+      throwError(log,event,'MISSING_BODY',400, 'Invalid request body.1234', 'This field is required.', 'Invalid request body.')
   }
 
 for (const [key, value] of Object.entries(body)) {
     if (!value && key !== 'rememberUser') {
         log.warn({key},`One more fields are empty..`)
-        throwError(log,event,'MISSING_BODY',400, 'Invalid request body.', 'This field is required.', 'One or more required fields are empty..')
+        throwError(log,event,'MISSING_BODY',400, 'Invalid request body123.', 'This field is required.', 'One or more required fields are empty..')
     }
 }
 
