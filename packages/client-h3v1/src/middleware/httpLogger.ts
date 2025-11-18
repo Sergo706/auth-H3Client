@@ -10,7 +10,6 @@ import {
   getRequestHost,
   getRequestFingerprint,
   App,
-  getRequestHeader,
   setResponseHeader,
   getRequestHeaders,
   getResponseStatus,
@@ -97,17 +96,17 @@ export const httpLogger = () => {
   };
   
   
-  const incoming = getRequestHeader(event, 'x-request-id') ?? undefined
+  const incoming = event.headers.get('x-request-id') ?? undefined
   let requestId = incoming || randomUUID()
   setResponseHeader(event, 'x-request-id', requestId)
   
   event.context.time = performance?.now?.() ?? Date.now();
   event.context.rid = requestId;
   
-    const host = getRequestHost(event) || getRequestHeader(event, 'host') || '';
+    const host = getRequestHost(event, {xForwardedHost: true}) || event.headers.get('host') || '';
     const fullUrl = `${host}${url.pathname}${url.search || ''}`
     const ip = getRequestIP(event) || ''
-    const ua = getRequestHeader(event, 'user-agent') || ''
+    const ua = event.headers.get('user-agent') || ''
     const fp = await getRequestFingerprint(event)
     const logger = httpLog;
   
@@ -125,7 +124,7 @@ export const httpLogger = () => {
       FullUrl: fullUrl,
       cookies: parseCookies(event),
       fingerPrints: fp,
-      referrer:  getRequestHeader(event, 'referer') || undefined,
+      referrer:  event.headers.get('referer') || undefined,
   
     });
     (event.context.log as pino.Logger).info('request start')
@@ -140,7 +139,7 @@ export const httpLogger = () => {
        const ms = (performance.now() ?? Date.now()) - (event.context.time as number);
 
        const url = getSafeUrl(event);
-       const host = getRequestHost(event) || getRequestHeader(event, 'host') || '';
+       const host = getRequestHost(event) || event.headers.get('host') || '';
        const fullUrl = `${host}${url.pathname}`
        const status = getResponseStatus(event);
        const hasError = Boolean(event.context.error)
@@ -152,7 +151,7 @@ export const httpLogger = () => {
       msg = `error: ${status} on ${event.method} ${url.pathname}${err?.message ? ` - ${err.message}` : ''}`
     } else {
         msg = status === 404
-          ? `404 page hit. referer: ${getRequestHeader(event, 'referer') || 'N/A'}, latency: ${Math.round(ms)}ms`
+          ? `404 page hit. referer: ${event.headers.get('referer') || 'N/A'}, latency: ${Math.round(ms)}ms`
           : `${event.method} ${fullUrl}${url.search || ''} completed`
     }
 
