@@ -34,37 +34,47 @@ const noStore = defineEventHandler((event) => {
  * magicLinksRouter(router);
  */
 export function magicLinksRouter(router: Router) {
-  router.use('/auth/verify-mfa/:visitor', only('GET'))
-  router.use('/auth/verify-mfa/:visitor', noStore)
-  router.use('/auth/verify-mfa/:visitor', csrfToken)
-  router.get('/auth/verify-mfa/:visitor', verifyLink)
-  
-  router.use('/auth/verify-mfa/:visitor', only('POST'))
-  router.use('/auth/verify-mfa/:visitor', verifyLink)
-  router.use('/auth/verify-mfa/:visitor', checkCsrf)
-  router.use('/auth/verify-mfa/:visitor', contentType('application/json'))
-  router.use('/auth/verify-mfa/:visitor', limitBytes(1024))
-  router.post('/auth/verify-mfa/:visitor', sendCode)
+
+  const verifyMfaGetPipeline = defineEventHandler(async (event) => {
+      await noStore(event);
+      await csrfToken(event);
+      return verifyLink(event);
+  });
+  router.get('/auth/verify-mfa/:visitor', verifyMfaGetPipeline);
+
+  const verifyMfaPostPipeline = defineEventHandler(async (event) => {
+      await verifyLink(event); 
+      await checkCsrf(event);
+      await contentType('application/json')(event);
+      await limitBytes(1024)(event);
+      return sendCode(event);
+  });
+  router.post('/auth/verify-mfa/:visitor', verifyMfaPostPipeline);
+
+  const initResetPipeline = defineEventHandler(async (event) => {
+      await checkCsrf(event);
+      await contentType('application/json')(event);
+      await limitBytes(1024)(event);
+      return initPasswordReset(event);
+  });
+  router.post('/auth/password-reset', initResetPipeline);
 
 
-  router.use('/auth/password-reset', only('POST'))
-  router.use('/auth/password-reset', checkCsrf)
-  router.use('/auth/password-reset', contentType('application/json'))
-  router.use('/auth/password-reset', limitBytes(1024))
-  router.post('/auth/password-reset', initPasswordReset)
+const resetGetPipeline = defineEventHandler(async (event) => {
+      await noStore(event);
+      await csrfToken(event);
+      return verifyLink(event);
+  });
+  router.get('/auth/reset-password/:visitor', resetGetPipeline);
 
-
-  router.use('/auth/reset-password/:visitor', only('GET'))
-  router.use('/auth/reset-password/:visitor', noStore)
-  router.use('/auth/reset-password/:visitor', csrfToken)
-  router.get('/auth/reset-password/:visitor', verifyLink)
-
-  router.use('/auth/reset-password/:visitor', only('POST'))
-  router.use('/auth/reset-password/:visitor', verifyLink)
-  router.use('/auth/reset-password/:visitor', checkCsrf)
-  router.use('/auth/reset-password/:visitor', contentType('application/json'))
-  router.use('/auth/reset-password/:visitor', limitBytes(1024))
-  router.post('/auth/reset-password/:visitor', sendNewPassword)
+const resetPostPipeline = defineEventHandler(async (event) => {
+      await verifyLink(event); 
+      await checkCsrf(event);
+      await contentType('application/json')(event);
+      await limitBytes(1024)(event);
+      return sendNewPassword(event);
+  });
+  router.post('/auth/reset-password/:visitor', resetPostPipeline);
 
 }
 
