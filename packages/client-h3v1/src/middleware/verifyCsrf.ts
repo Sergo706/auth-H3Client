@@ -18,6 +18,7 @@ export default defineEventHandler( async (event) => {
     const log = getLogger().child({service: `csrf`, branch: `general`})
     const name = '__Host-csrf';
     const cookie = getCookie(event, name)
+     console.log(`ENTERED CSRF`);
 
     log.info(`Verifying csrf token...`)
 

@@ -18,6 +18,7 @@ export function limitBytes(maxBytes: number): EventHandler {
     return defineEventHandler( async (event) => {
         assertMethod(event, "POST")
      const header = getHeader(event, 'Content-Length')
+     console.log(`ENTERED LIMITBYTES`);
     
      if (header && Number.isFinite(+header) && +header > maxBytes) {
         throwError(log,event,'INVALID_CONTENT_TYPE',403, 'Forbidden', '', `exceeded allowed posts request bytes. Allowed: ${maxBytes}, Received: ${+header}. Request has been dropped`)

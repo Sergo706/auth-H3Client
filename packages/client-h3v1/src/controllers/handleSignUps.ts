@@ -36,6 +36,7 @@ if (!contentType || contentType !== 'application/json') {
 };
 
 const body = event.context.body
+     console.log(`ENTERED CONTROLLER, BODY:`, body);
 
   if (!body) {
       throwError(log,event,'MISSING_BODY',400, 'Invalid request body.1234', 'This field is required.', 'Invalid request body.')
