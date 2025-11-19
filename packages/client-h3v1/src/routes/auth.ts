@@ -3,7 +3,7 @@ import { contentType } from "../middleware/validateContentType.js";
 import checkCsrf from "../middleware/verifyCsrf.js"
 import  login  from "../controllers/handleLogin.js";
 import { handleLogout } from "../controllers/handleLogout.js";
-import { Router } from "h3";
+import { defineEventHandler, Router } from "h3";
 import { limitBytes } from "../middleware/limitBytes.js";
 
 /**
@@ -23,20 +23,31 @@ import { limitBytes } from "../middleware/limitBytes.js";
  */
 export function useAuthRoutes(router: Router) {
 
-  router.use('/signup', checkCsrf)
-  router.use('/signup', contentType('application/json'))
-  router.use('/signup', limitBytes(1024))
-  router.post('/signup', signup)
+  const signUpPipeline = defineEventHandler(async (event) => {
+    await checkCsrf(event);
+    await contentType('application/json')(event);
+    await limitBytes(1024)(event);
+    return signup(event);
+  })
 
-  router.use('/logout', checkCsrf)
-  router.use('/logout', limitBytes(0))
-  router.post('/logout', handleLogout)
+  router.post('/signup', signUpPipeline);
 
-  router.use('/login', checkCsrf)
-  router.use('/login', contentType('application/json'))
-  router.use('/login', limitBytes(1024))
-  router.post('/login', login)
+  const loginPipeline = defineEventHandler(async (event) => {
+      await checkCsrf(event);
+      await contentType('application/json')(event);
+      await limitBytes(1024)(event);
+      return login(event);
+  });
 
+  router.post('/login', loginPipeline);
+
+  const logoutPipeline = defineEventHandler(async (event) => {
+      await checkCsrf(event);
+      await limitBytes(0)(event);
+      return handleLogout(event);
+  })
+
+  router.post('/logout', logoutPipeline)
 }
 
 export default useAuthRoutes

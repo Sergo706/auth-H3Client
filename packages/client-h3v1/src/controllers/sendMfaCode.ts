@@ -1,7 +1,7 @@
 import { getLogger } from "../utils/logger.js";
 import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
-import { appendHeader, assertMethod, defineEventHandler, getCookie, getHeader, getQuery, getRouterParam, readBody, sendRedirect, setResponseStatus } from "h3";
+import { appendHeader, assertMethod, defineEventHandler, getCookie, getHeader, getQuery, getRouterParam, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "../config/config.js";
