@@ -1,7 +1,7 @@
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from '../utils/logger.js';
 import { banIp } from '../utils/banIp.js';
-import { assertMethod, defineHandler, getCookie, getQuery, getRequestIP, getRouterParam, readBody } from 'h3';
+import { assertMethod, defineHandler, getCookie, getQuery, getRequestIP, getRouterParam } from 'h3';
 import throwError from '../middleware/error.js';
 
 

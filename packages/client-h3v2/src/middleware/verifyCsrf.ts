@@ -1,5 +1,5 @@
 import { verifySignedCookie } from "../utils/cryptoCookies.js";
-import { defineHandler, getCookie, HTTPError, readBody } from 'h3'
+import { defineHandler, getCookie, HTTPError } from 'h3'
 import { getLogger } from "../utils/logger.js";
 
 
