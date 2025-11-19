@@ -74,7 +74,7 @@ export async function sendToServer<T>(keepAlive: boolean, endpoint: string, meth
   if (body) headers['Content-Type'] = 'application/json';
 
   log.info(`Mapped. About to fetch`)
-  const signal = AbortSignal.timeout(3000)
+  const signal = AbortSignal.timeout(15000)
 try { 
    const response = await fetch(targetURL, {
          method: method,
