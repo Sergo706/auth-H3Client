@@ -36,7 +36,6 @@ if (!contentType || contentType !== 'application/json') {
 };
 
 const body = event.context.body
-     console.log(`ENTERED CONTROLLER, BODY:`, body);
 
   if (!body) {
       throwError(log,event,'MISSING_BODY',400, 'Invalid request body.1234', 'This field is required.', 'Invalid request body.')
@@ -71,7 +70,7 @@ const sendData = await sendToServer(false, `/signup`, "POST", event, true, cooki
         const accessIat   = results.accessIat;
         
         if (cookies && accessToken) {
-            cookies.forEach(line => appendHeader(event, 'Set-Cookie', line));
+            cookies.forEach((line: unknown) => appendHeader(event, 'Set-Cookie', line));
             makeCookie(event, '__Secure-a', accessToken, {
                 httpOnly: true,
                 sameSite: 'strict',

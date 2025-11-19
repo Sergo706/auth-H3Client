@@ -18,19 +18,15 @@ export function limitBytes(maxBytes: number): EventHandler {
     return defineEventHandler( async (event) => {
         assertMethod(event, "POST")
      const header = getHeader(event, 'Content-Length')
-     console.log(`ENTERED LIMITBYTES`);
     
      if (header && Number.isFinite(+header) && +header > maxBytes) {
         throwError(log,event,'INVALID_CONTENT_TYPE',403, 'Forbidden', '', `exceeded allowed posts request bytes. Allowed: ${maxBytes}, Received: ${+header}. Request has been dropped`)
      }
      const raw = await readRawBody(event, false)
-        console.log("RAW" ,raw);
 
      const rawBody = typeof raw === 'string' ? Buffer.from(raw, 'utf8') : raw;
-        console.log(`RAWBODY`, rawBody);
 
      const bytes = rawBody?.byteLength ?? 0
-        console.log(bytes);
 
       if (bytes === 0) { 
         event.context.body = undefined; 

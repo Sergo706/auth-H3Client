@@ -1,4 +1,4 @@
-import { Router } from "h3";
+import { defineEventHandler, Router } from "h3";
 import { OAuthCallback } from "../controllers/OAuthSuccessCallBack.js";
 import { OAuthTokensValidations } from '../middleware/OAuthCallBack.js';
 import { OAuthRedirect } from "../controllers/OAuthRedirect.js";
@@ -21,7 +21,11 @@ export function useOAuthRoutes(router: Router) {
 
 router.get('/oauth/:provider', OAuthRedirect)
 
-router.use('/oauth/callback/:provider', OAuthTokensValidations)
-router.get('/oauth/callback/:provider', OAuthCallback)
+const callbackPipeline = defineEventHandler(async (event) => {
+      await OAuthTokensValidations(event);
+      return OAuthCallback(event);
+  })
+  
+router.get('/oauth/callback/:provider', callbackPipeline)
 
 }
