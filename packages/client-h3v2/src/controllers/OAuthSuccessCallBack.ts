@@ -1,4 +1,4 @@
-import { getCookie, getRequestIP, H3Event, redirect } from "h3";
+import { getCookie, getRequestIP, H3Event } from "h3";
 import { getLogger } from "../utils/logger.js";
 import { getConfiguration } from "../config/config.js";
 import throwError from "../middleware/error.js";

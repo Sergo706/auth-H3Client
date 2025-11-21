@@ -106,20 +106,22 @@ const sendData = await sendToServer(false, `/signup`, "POST", event, true, cooki
     }
 
     if (sendData.status === 400) {
-     if (results.inputError) {
-        log.info({error: results.inputError}, `Input error`) 
+        const inputError = results.error ?? results.inputError;
+
+     if (inputError) {
+        log.info({error: inputError}, `Input error`) 
         setResponseStatus(event, 400) 
         return {
             ok: false,
             receivedAt: new Date().toISOString(),
-            error: results.inputError
+            error: inputError
         }
     } else {
        setResponseStatus(event, 400)
         return {
             ok: false,
             receivedAt: new Date().toISOString(),
-            error: results.inputError
+            error: 'Unexpected error type'
         }
     }
 }
