@@ -1,7 +1,7 @@
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from '../utils/logger.js';
-import { appendHeader, assertMethod, defineEventHandler, getHeader, getRequestIP, H3Event, sendRedirect, setResponseStatus } from "h3";
+import { appendHeader, assertMethod, defineEventHandler, getHeader, getRequestIP, H3Error, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "../config/config.js";
@@ -125,6 +125,9 @@ try {
         return sendRedirect(event, onSuccessRedirect, 303);
 
 } catch(err) {
+    if (err instanceof H3Error) {
+        throw err;
+    }
     throwError(log,event,'SERVER_ERROR',500,`Unexpected error`,`An error occurred please try again later.`,`Unexpected error ${err}`)    
 }
 }) 
