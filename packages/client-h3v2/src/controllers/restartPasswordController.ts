@@ -1,7 +1,7 @@
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from '../utils/logger.js';
 import { banIp } from '../utils/banIp.js';
-import { assertMethod, defineHandler, getRequestIP } from 'h3';
+import { assertMethod, defineHandler, getRequestIP, HTTPError } from 'h3';
 import throwError from '../middleware/error.js';
 
 
@@ -85,6 +85,9 @@ if (!email) {
     };
 
     } catch(err) {
+        if (err instanceof HTTPError) {
+        throw err;
+    }
      throwError(log,event,'SERVER_ERROR',500,`Unexpected error`,`An error occurred please try again later.`,`Unexpected error ${err}`)  
 }
 
