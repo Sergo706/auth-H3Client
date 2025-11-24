@@ -29,29 +29,31 @@ const noStore = defineHandler((event) => {
  * const router = createRouter();
  * magicLinksRouter(router);
  */
-export function magicLinksRouter(router: H3) {
+export function magicLinksRouter(router: H3, prefix?: string) {
+    const p = (path: string) => prefix ? `/${prefix}${path}` : path;
+
     router
 
-    .get("/auth/verify-mfa/:visitor", verifyLink,
+    .get(p("/auth/verify-mfa/:visitor"), verifyLink,
         {middleware: [noStore, csrfToken]}
     )
-    .post('/auth/verify-mfa/:visitor', sendCode, 
+    .post(p('/auth/verify-mfa/:visitor'), sendCode, 
         {middleware: [verifyLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
     );
 
 
-    router.post('/auth/password-reset',initPasswordReset,
+    router.post(p('/auth/password-reset'),initPasswordReset,
         {middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)]}
     )
 
 
     router
     
-    .get("/auth/reset-password/:visitor", verifyLink, 
+    .get(p("/auth/reset-password/:visitor"), verifyLink, 
         {middleware: [noStore, csrfToken]}
     )
     
-    .post("/auth/reset-password/:visitor", sendNewPassword,
+    .post(p("/auth/reset-password/:visitor"), sendNewPassword,
         {middleware: [verifyLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
     )
 

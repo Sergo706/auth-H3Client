@@ -33,14 +33,14 @@ const noStore = defineEventHandler((event) => {
  * const router = createRouter();
  * magicLinksRouter(router);
  */
-export function magicLinksRouter(router: Router) {
-
+export function magicLinksRouter(router: Router, prefix?: string) {
+  const p = (path: string) => prefix ? `/${prefix}${path}` : path;
   const verifyMfaGetPipeline = defineEventHandler(async (event) => {
       await noStore(event);
       await csrfToken(event);
       return verifyLink(event);
   });
-  router.get('/auth/verify-mfa/:visitor', verifyMfaGetPipeline);
+  router.get(p('/auth/verify-mfa/:visitor'), verifyMfaGetPipeline);
 
   const verifyMfaPostPipeline = defineEventHandler(async (event) => {
       await verifyLink(event); 
@@ -49,7 +49,7 @@ export function magicLinksRouter(router: Router) {
       await limitBytes(1024)(event);
       return sendCode(event);
   });
-  router.post('/auth/verify-mfa/:visitor', verifyMfaPostPipeline);
+  router.post(p('/auth/verify-mfa/:visitor'), verifyMfaPostPipeline);
 
   const initResetPipeline = defineEventHandler(async (event) => {
       await checkCsrf(event);
@@ -57,7 +57,7 @@ export function magicLinksRouter(router: Router) {
       await limitBytes(1024)(event);
       return initPasswordReset(event);
   });
-  router.post('/auth/password-reset', initResetPipeline);
+  router.post(p('/auth/password-reset'), initResetPipeline);
 
 
 const resetGetPipeline = defineEventHandler(async (event) => {
@@ -65,7 +65,7 @@ const resetGetPipeline = defineEventHandler(async (event) => {
       await csrfToken(event);
       return verifyLink(event);
   });
-  router.get('/auth/reset-password/:visitor', resetGetPipeline);
+  router.get(p('/auth/reset-password/:visitor'), resetGetPipeline);
 
 const resetPostPipeline = defineEventHandler(async (event) => {
       await verifyLink(event); 
@@ -74,7 +74,7 @@ const resetPostPipeline = defineEventHandler(async (event) => {
       await limitBytes(1024)(event);
       return sendNewPassword(event);
   });
-  router.post('/auth/reset-password/:visitor', resetPostPipeline);
+  router.post(p('/auth/reset-password/:visitor'), resetPostPipeline);
 
 }
 

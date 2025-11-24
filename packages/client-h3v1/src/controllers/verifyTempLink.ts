@@ -52,7 +52,7 @@ const cookies = {
         throwError(log,event,'SERVER_ERROR', 500, 'Server Error', 'Server error please try again later', 'Api Call Failed')
     };
 
-    const json = await serverResponse.json() as any;
+    const json = await serverResponse.json() as {error: string | undefined, link: string | undefined};
     const linkType = json.link;
 
     if (serverResponse.ok && event.req.method === 'GET') { 
