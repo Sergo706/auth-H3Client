@@ -42,7 +42,7 @@ const cookies = {
        return sendRedirect(event, '/auth');
     }
     const url = getRequestURL(event).pathname;
-    const getAction    = /^\/auth\/([^/]+)\/[^?]+\?temp=/;
+    const getAction = /\/auth\/([^/]+)\//;
     const action = url.match(getAction)?.[1];
     if (!action) return notFoundHandler(event);
 
