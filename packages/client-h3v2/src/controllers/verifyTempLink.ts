@@ -53,7 +53,7 @@ const cookies = {
     };
 
     const json = await serverResponse.json() as {error: string | undefined, link: string | undefined};
-    const linkType = json.link;
+    const linkType = json.link as "Password Reset" | "MFA Code";
 
     if (serverResponse.ok && event.req.method === 'GET') { 
         log.info(`Link verified with a GET reqs`);
