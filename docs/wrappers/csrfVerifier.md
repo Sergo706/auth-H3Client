@@ -127,8 +127,12 @@ app.use(generateCsrfCookie);
 Include the CSRF token in your requests:
 
 ```ts
-// Get token from cookie
+// Get token from cookie (Nuxt)
 const csrfToken = useCookie('csrf_token');
+
+// OR using the client helper (Vanilla/Other)
+import { getCsrfToken } from 'auth-h3client/client';
+const token = getCsrfToken();
 
 // Include in request
 await $fetch('/api/submit', {
