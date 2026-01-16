@@ -3,7 +3,7 @@ import { getCachedUserData } from './getCachedUserData.js';
 import { getCookie, HTTPError, type EventHandler, type EventHandlerRequest } from 'h3';
 import { defineHandler } from 'h3';
 import type { Storage } from 'unstorage';
-import { CacheOptions } from '../types/CachedAuthResponse.js';
+import { CacheOptions } from '@internal/shared';
 
 interface AuthOptions {
   storage: Storage;

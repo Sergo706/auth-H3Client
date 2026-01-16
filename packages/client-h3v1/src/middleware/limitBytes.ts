@@ -1,6 +1,6 @@
 import { assertMethod, defineEventHandler, EventHandler, getHeader, readRawBody } from "h3";
 import throwError from "./error.js";
-import { getLogger } from "../utils/logger.js";
+import { getLogger } from "@internal/shared";
 
 
 /**

@@ -1,12 +1,12 @@
 import { getRequestIP, H3Event, sendRedirect } from "h3";
 import crypto from 'crypto';
-import { getLogger } from '../utils/logger.js';
-import { getConfiguration } from "../config/config.js";
+import { getLogger } from "@internal/shared";
+import { getConfiguration } from "@internal/shared";
 import { makeCookie } from "../utils/cookieGenerator.js";
-import { makePkcePair } from "../utils/pkce.js";
+import { makePkcePair } from "@internal/shared";
 import throwError from "../middleware/error.js";
-import { discoverOidc } from "../utils/discoverOidc.js";
-import { createSignedCookie } from "../utils/cryptoCookies.js";
+import { discoverOidc } from "@internal/shared";
+import { createSignedCookie } from "@internal/shared";
 
 /**
  * Initiates the OAuth/OIDC authorization flow for the requested provider by

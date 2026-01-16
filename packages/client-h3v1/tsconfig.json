@@ -3,8 +3,22 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "composite": true
+    "composite": true,
+    "paths": {
+      "@internal/shared": [
+        "../shared/src/index.ts"
+      ]
+    }
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "references": [
+    {
+      "path": "../shared"
+    }
+  ],
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

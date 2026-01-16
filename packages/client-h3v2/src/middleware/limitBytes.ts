@@ -1,6 +1,6 @@
-import { assertMethod, defineHandler, EventHandler, H3Event } from "h3";
+import { assertMethod, defineHandler, EventHandler } from "h3";
 import throwError from "./error.js";
-import { getLogger } from "../utils/logger.js";
+import { getLogger } from "@internal/shared";
 
 
 /**

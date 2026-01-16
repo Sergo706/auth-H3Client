@@ -1,6 +1,7 @@
 import { useState, useRequestHeaders } from 'nuxt/app';
 import type { Ref } from 'vue';
 import { $fetch } from 'ofetch';
+import type { ServerResponse } from "@internal/shared";
 
 export interface AuthState {
     id?: string;    
@@ -9,17 +10,6 @@ export interface AuthState {
     message?: string;
 }
 
-export interface ServerResponse {
-    authorized: boolean,
-    userId?: string,
-    reason?: string,
-    ipAddress: string,
-    userAgent:  string,
-    date: string,
-    roles?: string[] | string;
-    error?: string
-    message?: string
-}
 
 let activeAuthRequest: Promise<void> | null = null;
 

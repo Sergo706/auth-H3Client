@@ -1,0 +1,18 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist",
+        "composite": true,
+        "declaration": true,
+        "declarationMap": true
+    },
+    "include": [
+        "./**/*.ts",
+        "../client-h3v2/src/h3.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

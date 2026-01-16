@@ -1,9 +1,9 @@
 import { makeCookie } from '../utils/cookieGenerator.js'
 import { sendToServer } from '../utils/serverToServer.js'
-import { getLogger } from '../utils/logger.js';
+import { getLogger } from "@internal/shared";
 import { getCookie, H3Event, HTTPError } from 'h3';
 import throwError from './error.js';
-import { parseResponseContentType } from '../utils/checkResponseType.js';
+import { parseResponseContentType } from "@internal/shared";
 import { getMetadata } from '../utils/getAccessTokenMetaData.js';
 import { cache } from "../utils/getAccessTokenMetaData.js";
 import { getOperationalConfig } from '../utils/getRemoteConfig.js';

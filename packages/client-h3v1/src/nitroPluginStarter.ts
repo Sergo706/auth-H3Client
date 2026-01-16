@@ -1,13 +1,13 @@
 import { App, Router, setResponseStatus,  createRouter } from 'h3'
 import  csrfToken  from './middleware/csrf.js';
-import { configuration } from './config/config.js'
+import { configuration } from "@internal/shared";
 import {validator} from './middleware/visitorValid.js'
 import isValidIP from './middleware/isValidIP.js'
 import {httpLogger} from './middleware/httpLogger.js'
 import {useAuthRoutes} from './routes/auth.js';
 import {magicLinksRouter} from './routes/magicLinks.js';
 import { useOAuthRoutes } from './routes/OAuth.js';
-import type { Configuration }  from "./types/configSchema.js"
+import type { Configuration }  from "@internal/shared";
 
 
 export async function startService(config: Configuration, app: App, router?: Router) {

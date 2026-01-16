@@ -1,13 +1,13 @@
-import { getLogger } from '../utils/logger.js';
-import { getConfiguration } from "../config/config.js";
+import { getLogger } from "@internal/shared";
+import { getConfiguration } from "@internal/shared";
 import { deleteCookie, getCookie, getRequestIP, getValidatedQuery, H3Event, sendRedirect } from "h3";
 import throwError from "./error.js";
-import { discoverOidc } from '../utils/discoverOidc.js';
-import { verifyOAuthToken } from '../utils/verifyOAuthTokens.js';
-import { verifySignedCookie } from '../utils/cryptoCookies.js';
-import { query as OAuthQuery } from '../types/OAuthQuery.js';
-import { atHashCheck } from '../utils/atHash.js';
-import type { OidcIdTokenPayload } from '../types/oidc.js'
+import { discoverOidc } from "@internal/shared";
+import { verifyOAuthToken } from "@internal/shared";
+import { verifySignedCookie } from "@internal/shared";
+import { query as OAuthQuery } from "@internal/shared";
+import { atHashCheck } from "@internal/shared";
+import type { OidcIdTokenPayload } from "@internal/shared";
 
 
 /**

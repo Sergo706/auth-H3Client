@@ -1,10 +1,10 @@
-import { getLogger } from "../utils/logger.js";
+import { getLogger } from "@internal/shared";
 import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { appendHeader, assertMethod, defineEventHandler, getCookie, getHeader, getQuery, getRouterParam, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
-import { getConfiguration } from "../config/config.js";
+import { getConfiguration } from "@internal/shared";
 
 /**
  * Validates MFA code submissions by proxying them to the auth server, managing session cookies,

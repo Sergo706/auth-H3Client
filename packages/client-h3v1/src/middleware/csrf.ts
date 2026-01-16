@@ -1,8 +1,8 @@
 import crypto from 'crypto'
-import { createSignedCookie } from '../utils/cryptoCookies.js'
+import { createSignedCookie } from "@internal/shared";
 import { defineEventHandler, getCookie } from 'h3'
 import { makeCookie } from '../utils/cookieGenerator.js'
-import { getLogger } from '../utils/logger.js'
+import { getLogger } from "@internal/shared";
 
 /**
  * Ensures a CSRF cookie exists for the current request, minting and signing a new one when absent.

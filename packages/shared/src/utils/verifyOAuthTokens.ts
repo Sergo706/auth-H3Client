@@ -1,5 +1,5 @@
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import type { OidcIdTokenPayload } from '../types/oidc.js'
+import type { OidcIdTokenPayload } from '@internal/shared'
 
 /**
  * Verifies an OIDC ID token using the provider's JWKS endpoint and returns the decoded payload.
