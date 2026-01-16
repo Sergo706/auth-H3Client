@@ -23,6 +23,7 @@ This package supports both H3 v1 and H3 v2. Choose the matching entry point for 
 
 - H3 v1 (default): import from `auth-h3client` or `auth-h3client/v1` (peer: `h3@^1.15.4`).
 - H3 v2: import from `auth-h3client/v2` (peer: `h3@^2.0.0-beta.4`).
+- Client: import from `auth-h3client/client` for Nuxt/Vue composables (peer: `nuxt`, `vue`, `ofetch`).
 
 Quick wiring examples:
 
@@ -354,3 +355,14 @@ Refer to the TSDoc comments across `src/` for parameter descriptions and usage s
 - [Server-to-server requests](docs/server-to-server.md)
 - [Logging and error handling](docs/logging-and-errors.md)
 - [H3 v1 vs v2 guide](docs/h3-v1-v2.md)
+- [Client package](docs/client.md) - Nuxt/Vue composables and utilities
+- [Configuration guide](docs/configuration.md) - Full options reference
+
+### Handler Wrappers
+
+- [defineAuthenticatedEventHandler](docs/wrappers/defineAuthenticatedEventHandler.md) - Require authentication
+- [defineOptionalAuthenticationEvent](docs/wrappers/defineOptionalAuth.md) - Optional authentication
+- [defineAuthenticatedEventPostHandlers](docs/wrappers/authenticatedPostHandler.md) - Auth + CSRF + POST
+- [defineVerifiedCsrfHandler](docs/wrappers/csrfVerifier.md) - CSRF protection
+- [getAuthStatusHandler](docs/wrappers/getAuthStatus.md) - Pre-built auth status endpoint
+- [getCachedUserData](docs/wrappers/getCachedUserData.md) - Low-level user data caching

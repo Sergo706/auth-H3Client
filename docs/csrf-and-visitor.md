@@ -14,6 +14,8 @@ app.use(generateCsrfCookie);
 router.post('/signup', handler, { middleware: [verifyCsrfCookie] });
 ```
 
+For convenient handler wrapping, use `defineVerifiedCsrfHandler`. See [CSRF Verifier Wrapper](wrappers/csrfVerifier.md).
+
 ## Visitor validator (canary) / Bot detector
 
 - `validator` (src/middleware/visitorValid.ts) integrates with the auth service's botDetector module.
