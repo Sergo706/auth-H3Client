@@ -146,6 +146,23 @@ const data = await client.authFetch<MyData>('/api/endpoint', {
 
 ---
 
+## Utilities
+
+### getCsrfToken
+
+Helper to extract the CSRF token from the `__Host-csrf` cookie in the browser.
+
+```ts
+import { getCsrfToken } from 'auth-h3client/client';
+
+const token = getCsrfToken();
+// Returns token string or undefined
+```
+
+Useful when you need to manually attach the token to non-AuthBase requests.
+
+---
+
 ## Example: Protected Page
 
 ```vue
