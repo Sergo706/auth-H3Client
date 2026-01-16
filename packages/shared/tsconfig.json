@@ -8,8 +8,7 @@
         "declarationMap": true
     },
     "include": [
-        "./**/*.ts",
-        "../client-h3v2/src/h3.d.ts"
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",
