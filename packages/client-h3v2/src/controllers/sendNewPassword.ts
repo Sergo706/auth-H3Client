@@ -1,6 +1,6 @@
 import { sendToServer } from '../utils/serverToServer.js';
-import { getLogger } from '../utils/logger.js';
-import { banIp } from '../utils/banIp.js';
+import { getLogger } from "@internal/shared";
+import { banIp } from "@internal/shared";
 import { assertMethod, defineHandler, getCookie, getQuery, getRequestIP, getRouterParam } from 'h3';
 import throwError from '../middleware/error.js';
 

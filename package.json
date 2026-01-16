@@ -5,6 +5,9 @@
   "type": "module",
   "main": "./packages/client-h3v1/dist/main.js",
   "types": "./packages/client-h3v1/dist/main.d.ts",
+  "workspaces": [
+    "packages/*"
+  ],
   "exports": {
     ".": "./packages/client-h3v1/dist/main.js",
     "./v1": {
@@ -48,9 +51,9 @@
     "build:test": "tsc && cp -r ./test/smoke/client ./dist/test/smoke/client",
     "logs:http": "tail -n 0 -f ./dist/logs/http.log | jq .",
     "logs:app": "tail -n 0 -f ./dist/logs/info.log | jq .",
-    "install:subs": "npm --prefix packages/client-h3v1 install --no-package-lock --silent && npm --prefix packages/client-h3v2 install --no-package-lock --silent && npm --prefix packages/client install --no-package-lock --silent",
-    "build": "npm --prefix packages/client-h3v1 run build && npm --prefix packages/client-h3v2 run build && npm --prefix packages/client run build",
-    "prepare": "npm run install:subs && npm run build",
+    "install:subs": "npm --prefix packages/shared install --no-package-lock --silent && npm --prefix packages/client-h3v1 install --no-package-lock --silent && npm --prefix packages/client-h3v2 install --no-package-lock --silent && npm --prefix packages/client install --no-package-lock --silent",
+    "build": "npm --prefix packages/shared run build && npm --prefix packages/client-h3v1 run build && npm --prefix packages/client-h3v2 run build && npm --prefix packages/client run build",
+    "prepare": "npm run build",
     "prepack": "npm run install:subs && npm run build",
     "start": "node dist/test/server.js"
   },

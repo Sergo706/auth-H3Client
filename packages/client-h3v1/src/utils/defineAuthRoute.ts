@@ -3,8 +3,8 @@ import type { EventHandler, EventHandlerRequest } from 'h3';
 import { ensureValidCredentials,hmacSignatureMiddleware, throwHttpError, getLogger } from "../main.js";
 import { getCachedUserData } from "./getCachedUserData.js";
 import type { Storage } from 'unstorage';
-import type { Cookies } from '../types/Cookies.js';
-import { CacheOptions } from "../types/CachedAuthResponse.js";
+import type { Cookies } from "@internal/shared";
+import { CacheOptions } from "@internal/shared";
 
 export interface MfaResponse { mfaRequired: string; message: string };
 

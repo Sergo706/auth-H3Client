@@ -1,10 +1,10 @@
-import type { ServerResponse } from '../types/ServerResponse.js';
+import type { ServerResponse } from '@internal/shared';
 import type {  H3Event } from 'h3';
 import { serviceToService, getLogger, parseResponseContentType } from '../main.js';
 import { createHash } from 'node:crypto';
 import type { Storage } from 'unstorage';
-import type { CachedAuthResponse, CacheOptions } from '../types/CachedAuthResponse.js';
-import type { Cookies } from '../types/Cookies.js';
+import type { CachedAuthResponse, CacheOptions } from '@internal/shared';
+import type { Cookies } from '@internal/shared';
 
 export const getCachedUserData = async (event: H3Event, cookies: Cookies[], token: string, storage: Storage, cacheOptions?: CacheOptions): Promise<CachedAuthResponse> => {
      const log = getLogger().child({service: 'auth', type: 'dataAccess-cache'});

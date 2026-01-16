@@ -1,11 +1,11 @@
 import { appendHeader, deleteCookie, getCookie, H3Event, setResponseStatus } from "h3";
-import { getLogger } from "../utils/logger.js";
+import { getLogger } from "@internal/shared";
 import throwError from "./error.js";
 import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { getMetadata } from "../utils/getAccessTokenMetaData.js";
 import { cache } from "../utils/getAccessTokenMetaData.js";
-import { parseResponseContentType } from "../utils/checkResponseType.js";
+import { parseResponseContentType } from "@internal/shared";
 import { H3Error } from 'h3';
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 

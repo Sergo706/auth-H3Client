@@ -1,5 +1,5 @@
 import { defineHandler, EventHandler } from 'h3'
-import { getLogger } from '../utils/logger.js';
+import { getLogger } from "@internal/shared";
 import throwError from './error.js';
 
 

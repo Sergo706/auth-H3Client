@@ -1,12 +1,17 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "./src",
     "outDir": "./dist",
     "composite": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "paths": {
+      "@internal/shared": ["../shared/src/index.ts"]
+    }
   },
+  "references": [
+    { "path": "../shared" }
+  ],
   "include": [
     "src/**/*"
   ],

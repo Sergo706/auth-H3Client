@@ -1,8 +1,8 @@
 import { sendToServer } from '../utils/serverToServer.js'
-import { getLogger } from "../utils/logger.js";
+import { getLogger } from "@internal/shared";
 import { deleteCookie, getCookie, H3Event, HTTPError } from 'h3';
 import throwError from './error.js';
-import { parseResponseContentType } from '../utils/checkResponseType.js';
+import { parseResponseContentType } from "@internal/shared";
 import { getOperationalConfig } from '../utils/getRemoteConfig.js';
 import { getMetadata } from '../utils/getRefreshTokenMetaData.js';
 import { cache } from '../utils/getRefreshTokenMetaData.js';

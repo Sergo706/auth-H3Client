@@ -1,4 +1,4 @@
-import type { ServerResponse } from './ServerResponse.ts';
+import type { ServerResponse } from "@internal/shared";
 import 'h3';
 
 declare module 'h3' {

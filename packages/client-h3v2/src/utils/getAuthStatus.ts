@@ -1,6 +1,7 @@
 import { defineAuthenticatedEventHandler } from "./defineAuthRoute.js";
 import { getLogger, throwHttpError } from "../main.js";
 import type { Storage } from "unstorage";
+import '@internal/shared'; 
 
 /**
  * Creates an authenticated status endpoint handler.

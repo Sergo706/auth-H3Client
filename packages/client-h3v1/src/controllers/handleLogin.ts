@@ -1,10 +1,10 @@
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
-import { getLogger } from '../utils/logger.js';
+import { getLogger } from "@internal/shared";
 import { appendHeader, assertMethod, defineEventHandler, getHeader, getRequestIP, H3Error, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
-import { getConfiguration } from "../config/config.js";
+import { getConfiguration } from "@internal/shared";
 
 /**
  * Handles login submissions by validating payloads, proxying the request to the

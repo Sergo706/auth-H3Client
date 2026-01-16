@@ -14,5 +14,10 @@
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "paths": {
+        "@internal/shared": [
+          "./packages/shared/src/index.ts"
+        ]
+      }
   }
 }

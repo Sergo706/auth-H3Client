@@ -1,6 +1,6 @@
-import { verifySignedCookie } from "../utils/cryptoCookies.js";
+import { verifySignedCookie } from "@internal/shared";
 import { defineHandler, getCookie, HTTPError } from 'h3'
-import { getLogger } from "../utils/logger.js";
+import { getLogger } from "@internal/shared";
 
 
 /**

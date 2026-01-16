@@ -1,6 +1,5 @@
 import type { WebSocketPeer } from 'h3'
-import { getLogger } from "../utils/logger.js";
-import { getOperationalConfig } from '../utils/getRemoteConfig.js';
+import { getLogger } from "@internal/shared";
 
 export async function authWs(peer: WebSocketPeer): Promise<void> {
  const log = getLogger().child({service: 'auth-ws', branch: `ws-authentication`, reqID: peer.id })
