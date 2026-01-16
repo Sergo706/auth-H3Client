@@ -128,3 +128,10 @@ router.get('/protected', defineHandler(async (event) => {
   return { ok: true };
 }));
 ```
+
+## See also
+
+For higher-level wrappers that handle auth and caching automatically:
+
+- [defineAuthenticatedEventHandler](wrappers/defineAuthenticatedEventHandler.md) - Wraps handlers with full authentication
+- [getCachedUserData](wrappers/getCachedUserData.md) - Low-level user data fetching with cache
