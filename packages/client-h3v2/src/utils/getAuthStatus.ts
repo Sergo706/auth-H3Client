@@ -1,7 +1,5 @@
 import { defineAuthenticatedEventHandler } from "./defineAuthRoute.js";
 import { getLogger, throwHttpError } from "../main.js";
-import type { Storage } from "unstorage";
-import '@internal/shared'; 
 
 /**
  * Creates an authenticated status endpoint handler.
@@ -15,7 +13,7 @@ import '@internal/shared';
  * import { getAuthStatusHandler } from '@internal/client-h3v2';
  * export default getAuthStatusHandler(useStorage('cache'));
  */
-export const getAuthStatusHandler = (storage: Storage) => {
+export const getAuthStatusHandler = () => {
     return defineAuthenticatedEventHandler(
         (event) => {
             const log = getLogger().child({ service: 'auth-client-status', branch: 'status', type: 'handler' });
@@ -41,6 +39,5 @@ export const getAuthStatusHandler = (storage: Storage) => {
                 ...user
             };
         },
-        { storage }
     );
 };
