@@ -24,5 +24,8 @@ router.get('/oauth/:provider', OAuthRedirect)
 router.get('/oauth/callback/:provider', OAuthCallback, 
     {middleware: [OAuthTokensValidations]}
 )
+router.post('/oauth/callback/:provider', OAuthCallback, 
+    {middleware: [OAuthTokensValidations]}
+)
 
 }

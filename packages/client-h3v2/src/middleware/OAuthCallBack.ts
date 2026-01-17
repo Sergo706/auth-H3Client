@@ -1,6 +1,6 @@
 import { getLogger } from "@internal/shared";
 import { getConfiguration } from "@internal/shared";
-import { deleteCookie, getCookie, getRequestIP, getValidatedQuery, H3Event, redirect } from "h3";
+import { deleteCookie, getCookie, getQuery, getRequestIP, H3Event, readBody, redirect } from "h3";
 import throwError from "./error.js";
 import { discoverOidc } from "@internal/shared";
 import { verifyOAuthToken } from "@internal/shared";
@@ -41,7 +41,9 @@ const clearCookies = () => {
     deleteCookie(event,`state${match.name}`);
 }
 
-const { code, state:stateFromIdP, error, iss } = await getValidatedQuery(event, query);
+const httpMethod = event.req.method;
+const input = httpMethod === 'POST' ? await readBody(event) : getQuery(event);
+const { code, state:stateFromIdP, error, iss } = query.parse(input);
 
     if (error) {
         log.error({error},'OAuth callback failed with an error');

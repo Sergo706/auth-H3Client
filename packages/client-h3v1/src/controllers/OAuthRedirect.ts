@@ -41,10 +41,12 @@ if (!match) {
   const nonce = crypto.randomBytes(32).toString('base64url');
   const { verifier, challenge } = makePkcePair();
 
+  const isFormPost = match.extraAuthParams?.response_mode === 'form_post';
+  const sameSiteMode = isFormPost ? 'none' : 'lax';
 
  makeCookie(event, `state${match.name}`, state, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: sameSiteMode,
     secure: true, 
     path: '/',  
     maxAge: 60 * 3,
@@ -53,7 +55,7 @@ if (!match) {
 if (match.supportPKCE) {
   makeCookie(event, `pkce_v${match.name}`, verifier, {
      httpOnly: true,
-     sameSite: "lax",
+     sameSite: sameSiteMode,
      secure: true, 
      path: '/',  
      maxAge: 60 * 3,
@@ -63,7 +65,7 @@ if (match.supportPKCE) {
    if (match.kind === 'oidc')  {
      makeCookie(event, `nonce${match.name}`, nonce, {
      httpOnly: true,
-     sameSite: "lax",
+     sameSite: sameSiteMode,
      secure: true, 
      path: '/',  
      maxAge: 60 * 3,

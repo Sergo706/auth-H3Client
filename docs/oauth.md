@@ -1,6 +1,6 @@
 # OAuth and OpenID Connect Guide
 
-This is a comprehensive guide for configuring OAuth and OpenID Connect (OIDC) providers with `auth-h3client`. The library supports both protocols and is designed to work with 99% of identity providers.
+This is a comprehensive guide for configuring OAuth and OpenID Connect (OIDC) providers with `auth-h3client`. The library supports both protocols and is designed to work with must of identity providers, including those that require `response_mode=form_post`.
 
 ---
 
@@ -62,7 +62,8 @@ When you call `useOAuthRoutes(app)`, these routes are registered:
 | Route | Handler | Description |
 |-------|---------|-------------|
 | `GET /oauth/:provider` | `OAuthRedirect` | Initiates the OAuth flow |
-| `GET /oauth/callback/:provider` | `OAuthCallback` | Handles the provider's callback |
+| `GET /oauth/callback/:provider` | `OAuthCallback` | Handles provider callback (query mode) |
+| `POST /oauth/callback/:provider` | `OAuthCallback` | Handles provider callback (form_post mode) |
 
 ---
 
@@ -378,6 +379,31 @@ GitHub doesn't return email in the main user response. You must call `/user/emai
 
 ---
 
+### Apple Sign In (OIDC)
+
+> [!IMPORTANT]
+> Apple **requires** `response_mode: 'form_post'`. You must register a `POST` route for the callback.
+
+```ts
+{
+  kind: 'oidc',
+  name: 'apple',
+  issuer: 'https://appleid.apple.com',
+  clientId: process.env.APPLE_CLIENT_ID!,
+  clientSecret: process.env.APPLE_CLIENT_SECRET!, // This must be a signed JWT (client_secret_post)
+  redirectUri: 'https://yourapp.com/oauth/callback/apple',
+  supportPKCE: true,
+  redirectUrlOnSuccess: 'https://yourapp.com/dashboard',
+  redirectUrlOnError: 'https://yourapp.com/login',
+  defaultScopes: ['name', 'email'],
+  extraAuthParams: {
+    response_mode: 'form_post' // Required by Apple
+  }
+}
+```
+
+---
+
 ## Advanced Configuration
 
 ### Extra Auth Parameters
@@ -400,8 +426,8 @@ extraAuthParams: {
   // Include previously granted scopes
   include_granted_scopes: 'true',
   
-  // Specify response mode (rarely needed)
-  response_mode: 'query',  // or 'form_post'
+  // Specify response mode (use 'form_post' for Apple Sign In)
+  response_mode: 'form_post',  // Automatically sets SameSite=None cookies
   
   // Customize login hint
   login_hint: 'user@example.com',

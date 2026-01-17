@@ -27,5 +27,6 @@ const callbackPipeline = defineEventHandler(async (event) => {
   })
   
 router.get('/oauth/callback/:provider', callbackPipeline)
+router.post('/oauth/callback/:provider', callbackPipeline)
 
 }
