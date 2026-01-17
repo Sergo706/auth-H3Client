@@ -2,9 +2,6 @@
     "name": "@internal/client",
     "private": true,
     "type": "module",
-    "scripts": {
-        "build": "tsc -p tsconfig.json"
-    },
     "dependencies": {
         "@internal/shared": "*"
     },
