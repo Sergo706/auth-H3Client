@@ -2,8 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "composite": false,
-    "noEmit": true,
-    "skipLibCheck": true
+    "noEmit": true
   },
   "include": [
     "packages/shared/src/**/*.ts",
