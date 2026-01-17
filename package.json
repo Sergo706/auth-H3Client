@@ -5,6 +5,9 @@
   "type": "module",
   "main": "./dist/v1.js",
   "types": "./dist/v1.d.ts",
+  "workspaces": [
+    "packages/*"
+  ],
   "exports": {
     ".": {
       "types": "./dist/v1.d.ts",
