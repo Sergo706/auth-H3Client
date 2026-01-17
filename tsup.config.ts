@@ -1,0 +1,40 @@
+import { defineConfig } from 'tsup';
+
+export default defineConfig({
+  entry: {
+    'v1': 'packages/client-h3v1/src/main.ts',
+    'v2': 'packages/client-h3v2/src/main.ts',
+    'client': 'packages/client/main.ts',
+  },
+  format: ['esm'],
+  tsconfig: 'tsconfig.prod.json',
+  dts: true,
+  sourcemap: true,
+  clean: true, 
+  splitting: false,
+  outDir: 'dist',
+  external: [
+    'node:crypto',
+    'node:buffer',
+    'node:net',
+    'crypto',
+    'fs',
+    'path',
+    'url',
+    'child_process',
+    'h3',
+    'vue',
+    'nuxt',
+    'ofetch',
+    'jose',
+    'zod',
+    'pino',
+    'telegraf',
+    'undici',
+    'unstorage',
+  ],
+  noExternal: [
+    '@internal/shared', 
+  ],
+  treeshake: true,
+});
