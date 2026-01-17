@@ -1,5 +1,5 @@
 import { type AuthState, useAuthData } from "./composables/useAuthData.js";
-import { $fetch } from 'ofetch';
+import { $fetch, FetchOptions, type $Fetch } from 'ofetch';
 
 export default class AuthBase {
     protected headers: Record<string, string>;
@@ -13,15 +13,28 @@ export default class AuthBase {
         return authRef.value;
     }
 
-    public async authFetch<T>(url: string, options: any = {}): Promise<T> {
+    public async authFetch(url: string, prefix: true, options?: FetchOptions): Promise<$Fetch>;
+    public async authFetch<T>(url: string, prefix?: false, options?: FetchOptions): Promise<T>;
+    public async authFetch<T>(url: string, prefix?: boolean, options?: FetchOptions): Promise<T | $Fetch> {
         await this.waitForAuth();
+     
+        if (prefix) {
+            return $fetch.create({
+                baseURL: url,
+                ...options,
+                headers: {
+                    ...this.headers,
+                    ...options?.headers
+                }
+            });
+        }
 
-        return $fetch<T>(url, {
+        return $fetch(url, {
             ...options,
             headers: {
                 ...this.headers,
-                ...options.headers
+                ...options?.headers
             }
-        });
+        }) as Promise<T>;
     }
 }
