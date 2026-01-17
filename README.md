@@ -65,6 +65,10 @@ Before using any exported handlers you must call the `configuration` function ex
 
 ```ts
 import { configuration } from 'auth-h3client';
+import { createStorage } from 'unstorage';
+import memoryDriver from 'unstorage/drivers/memory';
+
+const storage = createStorage({ driver: memoryDriver() });
 
 configuration({
   server: {
@@ -81,6 +85,13 @@ configuration({
       enableSSL: false,
     },
     cryptoCookiesSecret: process.env.COOKIE_SECRET!,
+  },
+  uStorage: {
+    storage: storage,
+    cacheOptions: {
+      successTtl: 60 * 60 * 24 * 30,  // 30 days
+      rateLimitTtl: 10
+    }
   },
   onSuccessRedirect: 'https://app.example.com/dashboard',
   OAuthProviders: [
@@ -157,6 +168,10 @@ Below is a single, complete configuration object showing all fields. Items marke
 ```ts
 // config/auth-client.config.ts
 import type { Configuration } from 'auth-h3client/dist/types/configSchema';
+import { createStorage } from 'unstorage';
+import memoryDriver from 'unstorage/drivers/memory';
+
+const storage = createStorage({ driver: memoryDriver() });
 
 export const config: Configuration = {
   server: {
@@ -181,6 +196,15 @@ export const config: Configuration = {
       clientKeyPath: 'client.key',       // optional
     },
     cryptoCookiesSecret: process.env.COOKIE_SECRET!,
+  },
+
+  // Storage for caching user authentication data (required)
+  uStorage: {
+    storage: storage,  // any unstorage driver: memory, redis, cloudflare-kv, etc.
+    cacheOptions: {
+      successTtl: 60 * 60 * 24 * 30,  // 30 days
+      rateLimitTtl: 10                 // 10 seconds
+    }
   },
 
   // Where users are redirected after successful auth (used by multiple flows)
@@ -255,6 +279,7 @@ export const config: Configuration = {
 | `server.hmac` | Enables optional HMAC sealing of outbound requests; requires client ID and shared secret. |
 | `server.ssl` | TLS settings for mutual TLS connections to the auth API. When `enableSSL` is `true`, provide certificate paths. |
 | `server.cryptoCookiesSecret` | Secret used to sign CSRF and state cookies. |
+| `uStorage` | Storage configuration for caching user auth data. Uses [unstorage](https://unstorage.unjs.io/). |
 | `onSuccessRedirect` | Default redirect URL after successful login/signup/MFA flows. |
 | `OAuthProviders` | Optional list of OAuth/OIDC providers with per-provider redirect behavior. |
 | `telegram` | Optional Telegram alerting configuration for security events. |
