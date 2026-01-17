@@ -85,6 +85,55 @@ cryptoCookiesSecret: 'long-random-string-at-least-32-chars'
 
 ---
 
+## Storage Settings (`uStorage`)
+
+Configuration for caching user authentication data. Required by authentication handlers.
+
+```ts
+import { createStorage } from 'unstorage';
+import memoryDriver from 'unstorage/drivers/memory';
+
+// Or use any unstorage driver: redis, cloudflare-kv, etc.
+const storage = createStorage({ driver: memoryDriver() });
+
+configuration({
+  // ... other options
+  uStorage: {
+    storage: storage,
+    cacheOptions: {
+      successTtl: 60 * 60 * 24 * 30,  // 30 days (default)
+      rateLimitTtl: 10                 // 10 seconds (default)
+    }
+  }
+});
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `storage` | `Storage` | required | An [unstorage](https://unstorage.unjs.io/) instance for caching auth data |
+| `cacheOptions.successTtl` | `number` | `2592000` (30 days) | TTL in seconds for successful auth cache |
+| `cacheOptions.rateLimitTtl` | `number` | `10` | TTL in seconds for rate limit cache |
+
+### Nuxt 3 Example
+
+```ts
+import { useStorage } from '#imports';
+
+configuration({
+  uStorage: {
+    storage: useStorage('cache'),  // Uses Nitro's built-in cache storage
+    cacheOptions: {
+      successTtl: 60 * 60 * 24,    // 1 day
+      rateLimitTtl: 10
+    }
+  }
+});
+```
+
+---
+
 ## Redirects (`onSuccessRedirect`)
 
 The default URL where users are redirected after a successful login or signup flow if no specific redirect was requested.
@@ -206,6 +255,10 @@ Here is a full configuration file you can adapt.
 
 ```ts
 import { configuration } from 'auth-h3client';
+import { createStorage } from 'unstorage';
+import memoryDriver from 'unstorage/drivers/memory';
+
+const storage = createStorage({ driver: memoryDriver() });
 
 export const setupAuth = () => {
     configuration({
@@ -223,6 +276,14 @@ export const setupAuth = () => {
                 enableSSL: false
             },
             cryptoCookiesSecret: process.env.AUTH_COOKIE_SECRET!
+        },
+        
+        uStorage: {
+            storage: storage,
+            cacheOptions: {
+                successTtl: 60 * 60 * 24 * 30,  // 30 days
+                rateLimitTtl: 10
+            }
         },
         
         onSuccessRedirect: 'http://localhost:3000/dashboard',

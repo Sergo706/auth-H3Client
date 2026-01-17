@@ -16,24 +16,11 @@ import { defineAuthenticatedEventHandler } from 'auth-h3client/v2';
 
 ```ts
 function defineAuthenticatedEventHandler<T extends EventHandlerRequest, D>(
-  handler: EventHandler<T, D>,
-  options: AuthOptions
+  handler: EventHandler<T, D>
 ): EventHandler<T, Promise<D | MfaResponse>>
 ```
 
-### Options
-
-```ts
-interface AuthOptions {
-  storage: Storage;      // unstorage instance for caching user data
-  cache?: CacheOptions;  // optional cache TTL settings
-}
-
-interface CacheOptions {
-  successTtl?: number;     // TTL for successful auth cache (default: 30 days)
-  rateLimitTtl?: number;   // TTL for rate limit cache (default: 10 seconds)
-}
-```
+> **Note**: Storage and cache options are now configured globally via `configuration()`. See [Configuration Guide](../configuration.md#storage-settings-ustorage).
 
 ### Return Types
 
@@ -53,39 +40,19 @@ interface MfaResponse {
 
 ```ts
 import { defineAuthenticatedEventHandler } from 'auth-h3client/v1';
-import { useStorage } from '#imports'; // Nuxt nitro
 
-export default defineAuthenticatedEventHandler(
-  (event) => {
-    // User is authenticated here
-    const user = event.context.authorizedData;
-    
-    return {
-      message: `Hello ${user.userId}!`,
-      roles: user.roles
-    };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineAuthenticatedEventHandler((event) => {
+  // User is authenticated here
+  const user = event.context.authorizedData;
+  
+  return {
+    message: `Hello ${user.userId}!`,
+    roles: user.roles
+  };
+});
 ```
 
-### With Cache Options
 
-```ts
-export default defineAuthenticatedEventHandler(
-  (event) => {
-    const user = event.context.authorizedData;
-    return { userId: user.userId };
-  },
-  {
-    storage: useStorage('cache'),
-    cache: {
-      successTtl: 60 * 60,      // 1 hour cache
-      rateLimitTtl: 30          // 30 second rate limit cache
-    }
-  }
-);
-```
 
 ### Accessing User Data
 
@@ -106,20 +73,17 @@ interface ServerResponse {
 ```
 
 ```ts
-export default defineAuthenticatedEventHandler(
-  (event) => {
-    const user = event.context.authorizedData!;
-    
-    // Check roles
-    const roles = Array.isArray(user.roles) ? user.roles : [user.roles];
-    if (!roles.includes('admin')) {
-      throw createError({ statusCode: 403, message: 'Admin required' });
-    }
-    
-    return { admin: true };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineAuthenticatedEventHandler((event) => {
+  const user = event.context.authorizedData!;
+  
+  // Check roles
+  const roles = Array.isArray(user.roles) ? user.roles : [user.roles];
+  if (!roles.includes('admin')) {
+    throw createError({ statusCode: 403, message: 'Admin required' });
+  }
+  
+  return { admin: true };
+});
 ```
 
 ---
@@ -186,25 +150,21 @@ throwHttpError(log, event, 'SERVER_ERROR', 500, 'Server error', '...');
 ```ts
 // server/api/profile.get.ts
 import { defineAuthenticatedEventHandler } from 'auth-h3client/v1';
-import { useStorage } from '#imports';
 
-export default defineAuthenticatedEventHandler(
-  async (event) => {
-    const user = event.context.authorizedData!;
-    
-    // Fetch additional profile data from database
-    const profile = await db.profiles.findUnique({
-      where: { userId: user.userId }
-    });
-    
-    return {
-      id: user.userId,
-      roles: user.roles,
-      ...profile
-    };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineAuthenticatedEventHandler(async (event) => {
+  const user = event.context.authorizedData!;
+  
+  // Fetch additional profile data from database
+  const profile = await db.profiles.findUnique({
+    where: { userId: user.userId }
+  });
+  
+  return {
+    id: user.userId,
+    roles: user.roles,
+    ...profile
+  };
+});
 ```
 
 ## Example: Role-Based Access
@@ -212,26 +172,22 @@ export default defineAuthenticatedEventHandler(
 ```ts
 // server/api/admin/users.get.ts
 import { defineAuthenticatedEventHandler } from 'auth-h3client/v1';
-import { useStorage } from '#imports';
 import { createError } from 'h3';
 
-export default defineAuthenticatedEventHandler(
-  async (event) => {
-    const user = event.context.authorizedData!;
-    const roles = Array.isArray(user.roles) ? user.roles : [user.roles].filter(Boolean);
-    
-    if (!roles.includes('admin')) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Forbidden',
-        message: 'Admin role required'
-      });
-    }
-    
-    return await db.users.findMany();
-  },
-  { storage: useStorage('cache') }
-);
+export default defineAuthenticatedEventHandler(async (event) => {
+  const user = event.context.authorizedData!;
+  const roles = Array.isArray(user.roles) ? user.roles : [user.roles].filter(Boolean);
+  
+  if (!roles.includes('admin')) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Forbidden',
+      message: 'Admin role required'
+    });
+  }
+  
+  return await db.users.findMany();
+});
 ```
 
 ---
