@@ -16,24 +16,11 @@ import { defineOptionalAuthenticationEvent } from 'auth-h3client/v2';
 
 ```ts
 function defineOptionalAuthenticationEvent<T extends EventHandlerRequest, D>(
-  handler: EventHandler<T, D>,
-  options: AuthOptions
+  handler: EventHandler<T, D>
 ): EventHandler<T, Promise<D>>
 ```
 
-### Options
-
-```ts
-interface AuthOptions {
-  storage: Storage;      // unstorage instance for caching user data
-  cache?: CacheOptions;  // optional cache TTL settings
-}
-
-interface CacheOptions {
-  successTtl?: number;     // TTL for successful auth cache (default: 30 days)
-  rateLimitTtl?: number;   // TTL for rate limit cache (default: 10 seconds)
-}
-```
+> **Note**: Storage and cache options are now configured globally via `configuration()`. See [Configuration Guide](../configuration.md#storage-settings-ustorage).
 
 ---
 
@@ -43,48 +30,41 @@ interface CacheOptions {
 
 ```ts
 import { defineOptionalAuthenticationEvent } from 'auth-h3client/v1';
-import { useStorage } from '#imports';
 
-export default defineOptionalAuthenticationEvent(
-  (event) => {
-    const user = event.context.authorizedData;
-    
-    if (user) {
-      // Authenticated user
-      return { greeting: `Hello ${user.userId}!`, guest: false };
-    }
-    
-    // Guest user
-    return { greeting: 'Hello guest!', guest: true };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineOptionalAuthenticationEvent((event) => {
+  const user = event.context.authorizedData;
+  
+  if (user) {
+    // Authenticated user
+    return { greeting: `Hello ${user.userId}!`, guest: false };
+  }
+  
+  // Guest user
+  return { greeting: 'Hello guest!', guest: true };
+});
 ```
 
 ### Conditional Content
 
 ```ts
-export default defineOptionalAuthenticationEvent(
-  async (event) => {
-    const user = event.context.authorizedData;
-    
-    const posts = await db.posts.findMany({
-      where: { published: true }
-    });
-    
-    // Add private data only for authenticated users
-    if (user) {
-      return {
-        posts,
-        bookmarks: await db.bookmarks.findMany({ userId: user.userId }),
-        canEdit: true
-      };
-    }
-    
-    return { posts, canEdit: false };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineOptionalAuthenticationEvent(async (event) => {
+  const user = event.context.authorizedData;
+  
+  const posts = await db.posts.findMany({
+    where: { published: true }
+  });
+  
+  // Add private data only for authenticated users
+  if (user) {
+    return {
+      posts,
+      bookmarks: await db.bookmarks.findMany({ userId: user.userId }),
+      canEdit: true
+    };
+  }
+  
+  return { posts, canEdit: false };
+});
 ```
 
 ---
@@ -176,44 +156,40 @@ Request
 ```ts
 // server/api/feed.get.ts
 import { defineOptionalAuthenticationEvent } from 'auth-h3client/v1';
-import { useStorage } from '#imports';
 
-export default defineOptionalAuthenticationEvent(
-  async (event) => {
-    const user = event.context.authorizedData;
-    
-    // Base query for public posts
-    const posts = await db.posts.findMany({
-      where: { published: true },
-      orderBy: { createdAt: 'desc' },
-      take: 20
+export default defineOptionalAuthenticationEvent(async (event) => {
+  const user = event.context.authorizedData;
+  
+  // Base query for public posts
+  const posts = await db.posts.findMany({
+    where: { published: true },
+    orderBy: { createdAt: 'desc' },
+    take: 20
+  });
+  
+  if (user) {
+    // Personalize for authenticated users
+    const following = await db.follows.findMany({
+      where: { followerId: user.userId }
     });
     
-    if (user) {
-      // Personalize for authenticated users
-      const following = await db.follows.findMany({
-        where: { followerId: user.userId }
-      });
-      
-      const followingIds = following.map(f => f.followingId);
-      
-      return {
-        posts: posts.map(p => ({
-          ...p,
-          isFollowing: followingIds.includes(p.authorId),
-          canBookmark: true
-        })),
-        isAuthenticated: true
-      };
-    }
+    const followingIds = following.map(f => f.followingId);
     
     return {
-      posts,
-      isAuthenticated: false
+      posts: posts.map(p => ({
+        ...p,
+        isFollowing: followingIds.includes(p.authorId),
+        canBookmark: true
+      })),
+      isAuthenticated: true
     };
-  },
-  { storage: useStorage('cache') }
-);
+  }
+  
+  return {
+    posts,
+    isAuthenticated: false
+  };
+});
 ```
 
 ## Example: Preview vs Full Content
@@ -221,34 +197,30 @@ export default defineOptionalAuthenticationEvent(
 ```ts
 // server/api/articles/[id].get.ts
 import { defineOptionalAuthenticationEvent } from 'auth-h3client/v1';
-import { useStorage } from '#imports';
 import { getRouterParam } from 'h3';
 
-export default defineOptionalAuthenticationEvent(
-  async (event) => {
-    const id = getRouterParam(event, 'id');
-    const user = event.context.authorizedData;
-    
-    const article = await db.articles.findUnique({ where: { id } });
-    
-    if (!article) {
-      throw createError({ statusCode: 404, message: 'Article not found' });
-    }
-    
-    // Premium content: show preview for guests, full for authenticated
-    if (article.premium && !user) {
-      return {
-        ...article,
-        content: article.content.slice(0, 500) + '...',
-        preview: true,
-        message: 'Sign in to read the full article'
-      };
-    }
-    
-    return { ...article, preview: false };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineOptionalAuthenticationEvent(async (event) => {
+  const id = getRouterParam(event, 'id');
+  const user = event.context.authorizedData;
+  
+  const article = await db.articles.findUnique({ where: { id } });
+  
+  if (!article) {
+    throw createError({ statusCode: 404, message: 'Article not found' });
+  }
+  
+  // Premium content: show preview for guests, full for authenticated
+  if (article.premium && !user) {
+    return {
+      ...article,
+      content: article.content.slice(0, 500) + '...',
+      preview: true,
+      message: 'Sign in to read the full article'
+    };
+  }
+  
+  return { ...article, preview: false };
+});
 ```
 
 ---

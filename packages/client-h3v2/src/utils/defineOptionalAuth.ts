@@ -2,17 +2,15 @@ import { ensureValidCredentials,hmacSignatureMiddleware, throwHttpError, getLogg
 import { getCachedUserData } from './getCachedUserData.js';
 import { getCookie, HTTPError, type EventHandler, type EventHandlerRequest } from 'h3';
 import { defineHandler } from 'h3';
-import type { Storage } from 'unstorage';
-import { CacheOptions } from '@internal/shared';
+import { getConfiguration } from "@internal/shared";
 
-interface AuthOptions {
-  storage: Storage;
-  cache?: CacheOptions; 
-}
 
-export const defineOptionalAuthenticationEvent = <T extends EventHandlerRequest, D>(handler: EventHandler<T, D>, options: AuthOptions): EventHandler<T, Promise<D>>  => {
+
+export const defineOptionalAuthenticationEvent = <T extends EventHandlerRequest, D>(handler: EventHandler<T, D>): EventHandler<T, Promise<D>>  => {
   return defineHandler<T, Promise<D>>(async (event) => {
       const log = getLogger().child({service: 'auth', type: 'optional-auth'});
+      const { uStorage } = getConfiguration()
+
     try {
 
     hmacSignatureMiddleware(event);
@@ -42,7 +40,7 @@ export const defineOptionalAuthenticationEvent = <T extends EventHandlerRequest,
  }
 ];
 
- const result = await getCachedUserData(event, cookies, token, options.storage);
+ const result = await getCachedUserData(event, cookies, token, uStorage.storage, uStorage.cacheOptions);
 
     if (result.type === 'ERROR') {
         if (result.status === 429) {

@@ -2,20 +2,16 @@ import {  appendHeader, defineEventHandler, getCookie, setResponseStatus } from 
 import type { EventHandler, EventHandlerRequest } from 'h3';
 import { ensureValidCredentials,hmacSignatureMiddleware, throwHttpError, getLogger } from "../main.js";
 import { getCachedUserData } from "./getCachedUserData.js";
-import type { Storage } from 'unstorage';
 import type { Cookies } from "@internal/shared";
-import { CacheOptions } from "@internal/shared";
+import { getConfiguration } from "@internal/shared";
 
 export interface MfaResponse { mfaRequired: string; message: string };
 
-interface AuthOptions {
-  storage: Storage;
-  cache?: CacheOptions; 
-}
 
-export const defineAuthenticatedEventHandler = <T extends EventHandlerRequest, D>(handler: EventHandler<T, D>, options: AuthOptions): EventHandler<T, Promise<D | MfaResponse>>  => { 
+export const defineAuthenticatedEventHandler = <T extends EventHandlerRequest, D>(handler: EventHandler<T, D>): EventHandler<T, Promise<D | MfaResponse>>  => { 
 
     return defineEventHandler<T, Promise<D | MfaResponse>>(async (event) => { 
+         const { uStorage } = getConfiguration()
          hmacSignatureMiddleware(event);
          const value = await ensureValidCredentials(event);
 
@@ -35,7 +31,7 @@ export const defineAuthenticatedEventHandler = <T extends EventHandlerRequest, D
             { label: 'canary_id', value: canary }
         ];
 
-        const result = await getCachedUserData(event, cookies, token, options.storage);
+        const result = await getCachedUserData(event, cookies, token, uStorage.storage, uStorage.cacheOptions);
         if (result.type === 'ERROR') {
             if (result.reason === 'SERVER_ERROR') {
                 throwHttpError(log,event,'SERVER_ERROR',500,'Server error','',);

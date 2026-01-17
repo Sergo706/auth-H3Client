@@ -16,19 +16,11 @@ import { defineAuthenticatedEventPostHandlers } from 'auth-h3client/v2';
 
 ```ts
 function defineAuthenticatedEventPostHandlers<T extends EventHandlerRequest, D>(
-  handler: EventHandler<T, D>,
-  options: AuthOptions
+  handler: EventHandler<T, D>
 ): EventHandler<T, Promise<D | MfaResponse>>
 ```
 
-### Options
-
-```ts
-interface AuthOptions {
-  storage: Storage;      // unstorage instance for caching user data
-  cache?: CacheOptions;  // optional cache TTL settings
-}
-```
+> **Note**: Storage and cache options are now configured globally via `configuration()`. See [Configuration Guide](../configuration.md#storage-settings-ustorage).
 
 ---
 
@@ -65,7 +57,7 @@ Request
 
 ```ts
 // This:
-defineAuthenticatedEventPostHandlers(handler, options)
+defineAuthenticatedEventPostHandlers(handler)
 
 // Is equivalent to:
 defineAuthenticatedEventHandler(
@@ -74,8 +66,7 @@ defineAuthenticatedEventHandler(
       assertMethod(event, 'POST');
       return handler(event);
     })
-  ),
-  options
+  )
 )
 ```
 
@@ -87,26 +78,22 @@ defineAuthenticatedEventHandler(
 
 ```ts
 import { defineAuthenticatedEventPostHandlers } from 'auth-h3client/v1';
-import { useStorage } from '#imports';
 import { readBody } from 'h3';
 
-export default defineAuthenticatedEventPostHandlers(
-  async (event) => {
-    const user = event.context.authorizedData!;
-    const body = await readBody(event);
-    
-    const post = await db.posts.create({
-      data: {
-        title: body.title,
-        content: body.content,
-        authorId: user.userId
-      }
-    });
-    
-    return { success: true, postId: post.id };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineAuthenticatedEventPostHandlers(async (event) => {
+  const user = event.context.authorizedData!;
+  const body = await readBody(event);
+  
+  const post = await db.posts.create({
+    data: {
+      title: body.title,
+      content: body.content,
+      authorId: user.userId
+    }
+  });
+  
+  return { success: true, postId: post.id };
+});
 ```
 
 ### Form Submission
@@ -114,23 +101,19 @@ export default defineAuthenticatedEventPostHandlers(
 ```ts
 // server/api/settings.post.ts
 import { defineAuthenticatedEventPostHandlers } from 'auth-h3client/v1';
-import { useStorage } from '#imports';
 import { readBody } from 'h3';
 
-export default defineAuthenticatedEventPostHandlers(
-  async (event) => {
-    const user = event.context.authorizedData!;
-    const { displayName, bio, notifications } = await readBody(event);
-    
-    await db.users.update({
-      where: { id: user.userId },
-      data: { displayName, bio, notifications }
-    });
-    
-    return { success: true, message: 'Settings updated' };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineAuthenticatedEventPostHandlers(async (event) => {
+  const user = event.context.authorizedData!;
+  const { displayName, bio, notifications } = await readBody(event);
+  
+  await db.users.update({
+    where: { id: user.userId },
+    data: { displayName, bio, notifications }
+  });
+  
+  return { success: true, message: 'Settings updated' };
+});
 ```
 
 ---
@@ -204,27 +187,23 @@ await $fetch('/api/posts', {
 // Note: Even for "delete" actions, use POST for CSRF protection
 
 import { defineAuthenticatedEventPostHandlers } from 'auth-h3client/v1';
-import { useStorage } from '#imports';
 import { getRouterParam } from 'h3';
 
-export default defineAuthenticatedEventPostHandlers(
-  async (event) => {
-    const user = event.context.authorizedData!;
-    const postId = getRouterParam(event, 'id');
-    
-    // Verify ownership
-    const post = await db.posts.findUnique({ where: { id: postId } });
-    
-    if (!post || post.authorId !== user.userId) {
-      throw createError({ statusCode: 403, message: 'Forbidden' });
-    }
-    
-    await db.posts.delete({ where: { id: postId } });
-    
-    return { success: true, deleted: postId };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineAuthenticatedEventPostHandlers(async (event) => {
+  const user = event.context.authorizedData!;
+  const postId = getRouterParam(event, 'id');
+  
+  // Verify ownership
+  const post = await db.posts.findUnique({ where: { id: postId } });
+  
+  if (!post || post.authorId !== user.userId) {
+    throw createError({ statusCode: 403, message: 'Forbidden' });
+  }
+  
+  await db.posts.delete({ where: { id: postId } });
+  
+  return { success: true, deleted: postId };
+});
 ```
 
 ## Example: File Upload
@@ -232,28 +211,24 @@ export default defineAuthenticatedEventPostHandlers(
 ```ts
 // server/api/upload.post.ts
 import { defineAuthenticatedEventPostHandlers } from 'auth-h3client/v1';
-import { useStorage } from '#imports';
 import { readMultipartFormData } from 'h3';
 
-export default defineAuthenticatedEventPostHandlers(
-  async (event) => {
-    const user = event.context.authorizedData!;
-    const formData = await readMultipartFormData(event);
-    
-    const file = formData?.find(f => f.name === 'file');
-    if (!file) {
-      throw createError({ statusCode: 400, message: 'No file provided' });
-    }
-    
-    const url = await uploadToStorage(file.data, {
-      userId: user.userId,
-      filename: file.filename
-    });
-    
-    return { success: true, url };
-  },
-  { storage: useStorage('cache') }
-);
+export default defineAuthenticatedEventPostHandlers(async (event) => {
+  const user = event.context.authorizedData!;
+  const formData = await readMultipartFormData(event);
+  
+  const file = formData?.find(f => f.name === 'file');
+  if (!file) {
+    throw createError({ statusCode: 400, message: 'No file provided' });
+  }
+  
+  const url = await uploadToStorage(file.data, {
+    userId: user.userId,
+    filename: file.filename
+  });
+  
+  return { success: true, url };
+});
 ```
 
 ---
