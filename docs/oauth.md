@@ -663,7 +663,8 @@ configuration({
 ---
 
 ## See Also
-
+- [Complete Configuration](../test/setup/config.ts) - For the test server, configured with providers
+- [Github callback](../test/setup/github.callback.ts) - Github callback example to get an email.
 - [Configuration Guide](./configuration.md) - Full configuration reference
 - [Routes and Controllers](./routes-and-controllers.md) - All available routes
 - [CSRF and Visitor Validation](./csrf-and-visitor.md) - Security middlewares
