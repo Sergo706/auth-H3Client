@@ -279,7 +279,6 @@ export const config: Configuration = {
 | `server.hmac` | Enables optional HMAC sealing of outbound requests; requires client ID and shared secret. |
 | `server.ssl` | TLS settings for mutual TLS connections to the auth API. When `enableSSL` is `true`, provide certificate paths. |
 | `server.cryptoCookiesSecret` | Secret used to sign CSRF and state cookies. |
-| `uStorage` | Storage configuration for caching user auth data. Uses [unstorage](https://unstorage.unjs.io/). |
 | `onSuccessRedirect` | Default redirect URL after successful login/signup/MFA flows. |
 | `OAuthProviders` | Optional list of OAuth/OIDC providers with per-provider redirect behavior. |
 | `telegram` | Optional Telegram alerting configuration for security events. |
