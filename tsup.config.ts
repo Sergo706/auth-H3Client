@@ -25,6 +25,7 @@ export default defineConfig({
     'h3',
     'vue',
     'nuxt',
+    'nuxt/app',
     'ofetch',
     'jose',
     'zod',
