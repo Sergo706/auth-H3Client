@@ -7,7 +7,25 @@ import { getConfiguration } from "@internal/shared";
 
 export interface MfaResponse { mfaRequired: string; message: string };
 
-
+/**
+ * Wraps an H3 event handler with strict authentication enforcement.
+ * Validates tokens, rotates credentials if needed, and populates `event.context.authorizedData`.
+ * Throws 401 if the user is not authenticated.
+ * 
+ * @template T - The event handler request type.
+ * @template D - The expected return type of the handler.
+ * @param handler - The H3 event handler to wrap.
+ * @returns A wrapped handler that requires authentication.
+ * 
+ * @example
+ * // server/api/private.get.ts
+ * import { defineAuthenticatedEventHandler } from 'auth-h3client';
+ * 
+ * export default defineAuthenticatedEventHandler((event) => {
+ *   const user = event.context.authorizedData;
+ *   return { message: `Hello, ${user.userId}` };
+ * });
+ */
 export const defineAuthenticatedEventHandler = <T extends EventHandlerRequest, D>(handler: EventHandler<T, D>): EventHandler<T, Promise<D | MfaResponse>>  => { 
 
     return defineEventHandler<T, Promise<D | MfaResponse>>(async (event) => { 

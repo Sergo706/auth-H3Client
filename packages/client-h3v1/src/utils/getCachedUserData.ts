@@ -6,6 +6,24 @@ import type { Storage } from 'unstorage';
 import type { CachedAuthResponse, CacheOptions } from "@internal/shared";
 import type { Cookies } from "@internal/shared";
 
+/**
+ * Retrieves and caches user authentication data from the auth service.
+ * Uses a SHA256 hash of tokens as cache key. Returns cached data if available,
+ * otherwise fetches from the auth server and caches the result.
+ * 
+ * @param event - The H3 event object.
+ * @param cookies - Array of cookies to forward to the auth service.
+ * @param token - The access token for authorization.
+ * @param storage - Unstorage instance for caching.
+ * @param cacheOptions - Optional TTL configuration for cache entries.
+ * @returns Cached auth response (success with user data or error details).
+ * 
+ * @example
+ * const result = await getCachedUserData(event, cookies, token, storage);
+ * if (result.type === 'SUCCESS') {
+ *   console.log(result.data.userId);
+ * }
+ */
 export const getCachedUserData = async (event: H3Event, cookies: Cookies[], token: string, storage: Storage, cacheOptions?: CacheOptions): Promise<CachedAuthResponse> => {
      const log = getLogger().child({service: 'auth', type: 'dataAccess-cache'});
      const canary = cookies.find(c => c.label === 'canary_id')?.value;
