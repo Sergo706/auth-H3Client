@@ -96,7 +96,7 @@ export const configurationSchema = z.strictObject({
       cacheOptions: z.object({
            successTtl: z.number().default(60 * 60 * 24 * 30),
            rateLimitTtl: z.number().default(10),
-      })
+      }).optional()
    }),
    onSuccessRedirect: z.url(),
    OAuthProviders,

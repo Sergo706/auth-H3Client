@@ -4,6 +4,25 @@ import { appendHeader, getCookie, H3Error, type EventHandler, type EventHandlerR
 import { defineEventHandler } from 'h3';
 import { getConfiguration } from "@internal/shared";
 
+/**
+ * Wraps an H3 event handler with optional authentication.
+ * Attempts to authenticate the user but proceeds as guest if authentication fails.
+ * Sets `event.context.authorizedData` to user data or `undefined` for guests.
+ * 
+ * @template T - The event handler request type.
+ * @template D - The expected return type of the handler.
+ * @param handler - The H3 event handler to wrap.
+ * @returns A wrapped handler that works for both authenticated users and guests.
+ * 
+ * @example
+ * // server/api/posts/[id].get.ts
+ * import { defineOptionalAuthenticationEvent } from 'auth-h3client';
+ * 
+ * export default defineOptionalAuthenticationEvent((event) => {
+ *   const user = event.context.authorizedData; // may be undefined
+ *   return { isLoggedIn: !!user };
+ * });
+ */
 export const defineOptionalAuthenticationEvent = <T extends EventHandlerRequest, D>(handler: EventHandler<T, D>): EventHandler<T, Promise<D>>  => {
   return defineEventHandler<T, Promise<D>>(async (event) => {
       const log = getLogger().child({service: 'auth', type: 'optional-auth'});

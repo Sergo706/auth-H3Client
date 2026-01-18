@@ -6,8 +6,8 @@ import { getLogger, throwHttpError } from "../main.js";
  * Returns the current user's auth data if authenticated.
  * 
  * @example
- * // In your Nuxt server route:
- * import { getAuthStatusHandler } from '@internal/client-h3v2';
+ * // In a Nuxt server route:
+ * import { getAuthStatusHandler } from 'auth-h3client';
  * export default getAuthStatusHandler;
  */
 export const getAuthStatusHandler = defineAuthenticatedEventHandler(

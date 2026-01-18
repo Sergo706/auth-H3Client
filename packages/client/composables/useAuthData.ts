@@ -13,6 +13,25 @@ export interface AuthState {
 
 let activeAuthRequest: Promise<void> | null = null;
 
+/**
+ * Composable that checks and returns the current authentication state.
+ * Implements a singleton pattern - multiple simultaneous calls result in only one network request.
+ * Updates the global `useState('auth')` reactive reference.
+ * 
+ * @param authStatusUrl - Optional custom endpoint URL for auth status check. Defaults to '/users/authStatus'.
+ * @returns A reactive ref containing the authentication state.
+ * 
+ * @example
+ * // In app.vue or middleware
+ * const auth = await useAuthData();
+ * if (!auth.value.authorized) {
+ *   navigateTo('/login');
+ * }
+ * 
+ * @example
+ * // With custom endpoint
+ * const auth = await useAuthData('/api/custom-auth-check');
+ */
 export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<Ref<AuthState>> => {
   const authorized = useState<AuthState>('auth', () => ({ authorized: false, mfaRequired: false }));
   const headers = useRequestHeaders();
