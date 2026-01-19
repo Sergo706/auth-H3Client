@@ -187,6 +187,26 @@ If `enableMiddleware` is `true` (default), the module registers a global server 
 ### 2. Auto-Imported Server Utilities
 Over 50 utilities from the core library are auto-imported into your `server/` directory.
 
+### 3. API Routes & Prefixes
+The module automatically registers the following routes. Note the mixed prefix strategy:
+
+| Route | Method | Description |
+| :--- | :--- | :--- |
+| `/login` | POST | User login |
+| `/signup` | POST | User registration |
+| `/logout` | POST | User logout |
+| `/api/auth/verify-mfa/:visitor` | GET/POST | MFA verification (Magic Link) |
+| `/api/auth/password-reset` | POST | Request password reset |
+| `/api/auth/reset-password/:visitor` | GET/POST | Reset password with token |
+| `/auth/oauth/:provider` | GET | OAuth start (e.g. `/auth/oauth/google`) |
+| `/auth/oauth/:provider/callback` | GET | OAuth callback |
+
+**Why the mix?**
+* **Core Auth** (`/login`, `/signup`) lives at the root for standard form compatibility.
+* **Flows** (`/api/...`) are prefixed to avoid collisions with your pages.
+
+### 4. Code Examples
+
 **Commonly Used Imports:**
 
 *   **Middleware wrappers**: `defineAuthenticatedEventHandler`, `defineOptionalAuthenticationEvent`
