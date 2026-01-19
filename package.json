@@ -29,6 +29,21 @@
       "import": "./dist/client.js",
       "default": "./dist/client.js"
     },
+    "./module": {
+      "types": "./dist/module.d.ts",
+      "import": "./dist/module.js",
+      "default": "./dist/module.js"
+    },
+    "./server/middleware": {
+      "types": "./dist/server/middleware.d.ts",
+      "import": "./dist/server/middleware.js",
+      "default": "./dist/server/middleware.js"
+    },
+    "./server/plugin": {
+      "types": "./dist/server/plugin.d.ts",
+      "import": "./dist/server/plugin.js",
+      "default": "./dist/server/plugin.js"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -41,6 +56,15 @@
       ],
       "client": [
         "dist/client.d.ts"
+      ],
+      "module": [
+        "dist/module.d.ts"
+      ],
+      "server/middleware": [
+        "dist/server/middleware.d.ts"
+      ],
+      "server/plugin": [
+        "dist/server/plugin.d.ts"
       ],
       "*": [
         "dist/v1.d.ts"
@@ -62,11 +86,13 @@
   "license": "ISC",
   "peerDependencies": {
     "h3": "^1.15.4 || ^2.0.0-beta.4",
-    "nuxt": "^4.2.1",
+    "nuxt": "^4.2.2 || ^3.0.0",
+    "nitropack": "^2.13.1",
     "vue": "^3.5.18",
     "ofetch": "^1.0.0"
   },
   "dependencies": {
+    "@nuxt/kit": "^3.17.0",
     "jose": "^6.1.0",
     "pino": "^9.11.0",
     "telegraf": "^4.16.3",
