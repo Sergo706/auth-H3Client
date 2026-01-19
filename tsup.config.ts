@@ -1,10 +1,9 @@
-import { defineConfig } from 'tsup';
+import { defineConfig, type Options } from 'tsup';
 
-export default defineConfig({
+const serverConfig: Options = {
   entry: {
     'v1': 'packages/client-h3v1/src/main.ts',
     'v2': 'packages/client-h3v2/src/main.ts',
-    'client': 'packages/client/main.ts',
     'module': 'packages/client/module.ts',
     'server/middleware': 'packages/client/server/middleware/auth.ts',
   },
@@ -12,7 +11,7 @@ export default defineConfig({
   tsconfig: 'tsconfig.prod.json',
   dts: true,
   sourcemap: true,
-  clean: true, 
+  clean: true,
   splitting: true,
   outDir: 'dist',
   external: [
@@ -40,7 +39,48 @@ export default defineConfig({
     'unstorage',
   ],
   noExternal: [
-    '@internal/shared', 
+    '@internal/shared',
   ],
   treeshake: true,
-});
+};
+
+const clientConfig: Options = {
+  entry: {
+    'client': 'packages/client/main.ts',
+  },
+  format: ['esm'],
+  tsconfig: 'tsconfig.prod.json',
+  dts: true,
+  sourcemap: true,
+  clean: false,
+  splitting: false,
+  outDir: 'dist',
+  noExternal: ['@internal/shared'],
+  external: [
+    'vue',
+    'nuxt',
+    'nuxt/app',
+    'ofetch',
+    'node:crypto',
+    'node:buffer', 
+    'node:net',
+    'crypto',
+    'fs',
+    'path',
+    'url',
+    'child_process',
+    'h3',
+    '@nuxt/kit',
+    'nitropack',
+    'nitropack/runtime',
+    'jose',
+    'zod',
+    'pino',
+    'telegraf',
+    'undici',
+    'unstorage',
+  ],
+  treeshake: true,
+};
+
+export default defineConfig([serverConfig, clientConfig]);
