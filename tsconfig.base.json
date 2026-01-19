@@ -1,18 +1,29 @@
 {
   "compilerOptions": {
-    "target": "ES2022",                                 
-    "module": "nodenext",                                
-     "moduleResolution": "nodenext",                    
-     "allowSyntheticDefaultImports": true,            
-    "esModuleInterop": true,                           
-    "forceConsistentCasingInFileNames": true,           
-    "strict": true,           
-    "resolveJsonModule": true,  
-    "isolatedModules": true,                         
+    "target": "ES2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
     "noEmitOnError": true,
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "paths": {
+      "@internal/shared": [
+        "./packages/shared/src/index.ts"
+      ],
+      "auth-h3client/v1": [
+        "./packages/client-h3v1/src/main.ts"
+      ],
+      "auth-h3client/client": [
+        "./packages/client/main.ts"
+      ]
+    }
   }
 }

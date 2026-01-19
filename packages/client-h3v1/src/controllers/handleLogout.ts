@@ -1,5 +1,5 @@
 import { assertMethod, deleteCookie, getCookie, getHeader, getQuery, getRequestIP, getRequestProtocol, H3Event, sendRedirect, setResponseStatus } from "h3";
-import { getLogger } from "../utils/logger.js";
+import { getLogger } from "@internal/shared";
 import { sendToServer } from "../utils/serverToServer.js";
 import throwError from "../middleware/error.js";
 import { cache as accessTokenCache } from "../utils/getAccessTokenMetaData.js";

@@ -1,6 +1,7 @@
 import { useState, useRequestHeaders } from 'nuxt/app';
 import type { Ref } from 'vue';
 import { $fetch } from 'ofetch';
+import type { ServerResponse } from "@internal/shared";
 
 export interface AuthState {
     id?: string;    
@@ -9,20 +10,28 @@ export interface AuthState {
     message?: string;
 }
 
-export interface ServerResponse {
-    authorized: boolean,
-    userId?: string,
-    reason?: string,
-    ipAddress: string,
-    userAgent:  string,
-    date: string,
-    roles?: string[] | string;
-    error?: string
-    message?: string
-}
 
 let activeAuthRequest: Promise<void> | null = null;
 
+/**
+ * Composable that checks and returns the current authentication state.
+ * Implements a singleton pattern - multiple simultaneous calls result in only one network request.
+ * Updates the global `useState('auth')` reactive reference.
+ * 
+ * @param authStatusUrl - Optional custom endpoint URL for auth status check. Defaults to '/users/authStatus'.
+ * @returns A reactive ref containing the authentication state.
+ * 
+ * @example
+ * // In app.vue or middleware
+ * const auth = await useAuthData();
+ * if (!auth.value.authorized) {
+ *   navigateTo('/login');
+ * }
+ * 
+ * @example
+ * // With custom endpoint
+ * const auth = await useAuthData('/api/custom-auth-check');
+ */
 export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<Ref<AuthState>> => {
   const authorized = useState<AuthState>('auth', () => ({ authorized: false, mfaRequired: false }));
   const headers = useRequestHeaders();

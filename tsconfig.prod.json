@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true
+  },
+  "include": [
+    "packages/shared/src/**/*.ts",
+    "packages/client-h3v1/src/**/*.ts",
+    "packages/client-h3v2/src/**/*.ts",
+    "packages/client/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "test"
+  ]
+}

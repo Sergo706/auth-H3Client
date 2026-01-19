@@ -1,5 +1,5 @@
 import { sendToServer } from "../utils/serverToServer.js";
-import { getLogger } from "../utils/logger.js";
+import { getLogger } from "@internal/shared";
 import { notFoundHandler } from "../middleware/notFound.js"
 import { defineHandler, getCookie, getQuery, getRequestURL, getRouterParam, H3Event, redirect } from "h3";
 import throwError from "../middleware/error.js";

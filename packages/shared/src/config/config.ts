@@ -1,5 +1,6 @@
-import type { Configuration }  from "../types/configSchema.js";
-import { configurationSchema } from "../types/configSchema.js";
+import { configurationSchema } from "@internal/shared";
+import type { Configuration } from "@internal/shared";
+
 import z from "zod";
 
 let cfg: Configuration | undefined;

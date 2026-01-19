@@ -5,8 +5,24 @@
         "outDir": "./dist",
         "composite": true,
         "declaration": true,
-        "declarationMap": true
+        "declarationMap": true,
+        "paths": {
+            "@internal/shared": [
+                "../shared/src/index.ts"
+            ],
+            "auth-h3client/v1": [
+                "../client-h3v1/src/main.ts"
+            ]
+        }
     },
+    "references": [
+        {
+            "path": "../shared"
+        },
+        {
+            "path": "../client-h3v1"
+        }
+    ],
     "include": [
         "./**/*.ts"
     ],

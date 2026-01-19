@@ -2,8 +2,8 @@
     "name": "@internal/client",
     "private": true,
     "type": "module",
-    "scripts": {
-        "build": "tsc -p tsconfig.json"
+    "dependencies": {
+        "@internal/shared": "*"
     },
     "peerDependencies": {
         "nuxt": "^4.2.1",

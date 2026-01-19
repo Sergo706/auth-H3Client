@@ -1,12 +1,12 @@
 import { H3Event } from "h3";
-import type { RemoteConfig } from "../types/configSchema.js";
+import type { RemoteConfig } from "@internal/shared";
 import { sendToServer } from "./serverToServer.js";
-import { parseResponseContentType } from "./checkResponseType.js";
-import { getLogger } from "./logger.js";
-import { sharedSettings } from "../types/configSchema.js";
+import { parseResponseContentType } from "@internal/shared";
+import { getLogger } from "@internal/shared";
+import { sharedSettings } from "@internal/shared";
 import z, { ZodError } from "zod";
-import { MiniCache } from "./miniCache.js";
-import { getConfiguration } from "../config/config.js";
+import { MiniCache } from "@internal/shared";
+import { getConfiguration } from "@internal/shared";
 const cache = new MiniCache<RemoteConfig>(100)
 
 /**

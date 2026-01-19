@@ -4,6 +4,9 @@ The `auth-h3client` library requires configuration at startup to know how to con
 
 This guide explains every configuration option available.
 
+> [!TIP]
+> **Using the Nuxt Module?** See [Nuxt Module](./module.md) for the recommended setup pattern using `defineAuthConfiguration()`.
+
 ## Initialization
 
 You must call the `configuration()` function **exactly once** when your server starts (e.g., in a Nuxt plugin or server entry file).
@@ -81,6 +84,55 @@ A generic secret used to sign client-side cookies (like CSRF and OAuth state coo
 
 ```ts
 cryptoCookiesSecret: 'long-random-string-at-least-32-chars'
+```
+
+---
+
+## Storage Settings (`uStorage`)
+
+Configuration for caching user authentication data. Required by authentication handlers.
+
+```ts
+import { createStorage } from 'unstorage';
+import memoryDriver from 'unstorage/drivers/memory';
+
+// Or use any unstorage driver: redis, cloudflare-kv, etc.
+const storage = createStorage({ driver: memoryDriver() });
+
+configuration({
+  // ... other options
+  uStorage: {
+    storage: storage,
+    cacheOptions: {
+      successTtl: 60 * 60 * 24 * 30,  // 30 days (default)
+      rateLimitTtl: 10                 // 10 seconds (default)
+    }
+  }
+});
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `storage` | `Storage` | required | An [unstorage](https://unstorage.unjs.io/) instance for caching auth data |
+| `cacheOptions.successTtl` | `number` | `2592000` (30 days) | TTL in seconds for successful auth cache |
+| `cacheOptions.rateLimitTtl` | `number` | `10` | TTL in seconds for rate limit cache |
+
+### Nuxt 3 Example
+
+```ts
+import { useStorage } from '#imports';
+
+configuration({
+  uStorage: {
+    storage: useStorage('cache'),  // Uses Nitro's built-in cache storage
+    cacheOptions: {
+      successTtl: 60 * 60 * 24,    // 1 day
+      rateLimitTtl: 10
+    }
+  }
+});
 ```
 
 ---
@@ -190,7 +242,14 @@ logLevel: 'debug' | 'info' | 'warn' | 'error' | 'fatal'
 
 ## Firewall (`enableFireWallBans`)
 
-If set to `true`, the client will check for IP bans enforced by the Auth Service.
+Enables the library to actively ban malicious IP addresses using the server's firewall (UFW).
+
+> [!CAUTION]
+> **System Requirement:** This feature requires `ufw` to be installed and the Node.js process to have permissions to execute `sudo ufw insert ...`.
+> Use with caution as it modifies system firewall rules.
+> 
+> **Serverless / Edge Compatibility:**  
+> If deploying to **Vercel, Netlify, Cloudflare Workers, or AWS Lambda**, you **MUST** set `enableFireWallBans: false`. These environments do not provide access to system-level firewalls.
 
 ```ts
 enableFireWallBans: true
@@ -206,6 +265,10 @@ Here is a full configuration file you can adapt.
 
 ```ts
 import { configuration } from 'auth-h3client';
+import { createStorage } from 'unstorage';
+import memoryDriver from 'unstorage/drivers/memory';
+
+const storage = createStorage({ driver: memoryDriver() });
 
 export const setupAuth = () => {
     configuration({
@@ -223,6 +286,14 @@ export const setupAuth = () => {
                 enableSSL: false
             },
             cryptoCookiesSecret: process.env.AUTH_COOKIE_SECRET!
+        },
+        
+        uStorage: {
+            storage: storage,
+            cacheOptions: {
+                successTtl: 60 * 60 * 24 * 30,  // 30 days
+                rateLimitTtl: 10
+            }
         },
         
         onSuccessRedirect: 'http://localhost:3000/dashboard',

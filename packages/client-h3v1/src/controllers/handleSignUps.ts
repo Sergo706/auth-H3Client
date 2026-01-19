@@ -1,12 +1,12 @@
-import { ResponseSign } from "../types/signup.js";
-import { banIp } from "../utils/banIp.js";
+import { ResponseSign } from "@internal/shared";
+import { banIp } from "@internal/shared";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
-import { getLogger } from '../utils/logger.js';
+import { getLogger } from "@internal/shared";
 import { appendHeader, assertMethod, defineEventHandler, getCookie, getHeader, getRequestIP, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
-import { getConfiguration } from "../config/config.js";
+import { getConfiguration } from "@internal/shared";
 
 /**
  * Handles user signup by validating the payload, delegating to the auth server,

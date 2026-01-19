@@ -1,4 +1,5 @@
 import * as z from "zod";
+import type { Storage } from 'unstorage';
 
 type EmailCB = (accessToken: string) => Promise<string>;
 type ExtraCB = (accessToken: string) => Promise<Record<string, unknown>>;
@@ -84,7 +85,19 @@ export const configurationSchema = z.strictObject({
       ]),
       cryptoCookiesSecret: z.string()
    }),
-
+   uStorage: z.object({
+      storage: z.custom<Storage>((val) => {
+         return val !== null &&
+                typeof val === 'object' &&
+                typeof (val as Storage).getItem === 'function' &&
+                typeof (val as Storage).setItem === 'function';
+                
+      }, { message: 'Must be a valid unstorage Storage instance' }),
+      cacheOptions: z.object({
+           successTtl: z.number().default(60 * 60 * 24 * 30),
+           rateLimitTtl: z.number().default(10),
+      }).optional()
+   }),
    onSuccessRedirect: z.url(),
    OAuthProviders,
    enableFireWallBans: z.boolean(),

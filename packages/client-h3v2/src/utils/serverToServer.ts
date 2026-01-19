@@ -1,12 +1,12 @@
-import { signature } from './serverSignature.js'
+import { signature } from "@internal/shared"
 import { clientHeaders } from './clientHeaders.js'
-import { getAuthAgent } from './serverAuth.js'
+import { getAuthAgent } from "@internal/shared"
 import { fetch } from 'undici'
-import { getLogger } from './logger.js'
+import { getLogger } from "@internal/shared"
 import type { H3Event } from 'h3'
-import { getConfiguration } from '../config/config.js' 
-import { getBaseUrl } from './buildBaseUrl.js'
-import { parseResponseContentType } from './checkResponseType.js'
+import { getConfiguration } from "@internal/shared"
+import { getBaseUrl } from "@internal/shared"
+
 import type { Response } from 'undici'
 type Cookie = { label: string; value: any };
 type Cookies = Cookie | Cookie[];
