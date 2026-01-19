@@ -21,8 +21,6 @@ export default defineNuxtModule<ModuleOptions>({
     enableMiddleware: true
   },
   async setup(options, nuxt) {
-    nuxt.options.runtimeConfig.authH3Client = {
-    };
 
     addImports([
       {
