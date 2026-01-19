@@ -22,6 +22,7 @@ export default defineNuxtModule<ModuleOptions>({
     enableMiddleware: true
   },
   setup(options, nuxt) {
+    const resolver = createResolver(import.meta.url);
 
     nuxt.options.runtimeConfig.authH3Client = {
       ...options
@@ -47,10 +48,10 @@ export default defineNuxtModule<ModuleOptions>({
     if (options.enableMiddleware !== false) {
       addServerHandler({
         middleware: true,
-        handler: 'auth-h3client/server/middleware'
+        handler: resolver.resolve('./server/middleware.js')
       });
     }
 
-    addServerPlugin('auth-h3client/server/plugin');
+    addServerPlugin(resolver.resolve('./server/plugin.js'));
   }
 });
