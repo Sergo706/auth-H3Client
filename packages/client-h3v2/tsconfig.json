@@ -5,8 +5,14 @@
     "outDir": "./dist",
     "composite": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "paths": {
+      "@internal/shared": ["../shared/src/index.ts"]
+    }
   },
+  "references": [
+    { "path": "../shared" }
+  ],
   "include": [
     "src/**/*"
   ],

@@ -3,66 +3,88 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "./packages/client-h3v1/dist/main.js",
-  "types": "./packages/client-h3v1/dist/main.d.ts",
+  "main": "./dist/v1.js",
+  "types": "./dist/v1.d.ts",
+  "workspaces": [
+    "packages/*"
+  ],
   "exports": {
-    ".": "./packages/client-h3v1/dist/main.js",
+    ".": {
+      "types": "./dist/v1.d.ts",
+      "import": "./dist/v1.js",
+      "default": "./dist/v1.js"
+    },
     "./v1": {
-      "types": "./packages/client-h3v1/dist/main.d.ts",
-      "import": "./packages/client-h3v1/dist/main.js",
-      "default": "./packages/client-h3v1/dist/main.js"
+      "types": "./dist/v1.d.ts",
+      "import": "./dist/v1.js",
+      "default": "./dist/v1.js"
     },
     "./v2": {
-      "types": "./packages/client-h3v2/dist/main.d.ts",
-      "import": "./packages/client-h3v2/dist/main.js",
-      "default": "./packages/client-h3v2/dist/main.js"
+      "types": "./dist/v2.d.ts",
+      "import": "./dist/v2.js",
+      "default": "./dist/v2.js"
     },
     "./client": {
-      "types": "./packages/client/dist/main.d.ts",
-      "import": "./packages/client/dist/main.js",
-      "default": "./packages/client/dist/main.js"
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "default": "./dist/client.js"
+    },
+    "./module": {
+      "types": "./dist/module.d.ts",
+      "import": "./dist/module.js",
+      "default": "./dist/module.js"
+    },
+    "./server/middleware": {
+      "types": "./dist/server/middleware.d.ts",
+      "import": "./dist/server/middleware.js",
+      "default": "./dist/server/middleware.js"
     },
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       "v1": [
-        "packages/client-h3v1/dist/main.d.ts"
+        "dist/v1.d.ts"
       ],
       "v2": [
-        "packages/client-h3v2/dist/main.d.ts"
+        "dist/v2.d.ts"
       ],
       "client": [
-        "packages/client/dist/main.d.ts"
+        "dist/client.d.ts"
+      ],
+      "module": [
+        "dist/module.d.ts"
+      ],
+      "server/middleware": [
+        "dist/server/middleware.d.ts"
       ],
       "*": [
-        "packages/client-h3v1/dist/main.d.ts"
+        "dist/v1.d.ts"
       ]
     }
   },
   "files": [
-    "packages/**/dist/**/*",
+    "dist",
     "README.md"
   ],
   "scripts": {
-    "build:test": "tsc && cp -r ./test/smoke/client ./dist/test/smoke/client",
-    "logs:http": "tail -n 0 -f ./dist/logs/http.log | jq .",
-    "logs:app": "tail -n 0 -f ./dist/logs/info.log | jq .",
-    "install:subs": "npm --prefix packages/client-h3v1 install --no-package-lock --silent && npm --prefix packages/client-h3v2 install --no-package-lock --silent && npm --prefix packages/client install --no-package-lock --silent",
-    "build": "npm --prefix packages/client-h3v1 run build && npm --prefix packages/client-h3v2 run build && npm --prefix packages/client run build",
-    "prepare": "npm run install:subs && npm run build",
-    "prepack": "npm run install:subs && npm run build",
+    "build": "tsup",
+    "prepare": "npm run build",
+    "prepack": "npm run build",
     "start": "node dist/test/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "h3": "^2.0.0-beta.4 || ^1.15.4",
-    "nuxt": "^4.2.1",
-    "vue": "^3.5.18"
+    "h3": "^1.15.4 || ^2.0.0-beta.4",
+    "nuxt": "^4.2.2 || ^3.0.0",
+    "nitropack": "^2.13.1",
+    "vue": "^3.5.18",
+    "ofetch": "^1.0.0"
   },
   "dependencies": {
+    "@nuxt/kit": "^3.17.0",
     "jose": "^6.1.0",
     "pino": "^9.11.0",
     "telegraf": "^4.16.3",
@@ -73,6 +95,7 @@
   "devDependencies": {
     "@types/node": "^24.10.1",
     "dotenv": "^17.2.3",
+    "tsup": "^8.5.1",
     "typescript": "^5.6.3",
     "unstorage": "^1.17.4"
   }

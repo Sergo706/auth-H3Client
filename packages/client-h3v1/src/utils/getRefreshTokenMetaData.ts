@@ -1,8 +1,8 @@
 import {sendToServer} from "./serverToServer.js"
 import pino from 'pino';
 import { H3Event } from 'h3';
-import { MiniCache } from "./miniCache.js";
-import type { ServerRefreshTokenMetaData } from "../types/ServerMetaData.js";
+import { MiniCache } from "@internal/shared";
+import type { ServerRefreshTokenMetaData } from "@internal/shared";
  export const cache = new MiniCache(200)
 
  type ErrorReason = { unAuthorized?: boolean, serverError?: boolean, } 

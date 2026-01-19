@@ -1,7 +1,11 @@
-import type { Configuration } from "../../packages/client-h3v2/src/types/configSchema.js"
+import type { Configuration } from "../../packages/shared/src/types/configSchema.js"
 import { githubEmailCallBack } from "./github.callback.js";
+import { createStorage } from 'unstorage';
+import memoryDriver from 'unstorage/drivers/memory';
 import dotenv from 'dotenv'
 dotenv.config({ debug: true })
+
+const storage = createStorage({ driver: memoryDriver() });
 
 export const config: Configuration = {
     server: {
@@ -86,5 +90,13 @@ export const config: Configuration = {
     telegram: {
         enableTelegramLogger: false,
     },
+    uStorage: {
+        storage: storage,
+        cacheOptions: {
+            successTtl: 60 * 60 * 24 * 30,  // 30 days
+            rateLimitTtl: 10
+        }
+    },
+    enableFireWallBans: false,
     logLevel: 'info'
 }

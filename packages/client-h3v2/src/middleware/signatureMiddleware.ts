@@ -1,7 +1,7 @@
 import { defineHandler, getRequestURL } from "h3";
-import { signature } from "../utils/serverSignature.js";
-import { getConfiguration } from "../config/config.js";
-import { getLogger } from "../utils/logger.js";
+import { signature } from "@internal/shared";
+import { getConfiguration } from "@internal/shared";
+import { getLogger } from "@internal/shared";
 
 
 /**

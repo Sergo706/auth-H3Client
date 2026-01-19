@@ -21,6 +21,8 @@ For convenient handler wrapping, use `defineVerifiedCsrfHandler`. See [CSRF Veri
 - `validator` (src/middleware/visitorValid.ts) integrates with the auth service's botDetector module.
 - It sets a signed canary cookie for page views and calls the auth service's `/check` endpoint.
 - When the upstream service flags a visitor as malicious, the middleware bans the IP and throws 403.
+> [!WARNING]
+> This middleware attempts to ban IPs using `ufw`. If you are in a **Serverless** environment (Vercel, AWS Lambda, etc.) or lack `sudo` permissions, you **must** disable the firewall feature via config or ensure the code catches the error gracefully.
 
 Important:
 

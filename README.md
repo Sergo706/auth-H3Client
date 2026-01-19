@@ -17,6 +17,20 @@ npm install auth-h3client
 yarn add auth-h3client
 ```
 
+## Nuxt 3+ Module
+
+If you are using **Nuxt 3++**, use the dedicated module. It handles all configuration, middleware, and auto-imports for you.
+
+1. Install:
+   ```bash
+   npm install auth-h3client
+   ```
+2. Add to `nuxt.config.ts`:
+   ```ts
+   modules: ['auth-h3client/module'],
+   ```
+3. Read the [Nuxt Module Documentation](docs/module.md) for full configuration and usage.
+
 ### H3 v1 vs v2
 
 This package supports both H3 v1 and H3 v2. Choose the matching entry point for your H3 version:
@@ -65,6 +79,10 @@ Before using any exported handlers you must call the `configuration` function ex
 
 ```ts
 import { configuration } from 'auth-h3client';
+import { createStorage } from 'unstorage';
+import memoryDriver from 'unstorage/drivers/memory';
+
+const storage = createStorage({ driver: memoryDriver() });
 
 configuration({
   server: {
@@ -81,6 +99,13 @@ configuration({
       enableSSL: false,
     },
     cryptoCookiesSecret: process.env.COOKIE_SECRET!,
+  },
+  uStorage: {
+    storage: storage,
+    cacheOptions: {
+      successTtl: 60 * 60 * 24 * 30,  // 30 days
+      rateLimitTtl: 10
+    }
   },
   onSuccessRedirect: 'https://app.example.com/dashboard',
   OAuthProviders: [
@@ -157,6 +182,10 @@ Below is a single, complete configuration object showing all fields. Items marke
 ```ts
 // config/auth-client.config.ts
 import type { Configuration } from 'auth-h3client/dist/types/configSchema';
+import { createStorage } from 'unstorage';
+import memoryDriver from 'unstorage/drivers/memory';
+
+const storage = createStorage({ driver: memoryDriver() });
 
 export const config: Configuration = {
   server: {
@@ -181,6 +210,15 @@ export const config: Configuration = {
       clientKeyPath: 'client.key',       // optional
     },
     cryptoCookiesSecret: process.env.COOKIE_SECRET!,
+  },
+
+  // Storage for caching user authentication data (required)
+  uStorage: {
+    storage: storage,  // any unstorage driver: memory, redis, cloudflare-kv, etc.
+    cacheOptions: {
+      successTtl: 60 * 60 * 24 * 30,  // 30 days
+      rateLimitTtl: 10                 // 10 seconds
+    }
   },
 
   // Where users are redirected after successful auth (used by multiple flows)

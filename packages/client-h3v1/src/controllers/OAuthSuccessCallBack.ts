@@ -1,12 +1,12 @@
 import { appendHeader, getCookie, getRequestIP, H3Event, sendRedirect, setHeader, setResponseStatus} from "h3";
-import { getLogger } from "../utils/logger.js";
-import { getConfiguration } from "../config/config.js";
+import { getLogger } from "@internal/shared";
+import { getConfiguration } from "@internal/shared";
 import throwError from "../middleware/error.js";
 import { sendToServer } from "../utils/serverToServer.js";
-import { parseResponseContentType } from "../utils/checkResponseType.js";
+import { parseResponseContentType } from "@internal/shared";
 import { makeCookie } from "../utils/cookieGenerator.js";
-import { safeObjectMerge } from "../utils/safeMerge.js";
-import { findStringsInObject } from "../utils/findObjectValues.js";
+import { safeObjectMerge } from "@internal/shared";
+import { findStringsInObject } from "@internal/shared";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 
 
