@@ -17,6 +17,20 @@ npm install auth-h3client
 yarn add auth-h3client
 ```
 
+## Nuxt 3+ Module
+
+If you are using **Nuxt 3++**, use the dedicated module. It handles all configuration, middleware, and auto-imports for you.
+
+1. Install:
+   ```bash
+   npm install auth-h3client
+   ```
+2. Add to `nuxt.config.ts`:
+   ```ts
+   modules: ['auth-h3client/module'],
+   ```
+3. Read the [Nuxt Module Documentation](docs/module.md) for full configuration and usage.
+
 ### H3 v1 vs v2
 
 This package supports both H3 v1 and H3 v2. Choose the matching entry point for your H3 version:
