@@ -11,7 +11,7 @@ npm install auth-h3client
 ## Prerequisites
 
 **This module is a Client SDK.**
-It requires a running instance of the **Auth Service** to connect to. It *does not* store users or passwords itself. It proxies requests to your backend Auth Service.
+It requires a running instance of the [**Auth Service**](https://github.com/Sergo706/auth) to connect to. It *does not* store users or passwords itself. It proxies requests to your backend Auth Service.
 
 ## Installation
 
