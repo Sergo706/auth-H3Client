@@ -1,8 +1,7 @@
-import { defineNuxtModule, addImports, createResolver, addServerHandler, addServerPlugin, addServerImports } from '@nuxt/kit';
-import type { Configuration } from '@internal/shared';
+import { defineNuxtModule, addImports, addServerHandler, addServerPlugin, addServerImports, resolvePath } from '@nuxt/kit';
 import { serverImports } from './presets/serverImports.js';
 
-export interface ModuleOptions extends Configuration {
+export interface ModuleOptions  {
   /**
    * Enable the auth server middleware (CSRF, bot detection, IP validation)
    * @default true
@@ -21,11 +20,8 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     enableMiddleware: true
   },
-  setup(options, nuxt) {
-    const resolver = createResolver(import.meta.url);
-
+  async setup(options, nuxt) {
     nuxt.options.runtimeConfig.authH3Client = {
-      ...options
     };
 
     addImports([
@@ -48,10 +44,9 @@ export default defineNuxtModule<ModuleOptions>({
     if (options.enableMiddleware !== false) {
       addServerHandler({
         middleware: true,
-        handler: resolver.resolve('./server/middleware.js')
+        handler: await resolvePath('auth-h3client/server/middleware')
       });
     }
 
-    addServerPlugin(resolver.resolve('./server/plugin.js'));
   }
 });

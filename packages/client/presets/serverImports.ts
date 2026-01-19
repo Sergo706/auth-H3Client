@@ -8,7 +8,7 @@ export const serverImports = [
   { name: 'sendMfaCodeHandler', from: 'auth-h3client/v1' },
   { name: 'sendNewPasswordHandler', from: 'auth-h3client/v1' },
   { name: 'verifyTempLinkHandler', from: 'auth-h3client/v1' },
-  
+  { name: 'defineAuthConfiguration', from: 'auth-h3client/v1' },
   { name: 'defineAuthenticatedEventHandler', from: 'auth-h3client/v1' },
   { name: 'defineOptionalAuthenticationEvent', from: 'auth-h3client/v1' },
   { name: 'defineVerifiedCsrfHandler', from: 'auth-h3client/v1' },

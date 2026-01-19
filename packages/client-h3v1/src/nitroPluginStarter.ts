@@ -1,36 +1,15 @@
-import { App, Router, setResponseStatus,  createRouter } from 'h3'
-import  csrfToken  from './middleware/csrf.js';
-import { configuration } from "@internal/shared";
-import {validator} from './middleware/visitorValid.js'
-import isValidIP from './middleware/isValidIP.js'
-import {httpLogger} from './middleware/httpLogger.js'
-import {useAuthRoutes} from './routes/auth.js';
-import {magicLinksRouter} from './routes/magicLinks.js';
-import { useOAuthRoutes } from './routes/OAuth.js';
-import type { Configuration }  from "@internal/shared";
+import type { NitroApp } from 'nitropack';
+import { configuration, httpLogger, useAuthRoutes, useOAuthRoutes, magicLinksRouter } from './main.js';
+import type { Configuration } from '@internal/shared';
 
-
-export async function startService(config: Configuration, app: App, router?: Router) {
+export function defineAuthConfiguration(nitro: NitroApp, config: Configuration) {
     try {
-    configuration(config)
-    console.log('auth called')
-
-    httpLogger()(app)
-    app.use(isValidIP)
-    app.use(validator)
-    app.use(csrfToken)
-    const r = router ?? createRouter()
-
-    useAuthRoutes(r)
-    magicLinksRouter(r)
-    useOAuthRoutes(r)
-
-    r.get(`/test`, (event) => {
-        setResponseStatus(event, 200)
-        return {msg: 'IT WORKS'}
-    })
-
-    if (!router) app.use(r)
+        configuration(config);
+        httpLogger()(nitro.h3App);
+        useAuthRoutes(nitro.router);
+        useOAuthRoutes(nitro.router);
+        magicLinksRouter(nitro.router, 'api');
+        console.log('[Auth] initialized successfully!');
     } catch (err) {
         throw err;
     }

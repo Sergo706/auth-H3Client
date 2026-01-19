@@ -7,7 +7,6 @@ export default defineConfig({
     'client': 'packages/client/main.ts',
     'module': 'packages/client/module.ts',
     'server/middleware': 'packages/client/server/middleware/auth.ts',
-    'server/plugin': 'packages/client/server/plugins/auth.ts',
   },
   format: ['esm'],
   tsconfig: 'tsconfig.prod.json',

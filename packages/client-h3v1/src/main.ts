@@ -58,7 +58,7 @@ export { signature } from "@internal/shared";
 export { sendToServer as serviceToService} from "./utils/serverToServer.js";
 export { sendLog as sendTelegramMessage } from "@internal/shared";
 export { verifyOAuthToken } from "@internal/shared";
-export { startService } from "./nitroPluginStarter.js";
+export { defineAuthConfiguration } from "./nitroPluginStarter.js";
 export { defineAuthenticatedEventHandler, type MfaResponse } from "./utils/defineAuthRoute.js";
 export { defineOptionalAuthenticationEvent } from "./utils/defineOptionalAuth.js";
 export { getAuthStatusHandler } from "./utils/getAuthStatus.js";
