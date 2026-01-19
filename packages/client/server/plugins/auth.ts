@@ -1,7 +1,7 @@
 import type { NitroApp } from 'nitropack';
 import { configuration, httpLogger, useAuthRoutes, useOAuthRoutes, magicLinksRouter } from 'auth-h3client/v1';
 import { defineNitroPlugin, useRuntimeConfig, useStorage } from 'nitropack/runtime/index';
-
+import type { Configuration } from '@internal/shared';
 
 /**
  * Nitro plugin that initializes auth routes and middleware.
@@ -10,7 +10,7 @@ import { defineNitroPlugin, useRuntimeConfig, useStorage } from 'nitropack/runti
 export default defineNitroPlugin((nitro: NitroApp) => {
   try {
     const config = useRuntimeConfig();
-    const authConfig = config.authH3Client;
+    const {enableMiddleware, ...authConfig} = config.authH3Client;
     
     if (!authConfig) {
       console.error('[auth] No authH3Client config found in runtimeConfig');
