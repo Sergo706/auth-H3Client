@@ -4,6 +4,9 @@ The `auth-h3client` library requires configuration at startup to know how to con
 
 This guide explains every configuration option available.
 
+> [!TIP]
+> **Using the Nuxt Module?** See [Nuxt Module](./module.md) for the recommended setup pattern using `defineAuthConfiguration()`.
+
 ## Initialization
 
 You must call the `configuration()` function **exactly once** when your server starts (e.g., in a Nuxt plugin or server entry file).

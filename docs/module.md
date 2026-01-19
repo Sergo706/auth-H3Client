@@ -1,6 +1,6 @@
 # Nuxt Module
 
-The `auth-h3client` library handles authentication for Nuxt 3+ applications. It provides a drop-in module that handles server-side security middleware, API route registration, and client-side state management.
+The `auth-h3client` library handles authentication for Nuxt 3+ applications. It provides a module that auto-imports client-side composables and server-side utilities, plus optional security middleware.
 
 ## Installation
 
@@ -13,86 +13,50 @@ npm install auth-h3client
 **This module is a Client SDK.**
 It requires a running instance of the [**Auth Service**](https://github.com/Sergo706/auth) to connect to. It *does not* store users or passwords itself. It proxies requests to your backend Auth Service.
 
-## Installation
+## Quick Start
 
-```bash
-npm install auth-h3client
-```
-
-## Quick Start Configuration (Development)
-
-For a standard development environment where your Auth Service is running locally on port 4000:
+### 1. Register the Module
 
 ```typescript
 // nuxt.config.ts
 export default defineNuxtConfig({
   modules: ['auth-h3client/module'],
   authH3Client: {
-    enableMiddleware: true,
+    enableMiddleware: true // Enables CSRF, bot detection, IP validation middleware
+  }
+})
+```
+
+### 2. Create a Server Plugin
+
+The module does **not** auto-configure the auth library because configuration includes non-serializable options (storage instances, callbacks). You must create a server plugin:
+
+```typescript
+// server/plugins/auth.ts
+import { defineAuthConfiguration } from 'auth-h3client/v1'
+import { defineNitroPlugin, useStorage } from 'nitropack/runtime'
+
+export default defineNitroPlugin((nitroApp) => {
+  defineAuthConfiguration(nitroApp, {
     server: {
       auth_location: { serverOrDNS: 'localhost', port: 4000 },
       hmac: { enableHmac: false },
       ssl: { enableSSL: false },
       cryptoCookiesSecret: 'dev-secret-minimum-32-characters-long-string-here'
     },
-    onSuccessRedirect: '/',
-    enableFireWallBans: false, // UFW not needed for dev
-    logLevel: 'debug',
-    telegram: { enableTelegramLogger: false }
-  }
-})
-```
-
-## Production Configuration
-
-The module must be configured in `nuxt.config.ts` under the `authH3Client` key. The configuration structure strictly mirrors the [Library Configuration](./configuration.md), with one major exception: **server-side storage (`uStorage`) is handled automatically by the module using Nuxt's Nitro storage**.
-
-### Example `nuxt.config.ts`
-
-```typescript
-export default defineNuxtConfig({
-  modules: ['auth-h3client/module'],
-
-  authH3Client: {
-    // 1. Module Options
-    // Enable global middleware for CSRF, Bot Detection, and IP Validation (default: true)
-    enableMiddleware: true,
-
-    // 2. Server Connection Config (Required)
-    server: {
-      auth_location: {
-        serverOrDNS: process.env.AUTH_HOST || 'auth-service',
-        port: parseInt(process.env.AUTH_PORT || '4000')
-      },
-      // HMAC Signing (Required)
-      hmac: {
-        enableHmac: true,
-        clientId: process.env.AUTH_CLIENT_ID || 'client-id',
-        sharedSecret: process.env.AUTH_SHARED_SECRET || 'secret'
-      },
-      // SSL Config (Required)
-      ssl: {
-        enableSSL: false 
-      },
-      // Secret for signing cookies (Required, min 32 chars)
-      cryptoCookiesSecret: process.env.AUTH_COOKIE_SECRET || 'CHANGE_ME_TO_A_VERY_LONG_RANDOM_STRING'
+    uStorage: {
+      storage: useStorage('cache'),
+      cacheOptions: {
+        successTtl: 60 * 60 * 24 * 30,
+        rateLimitTtl: 10
+      }
     },
-
-    // 3. User Redirection (Required)
     onSuccessRedirect: '/dashboard',
-
-    // 4. Security Settings (Required)
-    // [!CAUTION] Requires 'ufw' and sudo permissions.
-    enableFireWallBans: true,
+    enableFireWallBans: false,
+    logLevel: 'debug',
+    telegram: { enableTelegramLogger: false },
     
-    // 5. Logging (Required)
-    logLevel: 'debug', // 'debug' | 'info' | 'warn' | 'error' | 'fatal'
-    
-    telegram: {
-        enableTelegramLogger: false
-    },
-
-    // 6. OAuth Providers (Optional)
+    // Optional: OAuth Providers
     OAuthProviders: [
       {
         kind: 'oidc',
@@ -107,12 +71,23 @@ export default defineNuxtConfig({
         defaultScopes: ['openid', 'email', 'profile']
       }
     ]
-  }
+  })
 })
 ```
 
 > [!NOTE]
-> For a detailed explanation of every configuration field, please refer to the [Configuration Guide](./configuration.md).
+> For a detailed explanation of every configuration field, see the [Configuration Guide](./configuration.md).
+
+## Module Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enableMiddleware` | `boolean` | `true` | Enables global security middleware (CSRF, bot detection, IP validation) |
+
+> [!WARNING]
+> **Serverless / Edge Compatibility**
+> If deploying to **Vercel, Netlify, Cloudflare Workers, or AWS Lambda**, you **MUST** set `enableFireWallBans: false` in your plugin config.
+> The firewall feature relies on `sudo ufw` which is only available on VPS/Dedicated servers.
 
 ## Deployment & Serverless
 

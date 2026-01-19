@@ -39,11 +39,6 @@
       "import": "./dist/server/middleware.js",
       "default": "./dist/server/middleware.js"
     },
-    "./server/plugin": {
-      "types": "./dist/server/plugin.d.ts",
-      "import": "./dist/server/plugin.js",
-      "default": "./dist/server/plugin.js"
-    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -62,9 +57,6 @@
       ],
       "server/middleware": [
         "dist/server/middleware.d.ts"
-      ],
-      "server/plugin": [
-        "dist/server/plugin.d.ts"
       ],
       "*": [
         "dist/v1.d.ts"
