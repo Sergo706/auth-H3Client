@@ -1,7 +1,6 @@
 import type { NitroApp } from 'nitropack';
 import { configuration, httpLogger, useAuthRoutes, useOAuthRoutes, magicLinksRouter } from 'auth-h3client/v1';
 import { defineNitroPlugin, useRuntimeConfig, useStorage } from 'nitropack/runtime/index';
-import type { Configuration } from '@internal/shared';
 
 /**
  * Nitro plugin that initializes auth routes and middleware.
