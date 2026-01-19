@@ -8,7 +8,42 @@ The `auth-h3client` library handles authentication for Nuxt 3+ applications. It 
 npm install auth-h3client
 ```
 
-## Configuration
+## Prerequisites
+
+**This module is a Client SDK.**
+It requires a running instance of the **Auth Service** to connect to. It *does not* store users or passwords itself. It proxies requests to your backend Auth Service.
+
+## Installation
+
+```bash
+npm install auth-h3client
+```
+
+## Quick Start Configuration (Development)
+
+For a standard development environment where your Auth Service is running locally on port 4000:
+
+```typescript
+// nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['auth-h3client/module'],
+  authH3Client: {
+    enableMiddleware: true,
+    server: {
+      auth_location: { serverOrDNS: 'localhost', port: 4000 },
+      hmac: { enableHmac: false },
+      ssl: { enableSSL: false },
+      cryptoCookiesSecret: 'dev-secret-minimum-32-characters-long-string-here'
+    },
+    onSuccessRedirect: '/',
+    enableFireWallBans: false, // UFW not needed for dev
+    logLevel: 'debug',
+    telegram: { enableTelegramLogger: false }
+  }
+})
+```
+
+## Production Configuration
 
 The module must be configured in `nuxt.config.ts` under the `authH3Client` key. The configuration structure strictly mirrors the [Library Configuration](./configuration.md), with one major exception: **server-side storage (`uStorage`) is handled automatically by the module using Nuxt's Nitro storage**.
 
@@ -47,7 +82,8 @@ export default defineNuxtConfig({
     onSuccessRedirect: '/dashboard',
 
     // 4. Security Settings (Required)
-    enableFireWallBans: true, // Respect bans from auth service
+    // [!CAUTION] Requires 'ufw' and sudo permissions.
+    enableFireWallBans: true,
     
     // 5. Logging (Required)
     logLevel: 'debug', // 'debug' | 'info' | 'warn' | 'error' | 'fatal'
@@ -77,6 +113,14 @@ export default defineNuxtConfig({
 
 > [!NOTE]
 > For a detailed explanation of every configuration field, please refer to the [Configuration Guide](./configuration.md).
+
+## Deployment & Serverless
+
+> [!WARNING]
+> **Serverless / Edge Compatibility**
+> If deploying to **Vercel, Netlify, Cloudflare Workers, or AWS Lambda**, you **MUST** set `enableFireWallBans: false`.
+>
+> The firewall feature relies on `sudo ufw` which is only available on VPS/Dedicated servers (DigitalOcean Droplets, AWS EC2, Hetzner, etc.). Enabling it in a serverless environment will cause the application to crash or error on startup.
 
 ## Client-Side Composables
 
