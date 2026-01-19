@@ -239,7 +239,14 @@ logLevel: 'debug' | 'info' | 'warn' | 'error' | 'fatal'
 
 ## Firewall (`enableFireWallBans`)
 
-If set to `true`, the client will check for IP bans enforced by the Auth Service.
+Enables the library to actively ban malicious IP addresses using the server's firewall (UFW).
+
+> [!CAUTION]
+> **System Requirement:** This feature requires `ufw` to be installed and the Node.js process to have permissions to execute `sudo ufw insert ...`.
+> Use with caution as it modifies system firewall rules.
+> 
+> **Serverless / Edge Compatibility:**  
+> If deploying to **Vercel, Netlify, Cloudflare Workers, or AWS Lambda**, you **MUST** set `enableFireWallBans: false`. These environments do not provide access to system-level firewalls.
 
 ```ts
 enableFireWallBans: true
