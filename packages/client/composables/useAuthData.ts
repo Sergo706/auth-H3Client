@@ -1,6 +1,5 @@
-import { useState, useRequestHeaders } from 'nuxt/app';
+import { useState, useRequestHeaders, useRequestFetch } from 'nuxt/app';
 import type { Ref } from 'vue';
-import { $fetch } from 'ofetch';
 import type { ServerResponse } from "@internal/shared";
 
 export interface AuthState {
@@ -35,8 +34,9 @@ let activeAuthRequest: Promise<void> | null = null;
 export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<Ref<AuthState>> => {
   const authorized = useState<AuthState>('auth', () => ({ authorized: false, mfaRequired: false }));
   const headers = useRequestHeaders();
+  const $fetch = useRequestFetch();
 
-  if (activeAuthRequest) {
+  if (import.meta.client && activeAuthRequest) {
       await activeAuthRequest;
       return authorized;
   }
@@ -94,11 +94,18 @@ export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<
             mfaRequired: false 
         };
       } finally {
-        activeAuthRequest = null;
+       if (import.meta.client) {
+            activeAuthRequest = null;
+        }
       }
   };
 
-  activeAuthRequest = performCheck();
-  await activeAuthRequest;
+  const requestPromise = performCheck();
+
+  if (import.meta.client) {
+      activeAuthRequest = requestPromise;
+  }
+
+  await requestPromise;
   return authorized;
 };
