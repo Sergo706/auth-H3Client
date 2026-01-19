@@ -1,0 +1,72 @@
+export const serverImports = [
+  { name: 'loginHandler', from: 'auth-h3client/v1' },
+  { name: 'handleLogout', from: 'auth-h3client/v1' },
+  { name: 'signUpHandler', from: 'auth-h3client/v1' },
+  { name: 'OAuthRedirect', from: 'auth-h3client/v1' },
+  { name: 'OAuthCallback', from: 'auth-h3client/v1' },
+  { name: 'restartPasswordHandler', from: 'auth-h3client/v1' },
+  { name: 'sendMfaCodeHandler', from: 'auth-h3client/v1' },
+  { name: 'sendNewPasswordHandler', from: 'auth-h3client/v1' },
+  { name: 'verifyTempLinkHandler', from: 'auth-h3client/v1' },
+  
+  { name: 'defineAuthenticatedEventHandler', from: 'auth-h3client/v1' },
+  { name: 'defineOptionalAuthenticationEvent', from: 'auth-h3client/v1' },
+  { name: 'defineVerifiedCsrfHandler', from: 'auth-h3client/v1' },
+  { name: 'defineAuthenticatedEventPostHandlers', from: 'auth-h3client/v1' },
+  { name: 'getAuthStatusHandler', from: 'auth-h3client/v1' },
+  
+  { name: 'generateCsrfCookie', from: 'auth-h3client/v1' },
+  { name: 'verifyCsrfCookie', from: 'auth-h3client/v1' },
+  
+  { name: 'ensureAccessToken', from: 'auth-h3client/v1' },
+  { name: 'ensureRefreshCookie', from: 'auth-h3client/v1' },
+  { name: 'ensureValidCredentials', from: 'auth-h3client/v1' },
+  { name: 'OAuthTokensValidations', from: 'auth-h3client/v1' },
+  
+  { name: 'isIPValid', from: 'auth-h3client/v1' },
+  { name: 'botDetectorMiddleware', from: 'auth-h3client/v1' },
+  { name: 'hmacSignatureMiddleware', from: 'auth-h3client/v1' },
+  
+  { name: 'httpLogger', from: 'auth-h3client/v1' },
+  { name: 'limitBytes', from: 'auth-h3client/v1' },
+  { name: 'contentType', from: 'auth-h3client/v1' },
+  { name: 'notFoundHandler', from: 'auth-h3client/v1' },
+  
+  { name: 'useAuthRoutes', from: 'auth-h3client/v1' },
+  { name: 'useOAuthRoutes', from: 'auth-h3client/v1' },
+  { name: 'magicLinksRouter', from: 'auth-h3client/v1' },
+  
+  { name: 'makeCookie', from: 'auth-h3client/v1' },
+  { name: 'createSignedValue', from: 'auth-h3client/v1' },
+  { name: 'verifySignedValue', from: 'auth-h3client/v1' },
+  { name: 'toB64', from: 'auth-h3client/v1' },
+  { name: 'fromB64', from: 'auth-h3client/v1' },
+  { name: 'isSameBuffer', from: 'auth-h3client/v1' },
+  
+  { name: 'serviceToService', from: 'auth-h3client/v1' },
+  { name: 'clientHeaders', from: 'auth-h3client/v1' },
+  { name: 'signature', from: 'auth-h3client/v1' },
+  
+  { name: 'getAccessTokenMetaData', from: 'auth-h3client/v1' },
+  { name: 'getRefreshTokenMetaData', from: 'auth-h3client/v1' },
+  { name: 'getCachedUserData', from: 'auth-h3client/v1' },
+  { name: 'getOperationalConfig', from: 'auth-h3client/v1' },
+  
+  { name: 'discoverOidc', from: 'auth-h3client/v1' },
+  { name: 'makePkcePair', from: 'auth-h3client/v1' },
+  { name: 'verifyOAuthToken', from: 'auth-h3client/v1' },
+  { name: 'atHashCheck', from: 'auth-h3client/v1' },
+  
+  { name: 'throwHttpError', from: 'auth-h3client/v1' },
+  { name: 'getLogger', from: 'auth-h3client/v1' },
+  { name: 'sendTelegramMessage', from: 'auth-h3client/v1' },
+  
+  { name: 'getBaseUrl', from: 'auth-h3client/v1' },
+  { name: 'parseResponseContentType', from: 'auth-h3client/v1' },
+  { name: 'findStringsInObject', from: 'auth-h3client/v1' },
+  { name: 'safeObjectMerge', from: 'auth-h3client/v1' },
+  { name: 'MiniCache', from: 'auth-h3client/v1' },
+  { name: 'getAuthAgent', from: 'auth-h3client/v1' },
+  { name: 'banIp', from: 'auth-h3client/v1' },
+  
+] as const;

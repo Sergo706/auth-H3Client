@@ -65,3 +65,4 @@ export { getAuthStatusHandler } from "./utils/getAuthStatus.js";
 export { defineVerifiedCsrfHandler } from "./utils/csrfVerifier.js";
 export { defineAuthenticatedEventPostHandlers } from "./utils/authenticatedPostHandler.js";
 export { getCachedUserData } from "./utils/getCachedUserData.js";
+export { type H3Event, defineEventHandler, getRequestURL, isMethod, sendNoContent, getHeader } from 'h3';

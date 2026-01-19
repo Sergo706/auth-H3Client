@@ -8,15 +8,21 @@
         "declarationMap": true,
         "paths": {
             "@internal/shared": [
-                    "../shared/src/index.ts"
-                ]
+                "../shared/src/index.ts"
+            ],
+            "auth-h3client/v1": [
+                "../client-h3v1/src/main.ts"
+            ]
         }
     },
     "references": [
-            {
-                "path": "../shared"
-            }
-        ],
+        {
+            "path": "../shared"
+        },
+        {
+            "path": "../client-h3v1"
+        }
+    ],
     "include": [
         "./**/*.ts"
     ],
