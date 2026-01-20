@@ -11,7 +11,7 @@ const serverConfig: Options = {
   tsconfig: 'tsconfig.prod.json',
   dts: true,
   sourcemap: true,
-  clean: true,
+  clean: false,  
   splitting: true,
   outDir: 'dist',
   external: [
@@ -83,4 +83,4 @@ const clientConfig: Options = {
   treeshake: true,
 };
 
-export default defineConfig([serverConfig, clientConfig]);
+export default defineConfig([clientConfig, serverConfig]);
