@@ -1,7 +1,6 @@
-import { useState, useRequestHeaders } from 'nuxt/app';
+import { useState, useRequestHeaders, useFetch } from 'nuxt/app';
 import type { Ref } from 'vue';
 import type { ServerResponse } from "@internal/shared";
-import { $fetch } from 'ofetch';
 
 export interface AuthState {
     id?: string;    
@@ -10,8 +9,6 @@ export interface AuthState {
     message?: string;
 }
 
-
-let activeAuthRequest: Promise<void> | null = null;
 
 /**
  * Composable that checks and returns the current authentication state.
@@ -36,38 +33,37 @@ export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<
   const authorized = useState<AuthState>('auth', () => ({ authorized: false, mfaRequired: false }));
   const headers = useRequestHeaders();
 
-  if (import.meta.server) {
-      return authorized;
-  }
-  
-  if (import.meta.client && activeAuthRequest) {
-      await activeAuthRequest;
-      return authorized;
-  }
-
-  const performCheck = async () => {
       try {
-        const res = await $fetch.raw<ServerResponse | Omit<AuthState, 'authorized'>>(authStatusUrl, {
+         await useFetch<ServerResponse | Omit<AuthState, 'authorized'>>(authStatusUrl, {
+          key: `auth-data-${authStatusUrl}`,
           method: 'GET',
           headers: {
             ...headers,
             'Accept': 'application/json',
           },
           timeout: 5000,
-          ignoreResponseError: true
-        });
-        
-        const json = res._data;
+          ignoreResponseError: true,
+          retry: false,
 
-        if (!json || res.status === 401) {
-            authorized.value = { 
-                authorized: false,
-                mfaRequired: false 
-            };
-            return;
-        }
-        if (res.status === 202 && 'text' in json) {
-            const mfaMsg = json.message ?? 
+          getCachedData: (key, nuxtApp) => {
+                if (nuxtApp.isHydrating) {
+                 return nuxtApp.payload.data[key];
+             }
+              return undefined; 
+          },
+
+          onResponse ({ response }) {
+            const json = response._data;
+
+            if (!json || response.status === 401) {
+                authorized.value = { 
+                    authorized: false,
+                    mfaRequired: false 
+                };
+                  return;
+            }
+            if(response.status === 202 && 'text' in json) {
+               const mfaMsg = json.message ?? 
                         (json.text ? 'Multi factor authentication is required. Please check your email to continue.' : 'Security check required.');
                 authorized.value = {
                     authorized: false,
@@ -75,41 +71,37 @@ export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<
                     message: mfaMsg
                 };
                 return;
-       }
-
-        if (res.status === 200 && 'authorized' in json) {
+            }
+            if (response.status === 200 && 'authorized' in json) {
                 authorized.value = {
                     id: json.userId,
                     authorized: json.authorized,
                     mfaRequired: false
                 };
                 return;
+            }
+
+            authorized.value = { 
+                authorized: false,
+                mfaRequired: false 
+            };
+            return;
+        },
+        onResponseError() {
+            authorized.value = { 
+                authorized: false, 
+                mfaRequired: false 
+            };
+            return;
         }
-
-        authorized.value = { 
-            authorized: false,
-            mfaRequired: false 
-        };
-
+        });
+        
       } catch (err) {
         console.error("Auth check failed:", err);
         authorized.value = { 
             authorized: false, 
             mfaRequired: false 
         };
-      } finally {
-       if (import.meta.client) {
-            activeAuthRequest = null;
-        }
-      }
+      } 
+        return authorized;
   };
-
-  const requestPromise = performCheck();
-
-  if (import.meta.client) {
-      activeAuthRequest = requestPromise;
-  }
-
-  await requestPromise;
-  return authorized;
-};
