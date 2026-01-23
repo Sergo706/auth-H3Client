@@ -93,7 +93,7 @@ export const config: Configuration = {
     uStorage: {
         storage: storage,
         cacheOptions: {
-            successTtl: 60 * 60 * 24 * 30,  // 30 days
+            successTtl: 60 * 60 * 24 * 30,
             rateLimitTtl: 10
         }
     },
