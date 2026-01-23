@@ -17,7 +17,7 @@
   ],
   "include": [
     "src"
-  ],
+, "../shared/src/utils/rotationLock.ts"  ],
   "exclude": [
     "node_modules"
   ]

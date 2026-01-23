@@ -1,6 +1,6 @@
 import { H3, serve } from 'h3'
 import  csrfToken  from '../packages/client-h3v2/src/middleware/csrf.js';
-import { configuration } from '../packages/client-h3v2/src/config/config.js'
+import { configuration } from '@internal/shared'
 import { config } from './setup/config.js'
 import {validator} from '../packages/client-h3v2/src/middleware/visitorValid.js'
 import isValidIP from '../packages/client-h3v2/src/middleware/isValidIP.js'
