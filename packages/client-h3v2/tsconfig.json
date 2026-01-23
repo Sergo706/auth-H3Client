@@ -7,14 +7,19 @@
     "declaration": true,
     "declarationMap": true,
     "paths": {
-      "@internal/shared": ["../shared/src/index.ts"]
+      "@internal/shared": [
+        "../shared/src/index.ts"
+      ]
     }
   },
   "references": [
-    { "path": "../shared" }
+    {
+      "path": "../shared"
+    }
   ],
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/utils/applyRotationResults.ts"
   ],
   "exclude": [
     "node_modules",
