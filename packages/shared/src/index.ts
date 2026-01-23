@@ -22,3 +22,6 @@ export * from './utils/telegramLogger.js';
 export * from './utils/verifyOAuthTokens.js';
 export * from './types/oidc.js';
 export * from './types/signup.js';
+export * from './utils/rotationLock.js';
+export * from './types/cookiesSetter.js'
+export * from './types/rotationResult.js'

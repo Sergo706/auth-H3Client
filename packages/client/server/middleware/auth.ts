@@ -8,7 +8,7 @@ import { generateCsrfCookie, botDetectorMiddleware, isIPValid } from 'auth-h3cli
 export default defineEventHandler(async (event: H3Event) => {
   const { pathname } = getRequestURL(event);
 
-  if (isMethod(event, 'HEAD') || pathname === '/api/health' || pathname.startsWith('/api/_mdc')) {
+  if (isMethod(event, 'HEAD') || pathname === '/api/health' || pathname.startsWith('/api/_mdc') || pathname.startsWith('/_nuxt')) {
     if (isMethod(event, 'HEAD') || pathname === '/api/health') {
       sendNoContent(event);
     }
