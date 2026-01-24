@@ -58,11 +58,15 @@ export { signature } from "@internal/shared";
 export { sendToServer as serviceToService} from "./utils/serverToServer.js";
 export { sendLog as sendTelegramMessage } from "@internal/shared";
 export { verifyOAuthToken } from "@internal/shared";
+export {applyRotationResult} from "./utils/applyRotationResults.js"
+export {safeAction as lockAsyncAction} from "@internal/shared"
+export {checkForBots} from "./utils/checkForBots.js";
 export { defineAuthConfiguration } from "./nitroPluginStarter.js";
 export { defineAuthenticatedEventHandler, type MfaResponse } from "./utils/defineAuthRoute.js";
 export { defineOptionalAuthenticationEvent } from "./utils/defineOptionalAuth.js";
 export { getAuthStatusHandler } from "./utils/getAuthStatus.js";
 export { defineVerifiedCsrfHandler } from "./utils/csrfVerifier.js";
 export { defineAuthenticatedEventPostHandlers } from "./utils/authenticatedPostHandler.js";
+export { defineDeduplicatedEventHandler } from "./utils/requestDedupHandler.js";
 export { getCachedUserData } from "./utils/getCachedUserData.js";
 export { type H3Event, defineEventHandler, getRequestURL, isMethod, sendNoContent, getHeader } from 'h3';
