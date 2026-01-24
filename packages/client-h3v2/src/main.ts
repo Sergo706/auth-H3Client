@@ -58,7 +58,10 @@ export { signature } from "@internal/shared";
 export { sendToServer as serviceToService} from "./utils/serverToServer.js";
 export { sendLog as sendTelegramMessage } from "@internal/shared";
 export { verifyOAuthToken } from "@internal/shared";
-
+export {applyRotationResult} from "./utils/applyRotationResults.js"
+export {safeAction as lockAsyncAction} from "@internal/shared"
+export {checkForBots} from "./utils/checkForBots.js";
+export { defineDeduplicatedEventHandler } from "./utils/requestDedupHandler.js";
 export { defineAuthenticatedEventPostHandlers } from "./utils/authenticatedPostHandler.js";
 export { defineVerifiedCsrfHandler } from "./utils/csrfVerifier.js";
 export { defineAuthenticatedEventHandler, type MfaResponse } from "./utils/defineAuthRoute.js";
