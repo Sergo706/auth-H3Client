@@ -36,7 +36,6 @@ export const validator = async (event: H3Event): Promise<any> => {
     
     if (rawCookie && canary) {
       if (!verifySignedCookie(rawCookie, 'normal').valid) {
-        const imageUrl = '/assets/tea.png';
         log.warn('[FE] Host-dr_i_n Not verified tempering detected');
 
         throw new HTTPError({
@@ -101,6 +100,7 @@ export const validator = async (event: H3Event): Promise<any> => {
         message: 'Something went wrong, please try restarting the page, and try again.' ,
     })
   };
+  
 }
 };
 
