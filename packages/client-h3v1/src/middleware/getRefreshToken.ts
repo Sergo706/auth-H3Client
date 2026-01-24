@@ -1,11 +1,12 @@
 import { sendToServer } from '../utils/serverToServer.js'
-import { getLogger } from "@internal/shared";
-import { deleteCookie, getCookie, H3Event, H3Error, appendHeader, setResponseStatus } from 'h3';
+import { getLogger, safeAction, type RefreshRotationResult } from "@internal/shared";
+import { getCookie, H3Event, H3Error, appendHeader, setResponseStatus } from 'h3';
 import throwError from './error.js';
 import { parseResponseContentType } from "@internal/shared";
 import { getOperationalConfig } from '../utils/getRemoteConfig.js';
 import { getMetadata } from '../utils/getRefreshTokenMetaData.js';
 import { cache } from '../utils/getRefreshTokenMetaData.js';
+import { applyRotationResult } from '../utils/applyRotationResults.js';
 
 /**
  * Validates and refreshes the session cookie when required, coordinating with the auth server
@@ -21,7 +22,7 @@ export async function ensureRefreshCookie(event: H3Event) {
 
   let refresh = getCookie(event, 'session');
   const canary = getCookie(event, 'canary_id');
-  const { domain} = await getOperationalConfig(event)
+  const { domain, accessTokenTTL } = await getOperationalConfig(event)
 
   const iat = Number(getCookie(event, 'iat')); 
 
@@ -32,7 +33,7 @@ const log = getLogger().child({service: 'auth', branch: `refresh_tokens`, reqID:
    throwError(log, event, 'AUTH_REQUIRED', 401, 'Unauthorized','Re-authentication required', 'Refresh Tokens or canary id not founded. Login required');
  }
 
-const rotate = async () => {
+const rotate = async (): Promise<RefreshRotationResult> => {
     log.info(`rotating refresh tokens...`)
     const cookies = [
     {label: 'canary_id', value: canary},
@@ -52,16 +53,12 @@ const rotate = async () => {
     if (res.status === 429) {
       log.warn(`User rate limited`);  
        const retrySec = res.headers.get('Retry-After');
-
-            if (retrySec) {
-                appendHeader(event, 'Retry-After', (retrySec as unknown as number))
-                setResponseStatus(event, 429)
-                return {error: `To many attempts, please try again later.`};
-            } 
-
-                setResponseStatus(event, 429)
-                return {error: `To many attempts, please try again later.`};
-        };
+       if (retrySec) {
+           appendHeader(event, 'Retry-After', (retrySec as unknown as number))
+       }
+       setResponseStatus(event, 429)
+       return {error: `Too many attempts, please try again later.`};
+    }
 
    if (res.status === 401) {
      throwError(log, event, 'AUTH_REQUIRED', 401, 'Unauthorized','Re-authentication required', `Re-authentication required. \n ${json.message} \n ${json.error}`);
@@ -78,6 +75,7 @@ const rotate = async () => {
    if (res.status === 200) {
       log.info({session: json.session},'Verified refresh token. rotation is not needed.')
       setResponseStatus(event, 200, "OK")
+      event.context.session = refresh;
       return;
    }
 
@@ -92,22 +90,21 @@ const rotate = async () => {
      if (rawSetCookie.length === 0) {
         throwError(log, event, 'AUTH_SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', `New refresh token and related cookies ended up null. ${answer}`);
     }
-    
-    deleteCookie(event, 'session', {domain: domain, path: '/'})
-    deleteCookie(event, 'iat', {domain: domain, path: '/'})
-    rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
 
     const sessionLine = rawSetCookie.find(c => c.trim().startsWith('session=')) ?? '';
-    const sessionValue = sessionLine.split(';', 1)[0].split('=')[1] || refresh;
-    refresh = sessionValue; 
-    
-    
-    event.context.session = refresh;
+    const newRefresh = sessionLine.split(';', 1)[0].split('=')[1] || refresh;
+
+    return { type: 'refresh', newRefresh, rawSetCookie };
  } catch(err) {
     if (err instanceof H3Error) throw err;
     throwError(log, event, 'SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', `Unexpected error type. ${err}`);
 }
  }
+
+ const rotateAndApply = async () => {
+    const result = await safeAction(refresh, rotate);
+    return applyRotationResult(event, result, domain, accessTokenTTL);
+ };
 
 
  try {
@@ -128,14 +125,15 @@ const rotate = async () => {
      if ("shouldRotate" in meta && meta.shouldRotate) {
         log.info({ msUntilExp: meta.msUntilExp }, 'Meta suggests rotation; rotating refresh token');
         cache.del(refresh);
-        return await rotate();
+        return await rotateAndApply();
      }
      
     event.context.session = refresh;
  }  catch (err) {
-         log.error({ err }, 'Meta check failed; rotating both tokens');
+         log.error({ err }, 'Meta check failed; rotating refresh token');
          cache.del(refresh);
          throwError(log, event, 'AUTH_SERVER_ERROR', 500, 'Server Error','Server Error', 'Meta not authorized; re login required');
     }
 
 }
+

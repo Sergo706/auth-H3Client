@@ -87,7 +87,7 @@ import { applyRotationResult } from "../utils/applyRotationResults.js";
             const sessionLine = rawSetCookie.find(c => c.trim().startsWith('session=')) ?? '';
             const sessionValue = sessionLine.split(';', 1)[0].split('=')[1] || refresh;
 
-            return { newToken, newRefresh: sessionValue, accessIat, rawSetCookie };
+            return { type: 'both', newToken, newRefresh: sessionValue, accessIat, rawSetCookie };
         } catch (err) {
             if (err instanceof HTTPError) throw err;
             throwError(log, event, 'SERVER_ERROR', 500, 'Server Error', 'Something went wrong, please try restarting the page, and try again', `Unexpected error type. ${err}`);
