@@ -3,7 +3,7 @@ import { getLogger } from "@internal/shared";
 import { banIp } from "@internal/shared";
 import { appendHeader, assertMethod, getHeader, getRequestIP, setResponseStatus } from 'h3';
 import throwError from '../middleware/error.js';
-import { defineDeduplicatedEventHandler } from '../main.js';
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 
 /**
  * Initiates a password reset by validating the email payload and forwarding the

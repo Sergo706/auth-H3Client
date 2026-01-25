@@ -7,7 +7,7 @@ import { assertMethod, getCookie, getRequestIP, redirect } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";
-import { defineDeduplicatedEventHandler } from '../main.js';
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 /**
  * Handles user signup by validating the payload, delegating to the auth server,
  * managing issued cookies, and translating server responses into structured errors.

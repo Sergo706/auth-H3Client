@@ -5,7 +5,7 @@ import throwError from "../middleware/error.js";
 import { cache as accessTokenCache } from "../utils/getAccessTokenMetaData.js";
 import { cache as refreshTokenCache } from "../utils/getRefreshTokenMetaData.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
-import { defineDeduplicatedEventHandler } from '../main.js';
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 
 /**
  * Logs the user out by validating the request, notifying the auth server,

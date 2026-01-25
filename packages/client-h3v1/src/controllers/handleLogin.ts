@@ -5,7 +5,7 @@ import { appendHeader, assertMethod, defineEventHandler, getHeader, getRequestIP
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";
-import { defineDeduplicatedEventHandler } from "../main.js";
+import { defineDeduplicatedEventHandler } from "../utils/requestDedupHandler.js";
 
 /**
  * Handles login submissions by validating payloads, proxying the request to the
