@@ -13,6 +13,7 @@ export const serverImports = [
   { name: 'defineOptionalAuthenticationEvent', from: 'auth-h3client/v1' },
   { name: 'defineVerifiedCsrfHandler', from: 'auth-h3client/v1' },
   { name: 'defineAuthenticatedEventPostHandlers', from: 'auth-h3client/v1' },
+  { name: 'defineDeduplicatedEventHandler', from: 'auth-h3client/v1' },
   { name: 'getAuthStatusHandler', from: 'auth-h3client/v1' },
   
   { name: 'generateCsrfCookie', from: 'auth-h3client/v1' },
@@ -58,6 +59,7 @@ export const serverImports = [
   { name: 'atHashCheck', from: 'auth-h3client/v1' },
   
   { name: 'throwHttpError', from: 'auth-h3client/v1' },
+  { name: 'lockAsyncAction', from: 'auth-h3client/v1' },
   { name: 'getLogger', from: 'auth-h3client/v1' },
   { name: 'sendTelegramMessage', from: 'auth-h3client/v1' },
   
@@ -68,5 +70,7 @@ export const serverImports = [
   { name: 'MiniCache', from: 'auth-h3client/v1' },
   { name: 'getAuthAgent', from: 'auth-h3client/v1' },
   { name: 'banIp', from: 'auth-h3client/v1' },
+  { name: 'applyRotationResult', from: 'auth-h3client/v1' },
+  { name: 'checkForBots', from: 'auth-h3client/v1' },
   
 ] as const;
