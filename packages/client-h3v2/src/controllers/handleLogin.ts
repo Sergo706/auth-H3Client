@@ -1,10 +1,11 @@
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from "@internal/shared";
-import { assertMethod, defineHandler, getRequestIP, redirect } from "h3";
+import { assertMethod, getRequestIP, redirect } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";
+import { defineDeduplicatedEventHandler } from '../main.js';
 
 /**
  * Handles login submissions by validating payloads, proxying the request to the
@@ -17,7 +18,7 @@ import { getConfiguration } from "@internal/shared";
  * // In an H3 router:
  * router.post('/login', loginHandler, { middleware: [...] });
  */
-export default defineHandler(async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 
 assertMethod(event, "POST")
 const log = getLogger().child({service: 'auth', branch: 'classic', type: 'login', ip: getRequestIP(event)});

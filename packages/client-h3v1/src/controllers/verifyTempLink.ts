@@ -1,9 +1,9 @@
 import { sendToServer } from "../utils/serverToServer.js";
 import { getLogger } from "@internal/shared";
 import { notFoundHandler } from "../middleware/notFound.js"
-import { defineEventHandler, getCookie, getQuery, getRequestURL, getRouterParam, H3Event, sendRedirect, setResponseStatus } from "h3";
+import { getCookie, getQuery, getRequestURL, getRouterParam, H3Event, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
-
+import { defineDeduplicatedEventHandler } from "../main.js";
 
 /**
  * Validates temporary links (MFA or password reset) by confirming signed tokens with the auth server
@@ -15,7 +15,7 @@ import throwError from "../middleware/error.js";
  * @example
  * router.get('/auth/verify-mfa/:visitor', verifyLink);
  */
-export default defineEventHandler(async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 
 const { temp } = getQuery(event)
 const visitor = getRouterParam(event, "visitor");
