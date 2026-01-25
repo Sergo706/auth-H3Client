@@ -5,7 +5,7 @@ import { appendHeader, assertMethod, getCookie, getHeader, getQuery, getRouterPa
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";
-import { defineDeduplicatedEventHandler } from "../main.js";
+import { defineDeduplicatedEventHandler } from "../utils/requestDedupHandler.js";
 
 /**
  * Validates MFA code submissions by proxying them to the auth server, managing session cookies,

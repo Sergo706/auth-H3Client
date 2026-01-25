@@ -3,7 +3,7 @@ import { getLogger } from "@internal/shared";
 import { banIp } from "@internal/shared";
 import { assertMethod, getRequestIP, HTTPError } from 'h3';
 import throwError from '../middleware/error.js';
-import { defineDeduplicatedEventHandler } from '../main.js';
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 
 
 

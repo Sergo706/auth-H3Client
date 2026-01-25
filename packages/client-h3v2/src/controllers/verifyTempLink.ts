@@ -3,7 +3,7 @@ import { getLogger } from "@internal/shared";
 import { notFoundHandler } from "../middleware/notFound.js"
 import { getCookie, getQuery, getRequestURL, getRouterParam, H3Event, redirect } from "h3";
 import throwError from "../middleware/error.js";
-import { defineDeduplicatedEventHandler } from "../main.js";
+import { defineDeduplicatedEventHandler } from "../utils/requestDedupHandler.js";
 
 
 /**

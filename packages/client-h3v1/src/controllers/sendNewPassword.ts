@@ -3,7 +3,7 @@ import { getLogger } from "@internal/shared";
 import { banIp } from "@internal/shared";
 import { appendHeader, assertMethod, getCookie, getHeader, getQuery, getRequestIP, getRouterParam, setResponseStatus } from 'h3';
 import throwError from '../middleware/error.js';
-import { defineDeduplicatedEventHandler } from '../main.js';
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 
 /**
  * Submits a new password for visitors who passed link validation, enforcing payload rules

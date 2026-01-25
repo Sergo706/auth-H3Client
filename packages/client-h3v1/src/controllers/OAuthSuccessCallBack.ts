@@ -8,7 +8,7 @@ import { makeCookie } from "../utils/cookieGenerator.js";
 import { safeObjectMerge } from "@internal/shared";
 import { findStringsInObject } from "@internal/shared";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
-import { defineDeduplicatedEventHandler } from "../main.js";
+import { defineDeduplicatedEventHandler } from "../utils/requestDedupHandler.js";
 
 /**
  * Completes the OAuth/OIDC login by enriching the provider payload, ensuring a usable email,
