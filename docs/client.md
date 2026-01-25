@@ -1,182 +1,151 @@
-# Client-Side Authentication & Data Fetching
+# Client-Side Authentication (Detailed Guide)
 
-The client-side library is designed to solve the "Token Rotation Race Condition" (401 loops) through a **Singleton Gatekeeper** pattern.
+This document details how to secure your Nuxt/Vue frontend using the `auth-h3client` primitives. Unlike other libraries that hide complexity behind opaque "auth" objects, this library gives you two precise tools: **State Management** (`useAuthData`) and **Cookie Access** (`getCsrfToken`).
 
-It ensures that **no API request is ever sent** unless the authentication state is known to be valid and fresh. If a token rotation is required (e.g., after 15 minutes), the library pauses all outgoing requests, performs the rotation once, updates the cookies, and then releases the requests.
+## 1. Concepts
+
+### The "Singleton Gatekeeper" Pattern
+Authentication state is managed by a single, global promise called the "Gatekeeper".
+
+-   **Problem**: If a user opens your app and 5 components immediately request data, and the access token is invalid, you don't want to fire 5 refresh requests. Use of `await useAuthData()` prevents this.
+-   **Solution**: `useAuthData()` initiates the check *once*. All 5 components await the *same* promise. Once resolved, the state is cached.
+
+### SSR vs Client
+-   **Server-Side (SSR)**: The middleware runs `ensureValidCredentials` automatically. The *result* is hydrated to the client. This means `useAuthData` often returns instantly on the client because the server already did the work.
+-   **Client-Side**: If the session expires while the user is browsing, `useAuthData` detects the expiry (via 401 or metadata check) and triggers a transparent background rotation.
 
 ---
 
-## 1. Setup (Nuxt Wiring)
+## 2. API Reference
 
-To guarantee race-condition-free navigation, you must initialize the Gatekeeper at two points in your Nuxt application.
+### `useAuthData(authStatusUrl?)`
 
-### A. Initial Load (`app.vue`)
-This protects the application on the very first page load (SSR or SPA entry). It ensures the session is valid before any child component attempts to fetch data.
+**Signature**:
+```typescript
+function useAuthData(authStatusUrl: string = '/users/authStatus'): Promise<Ref<AuthState>>
+```
 
+**Returns**: A persistent, reactive `Ref<AuthState>` (shared via `useState('auth')`).
+
+**Properties**:
+```typescript
+interface AuthState {
+  // TRUE if the user has a valid access token.
+  // FALSE if the user is guest, expired, or banned.
+  authorized: boolean;
+
+  // The User ID (if authorized).
+  id?: string;
+
+  // TRUE if the server responded with 202 MFA Required.
+  // You should show an OTP modal if this is true.
+  mfaRequired: boolean;
+
+  // Error or Info message from the server.
+  message?: string;
+}
+```
+
+### `getCsrfToken()`
+
+**Signature**:
+```typescript
+function getCsrfToken(): string | undefined
+```
+**Returns**: The value of the `__Host-csrf` cookie (parsed from `document.cookie`).
+**Usage**: Must be included in the header `X-CSRF-Token` for ALL `POST`, `PUT`, `DELETE` requests.
+
+---
+
+## 3. Implementation Patterns
+
+### Pattern A: Global Route Guard (Recommended)
+
+To protect your entire application (or sensitive routes) from rendering before auth is settled.
+
+**`app.vue` (Root Level)**
 ```vue
 <script setup lang="ts">
-import { useAuthData } from 'auth-h3client/nuxt';
+import { useAuthData } from 'auth-h3client/client';
 
-// 1. GLOBAL GATEKEEPER
-// This awaits the singleton lock. It pauses the app mounting until
-// the token rotation (if needed) is complete.
+// 1. BLOCKING check.
+// The app will NOT mount until we know if the user is logged in or out.
+// If valid, token rotation happens here.
 await useAuthData(); 
 </script>
-
-<template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
-</template>
-
 ```
 
-### B. Client-Side Navigation (`middleware`)
-
-This protects the application when the user clicks links to navigate. If the token expires while the user is reading a page, this middleware rotates it *before* the next page loads its data.
-
-Create `middleware/auth-check.global.ts`:
-
+**`middleware/auth.ts` (Route Level)**
 ```typescript
-import { useAuthData } from "auth-h3client/nuxt";
+import { useAuthData } from "auth-h3client/client";
 
-export default defineNuxtRouteMiddleware(async () => {
-  // Skip on server (app.vue handled it)
-  if (import.meta.server) return;
+export default defineNuxtRouteMiddleware(async (to) => {
+  const auth = await useAuthData();
   
-  // On client navigation, ensure auth is fresh before entering the route
-  await useAuthData();
+  if (!auth.value.authorized && to.path !== '/login') {
+    return navigateTo('/login');
+  }
 });
+```
 
+### Pattern B: Secure Data Fetching
+
+Since `auth-h3client` does not wrap `fetch`, you must attach the CSRF token manually.
+
+**Using `ofetch` / `$fetch`**
+```typescript
+import { getCsrfToken } from 'auth-h3client/client';
+
+await $fetch('/api/user/settings', {
+  method: 'POST',
+  body: { theme: 'dark' },
+  headers: {
+    // CRITICAL: The server will reject POSTs without this
+    'X-CSRF-Token': getCsrfToken() || ''
+  }
+});
+```
+
+**Using `useFetch` (Nuxt)**
+```typescript
+const { data } = await useFetch('/api/user/settings', {
+  headers: {
+    'X-CSRF-Token': getCsrfToken() || ''
+  }
+});
+```
+
+### Pattern C: Handling MFA
+
+If the server requires Step-Up Authentication (e.g., for changing passwords), `useAuthData` will report `mfaRequired: true`.
+
+```vue
+<script setup>
+const auth = await useAuthData();
+
+watchEffect(() => {
+  if (auth.value.mfaRequired) {
+    showOtpModal.value = true;
+  }
+});
+</script>
 ```
 
 ---
 
-## 2. Creating API Services (`AuthBase`)
+## 4. Troubleshooting
 
-Your API service classes should extend `AuthBase`. This gives them access to the `waitForAuth()` lock and the `authFetch()` wrapper.
+### "401 Unauthorized Loop"
+-   **Symptom**: The page reloads endlessly or console shows repetitive 401 errors.
+-   **Cause**: The Refresh Token (`session` cookie) is expired or missing, but your code keeps trying to fetch protected data.
+-   **Fix**: Ensure you check `if (!auth.value.authorized)` *before* making API calls.
 
-### The Patterns
+### "CSRF Token Invalid"
+-   **Symptom**: POST requests fail with 403.
+-   **Cause**: You forgot to send the `X-CSRF-Token` header.
+-   **Fix**: Use `getCsrfToken()` in your headers.
 
-There are three ways to use the library depending on the endpoint security level.
-
-#### Pattern 1: Strict Authentication (Fail Fast)
-
-Use this for endpoints that **require** a user (e.g., `getPrivateAvatar`, `getBilling`).
-
-**Why `waitForAuth`?**
-We manually check `auth.authorized` to stop execution locally. This saves a network round-trip. If we didn't check, `authFetch` would send the request, and the server would return a 401.
-
-```typescript
-import AuthBase from 'auth-h3client/client';
-import type { Results } from '~~/shared/types';
-
-export default class Profiles extends AuthBase {
-    
-    async getPrivateAvatar() {
-        // 1. GATEKEEPER: Wait for rotation & Get State
-        const auth = await this.waitForAuth(); 
-
-        // 2. FAIL FAST optimization
-        // Stop execution here if not logged in. 
-        // Prevents sending a request we know will fail.
-        if (!auth.authorized) {
-            return { ok: false, reason: 'Not allowed' };
-        }
-
-        // 3. SAFE FETCH
-        // Cookies are guaranteed fresh.
-        return await this.authFetch<Results<any>>('/api/users/private-avatar');
-    }
-}
-
-```
-
-#### Pattern 2: Optional Authentication (Personalized)
-
-Use this for endpoints that work for both Guests and Users (e.g., `getPost`, `getAuthorById`). The server returns different data if a user is logged in.
-
-**Why `waitForAuth`?**
-Even though we don't block guests, we **must wait** for the lock. If we didn't, a "Guest" request might fire while a "Token Rotation" is happening in the background, causing a race condition on the server.
-
-```typescript
-async getAuthorById(id: number) {
-    // 1. GATEKEEPER: Wait for any pending rotation.
-    // We do NOT check "if (!authorized) return" because guests are allowed.
-    await this.waitForAuth(); 
-    
-    // 2. FETCH
-    // If logged in: Sends fresh cookies -> Personalized response
-    // If guest: Sends no cookies -> Generic response
-    return await this.authFetch<Results<any>>(`/api/authors/${id}`);
-}
-
-```
-
-#### Pattern 3: Pure Public Data
-
-For endpoints that **never** touch user data (e.g., `getSystemStatus`, `getTags`).
-
-```typescript
-async getTags() {
-    // No auth check needed because the server handler ignores cookies.
-    // However, using authFetch is still recommended for consistency.
-    return await this.authFetch<Results<string[]>>('/api/tags');
-}
-
-```
-
----
-
-## 3. API Reference
-
-### `useAuthData()` (Composable)
-
-* **Returns:** `Promise<Ref<AuthState>>`
-* **Behavior:**
-* **Singleton:** If called 10 times simultaneously, it sends **1 network request**.
-* **SSR Safe:** Deduplication logic only runs on the client.
-* **Reactive:** Updates the global `useState('auth')`.
-
-
-
-### `AuthBase` (Class)
-
-#### `waitForAuth(): Promise<AuthState>`
-
-* Waits for the singleton lock to resolve.
-* Returns the current authentication state (`authorized`, `userId`, `roles`).
-* **Cost:** 0ms (memory lookup) if the check was already performed by `app.vue` or middleware.
-
-#### `authFetch<T>(url, options): Promise<T>`
-
-#### `authFetch(url, prefix: true, options): Promise<$Fetch>`
-
-* Wraps `$fetch` (ofetch).
-* **Guarantees:** The request will **never** be sent until the authentication status is settled and tokens are rotated.
-* **Prefix Overload:** If `prefix: true` is passed, it returns a `$fetch.create` instance with the base URL and headers pre-configured, useful for creating sub-services.
-
----
-
-## 4. Why "Fail Fast"?
-
-You might notice that `authFetch` internally calls `waitForAuth`. So why do we call it manually in **Pattern 1**?
-
-**Without Fail Fast:**
-
-1. Component calls `authFetch('/api/private')`.
-2. `authFetch` waits for rotation. Result: "User is logged out".
-3. `authFetch` sends request to server anyway.
-4. Server processes request -> Returns **401 Unauthorized**.
-5. Client handles error.
-*(Result: Wasted bandwidth and server CPU)*
-
-**With Fail Fast:**
-
-1. Component calls `waitForAuth()`.
-2. Result: "User is logged out".
-3. Code returns early: `if (!authorized) return`.
-4. **No request is sent to the server.**
-*(Result: Instant UI feedback, zero server load)*
-
-Because of the Singleton Lock, calling `waitForAuth` twice (once manually, once inside `authFetch`) costs **zero** extra network requests.
+### "Hydration Mismatch"
+-   **Symptom**: "Text content does not match server-rendered HTML."
+-   **Cause**: Reading `document.cookie` (via `getCsrfToken`) during SSR.
+-   **Fix**: `getCsrfToken` handles this gracefully, but ensure you only use the token in `onMounted` or interaction handlers if relying on client-side cookies.

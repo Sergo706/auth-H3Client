@@ -1,200 +1,109 @@
 # defineAuthenticatedEventHandler
 
-A higher-order function that wraps H3 event handlers with authentication, token validation, and user data caching.
+This is the primary H3 wrapper for protecting API routes. It abstracts away the complexity of Request Signing, Token Verification, Session Rotation, and User Data Fetching.
 
-## Import
+## Overview
 
-```ts
-// H3 v1
-import { defineAuthenticatedEventHandler } from 'auth-h3client/v1';
+When you wrap a function with this handler, you are guaranteed that:
+1.  The request comes from a legitimate source (HMAC check, if enabled).
+2.  The user has a valid, active session.
+3.  The user's latest data (roles, ID) is available in `event.context`.
 
-// H3 v2
-import { defineAuthenticatedEventHandler } from 'auth-h3client/v2';
-```
-
-## Signature
-
-```ts
-function defineAuthenticatedEventHandler<T extends EventHandlerRequest, D>(
-  handler: EventHandler<T, D>
-): EventHandler<T, Promise<D | MfaResponse>>
-```
-
-> **Note**: Storage and cache options are now configured globally via `configuration()`. See [Configuration Guide](../configuration.md#storage-settings-ustorage).
-
-### Return Types
-
-```ts
-// On MFA required (status 202)
-interface MfaResponse {
-  mfaRequired: string;
-  message: string;
-}
-```
-
----
-
-## Usage
-
-### Basic Usage
-
-```ts
-import { defineAuthenticatedEventHandler } from 'auth-h3client/v1';
-
-export default defineAuthenticatedEventHandler((event) => {
-  // User is authenticated here
-  const user = event.context.authorizedData;
-  
-  return {
-    message: `Hello ${user.userId}!`,
-    roles: user.roles
-  };
-});
-```
-
-
-
-### Accessing User Data
-
-The authenticated user data is available on `event.context.authorizedData`:
-
-```ts
-interface ServerResponse {
-  authorized: boolean;
-  userId?: string;
-  reason?: string;
-  ipAddress: string;
-  userAgent: string;
-  date: string;
-  roles?: string[] | string;
-  error?: string;
-  message?: string;
-}
-```
-
-```ts
-export default defineAuthenticatedEventHandler((event) => {
-  const user = event.context.authorizedData!;
-  
-  // Check roles
-  const roles = Array.isArray(user.roles) ? user.roles : [user.roles];
-  if (!roles.includes('admin')) {
-    throw createError({ statusCode: 403, message: 'Admin required' });
-  }
-  
-  return { admin: true };
-});
-```
-
----
-
-## Authentication Flow
-
-1. **HMAC Signature Verification**: Validates request signature
-2. **Credential Validation**: Calls `ensureValidCredentials` to rotate tokens if needed
-3. **Cookie Extraction**: Gets `session`, `canary_id` cookies and access token
-4. **User Data Fetch**: Calls auth service via `getCachedUserData`
-5. **Cache Check**: Returns cached data if available
-6. **Handler Execution**: Runs your handler with `event.context.authorizedData` set
-
-```
-Request → HMAC Check → Token Rotation → Cookie Check → Cache/API → Handler
-```
-
----
-
-## Response Handling
-
-| Scenario | Status | Response |
-|----------|--------|----------|
-| Success | 200 | Handler return value |
-| MFA Required | 202 | `{ mfaRequired: 'MFA required', message: '...' }` |
-| Unauthorized | 401 | Error thrown |
-| Rate Limited | 429 | Error with `Retry-After` header |
-| Server Error | 500 | Error thrown |
-
----
-
-## Required Cookies
-
-The handler expects these cookies to be present:
-
-| Cookie | Description |
-|--------|-------------|
-| `session` | Refresh token / session cookie |
-| `canary_id` | Canary cookie for session binding |
-
-Access token is expected on `event.context.accessToken` (set by `ensureValidCredentials`).
-
----
-
-## Error Handling
-
-Errors are thrown using `throwHttpError` with structured error codes:
-
-```ts
-// Missing credentials
-throwHttpError(log, event, 'FORBIDDEN', 401, 'UnAuthorized', '...');
-
-// Rate limited
-throwHttpError(log, event, 'FORBIDDEN', 429, 'To many requests', '...');
-
-// Server error
-throwHttpError(log, event, 'SERVER_ERROR', 500, 'Server error', '...');
-```
-
----
-
-## Example: Protected API Route
-
-```ts
-// server/api/profile.get.ts
+```typescript
 import { defineAuthenticatedEventHandler } from 'auth-h3client/v1';
 
 export default defineAuthenticatedEventHandler(async (event) => {
-  const user = event.context.authorizedData!;
+  // If this code runs, thousands of security checks have passed.
+  const userId = event.context.authorizedData!.userId;
+  return { secret: 'data' };
+});
+```
+
+## The Authentication Pipeline
+
+Every request goes through this strict pipeline:
+
+1.  **HMAC Verification**: Checks `Authorization` or `x-signature` headers against the shared secret.
+    -   *Fail* -> `401 Unauthorized` (Signature Mismatch).
+2.  **Credential Rotation (`ensureValidCredentials`)**:
+    -   Checks cookies (`session`, `canary_id`).
+    -   Rotates tokens if access token is missing or near expiry.
+    -   *Fail* -> `401 Unauthorized` (Session Invalid) or `202 MFA Required`.
+3.  **User Data Fetch (`getCachedUserData`)**:
+    -   Calls `GET /secret/accesstoken/metadata`.
+    -   Checks cache first.
+    -   *Fail* -> `403 Forbidden` (Banned) or `429 Too Many Requests`.
+4.  **Handler Execution**:
+    -   Only if all above pass, your callback is executed.
+
+## Context Injection
+
+The wrapper injects typed data into `event.context`.
+
+### `event.context.authorizedData`
+
+This object contains the user's profile as returned by the Auth Service.
+
+```typescript
+interface ServerAccessTokenMetaData {
+  authorized: boolean;       // Status
+  ipAddress: string;         // Origin IP
+  userAgent: string;         // Device Info
+  date: string;              // Login Date
+  roles: string[] | string;  // RBAC Roles (e.g. ['admin', 'editor'])
+  msUntilExp: number;        // Ms until token expiration
+  payload: {                 // Raw JWT Payload
+    sub?: string;            // User ID
+    iss?: string;            // Issuer
+    // ... custom claims
+  };
+}
+```
+
+## Return Types and Scenarios
+
+Your handler can return any data. However, the *wrapper itself* can return specific control responses that you should be aware of.
+
+| Scenario | Status Code | Body Structure | Description |
+| :--- | :--- | :--- | :--- |
+| **Success** | `200 OK` | `T` (Your Return Type) | Normal operation. |
+| **Step-Up Auth** | `202 Accepted` | `{ mfaRequired: true, message: '...' }` | The user is authenticated, but this specific action triggered a security rule (e.g. "Change Password" requires Email OTP). The client should display an OTP modal. |
+| **Invalid Session** | `401 Unauthorized` | `{ statusCode: 401, message: '...' }` | Session expired or revoked. Client should redirect to Login. |
+| **Rate Limited** | `429 Too Many Requests` | `{ statusCode: 429, message: '...' }` | User is spamming the auth checks. Includes `Retry-After` header. |
+| **Banned/Blocked** | `403 Forbidden` | `{ statusCode: 403, message: '...' }` | User or IP is blacklisted. |
+
+## Advanced Usage
+
+### Accessing the Raw Token
+
+If you need to pass the access token to another microservice:
+
+```typescript
+export default defineAuthenticatedEventHandler((event) => {
+  const token = event.context.accessToken; // Populated by rotation logic
   
-  // Fetch additional profile data from database
-  const profile = await db.profiles.findUnique({
-    where: { userId: user.userId }
+  await fetch('https://other-service.internal/api', {
+    headers: { Authorization: `Bearer ${token}` }
   });
-  
-  return {
-    id: user.userId,
-    roles: user.roles,
-    ...profile
-  };
 });
 ```
 
-## Example: Role-Based Access
+### Extending Validation
 
-```ts
-// server/api/admin/users.get.ts
-import { defineAuthenticatedEventHandler } from 'auth-h3client/v1';
-import { createError } from 'h3';
+You can add your own checks *inside* the handler.
 
-export default defineAuthenticatedEventHandler(async (event) => {
+```typescript
+export default defineAuthenticatedEventHandler((event) => {
   const user = event.context.authorizedData!;
-  const roles = Array.isArray(user.roles) ? user.roles : [user.roles].filter(Boolean);
   
-  if (!roles.includes('admin')) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Forbidden',
-      message: 'Admin role required'
-    });
+  // Custom RBAC Check
+  if (!user.roles.includes('super-admin')) {
+    throw createError({ statusCode: 403, message: 'Super Admin only' });
   }
   
-  return await db.users.findMany();
+  // Custom IP Check
+  if (user.ipAddress !== '10.0.0.5') {
+    throw createError({ statusCode: 403, message: 'VPN required' });
+  }
 });
 ```
-
----
-
-## See Also
-
-- [defineOptionalAuthenticationEvent](./defineOptionalAuth.md) - Optional authentication wrapper
-- [defineAuthenticatedEventPostHandlers](./authenticatedPostHandler.md) - POST + CSRF + Auth combined
-- [getAuthStatusHandler](./getAuthStatus.md) - Pre-built auth status endpoint
-- [getCachedUserData](./getCachedUserData.md) - Low-level user data fetching
