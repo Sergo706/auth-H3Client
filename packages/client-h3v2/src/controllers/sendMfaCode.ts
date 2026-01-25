@@ -1,10 +1,11 @@
 import { getLogger } from "@internal/shared";
 import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
-import { assertMethod, defineHandler, getCookie, getQuery, getRouterParam, redirect } from "h3";
+import { assertMethod, getCookie, getQuery, getRouterParam, redirect } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";
+import { defineDeduplicatedEventHandler } from "../main.js";
 
 /**
  * Validates MFA code submissions by proxying them to the auth server, managing session cookies,
@@ -16,7 +17,7 @@ import { getConfiguration } from "@internal/shared";
  * @example
  * router.post('/auth/verify-mfa/:visitor', sendCode, { middleware: [...] });
  */
-export default defineHandler(async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 const { domain, accessTokenTTL } = await getOperationalConfig(event)
 const { onSuccessRedirect } = getConfiguration()
 

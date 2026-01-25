@@ -1,5 +1,5 @@
 import { defineEventHandler, Router } from "h3";
-import { OAuthCallback } from "../controllers/OAuthSuccessCallBack.js";
+import OAuthCallback  from "../controllers/OAuthSuccessCallBack.js";
 import { OAuthTokensValidations } from '../middleware/OAuthCallBack.js';
 import { OAuthRedirect } from "../controllers/OAuthRedirect.js";
 

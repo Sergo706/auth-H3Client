@@ -1,11 +1,9 @@
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from "@internal/shared";
 import { banIp } from "@internal/shared";
-import { appendHeader, assertMethod, defineEventHandler, getHeader, getRequestIP, setResponseStatus } from 'h3';
+import { appendHeader, assertMethod, getHeader, getRequestIP, setResponseStatus } from 'h3';
 import throwError from '../middleware/error.js';
-
-
-
+import { defineDeduplicatedEventHandler } from '../main.js';
 
 /**
  * Initiates a password reset by validating the email payload and forwarding the
@@ -17,7 +15,7 @@ import throwError from '../middleware/error.js';
  * @example
  * router.post('/auth/password-reset', initPasswordReset, { middleware: [...] });
  */
-export default defineEventHandler(async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 
   const log = getLogger().child({service: 'auth', branch: 'password-reset'})
   assertMethod(event, "POST")

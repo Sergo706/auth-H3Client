@@ -8,7 +8,7 @@ import { makeCookie } from "../utils/cookieGenerator.js";
 import { safeObjectMerge } from "@internal/shared";
 import { findStringsInObject } from "@internal/shared";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
-
+import { defineDeduplicatedEventHandler } from "../main.js";
 
 /**
  * Completes the OAuth/OIDC login by enriching the provider payload, ensuring a usable email,
@@ -20,7 +20,7 @@ import { getOperationalConfig } from "../utils/getRemoteConfig.js";
  * @example
  * router.get('/oauth/callback/:provider', OAuthCallback, { middleware: [OAuthTokensValidations] });
  */
-export async function OAuthCallback(event: H3Event) {
+export default defineDeduplicatedEventHandler(async (event) => {
 
     const log = getLogger().child({service: 'auth-client', branch: 'OAuth', type: 'handler-success-callback', reqId: event.context.rid, reqIp: getRequestIP(event)});
     const { OAuthProviders } = getConfiguration()   
@@ -186,4 +186,4 @@ const normalized = data ? { ...restUser, ...data } : restUser;
   } catch(err) {
     throwError(log,event,'AUTH_SERVER_ERROR',500,'SERVER_ERROR','',`${err},Unexpected error`)
   }
-}
+})
