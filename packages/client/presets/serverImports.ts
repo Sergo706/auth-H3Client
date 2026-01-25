@@ -1,9 +1,9 @@
 export const serverImports = [
   { name: 'loginHandler', from: 'auth-h3client/v1' },
-  { name: 'handleLogout', from: 'auth-h3client/v1' },
+  { name: 'logoutHandler', from: 'auth-h3client/v1' },
   { name: 'signUpHandler', from: 'auth-h3client/v1' },
   { name: 'OAuthRedirect', from: 'auth-h3client/v1' },
-  { name: 'OAuthCallback', from: 'auth-h3client/v1' },
+  { name: 'OAuthSuccessCallBack', from: 'auth-h3client/v1' },
   { name: 'restartPasswordHandler', from: 'auth-h3client/v1' },
   { name: 'sendMfaCodeHandler', from: 'auth-h3client/v1' },
   { name: 'sendNewPasswordHandler', from: 'auth-h3client/v1' },
@@ -13,6 +13,8 @@ export const serverImports = [
   { name: 'defineOptionalAuthenticationEvent', from: 'auth-h3client/v1' },
   { name: 'defineVerifiedCsrfHandler', from: 'auth-h3client/v1' },
   { name: 'defineAuthenticatedEventPostHandlers', from: 'auth-h3client/v1' },
+  { name: 'defineDeduplicatedEventHandler', from: 'auth-h3client/v1' },
+
   { name: 'getAuthStatusHandler', from: 'auth-h3client/v1' },
   
   { name: 'generateCsrfCookie', from: 'auth-h3client/v1' },
@@ -68,5 +70,9 @@ export const serverImports = [
   { name: 'MiniCache', from: 'auth-h3client/v1' },
   { name: 'getAuthAgent', from: 'auth-h3client/v1' },
   { name: 'banIp', from: 'auth-h3client/v1' },
+  { name: 'applyRotationResult', from: 'auth-h3client/v1' },
+  { name: 'lockAsyncAction', from: 'auth-h3client/v1' },
+  { name: 'checkForBots', from: 'auth-h3client/v1' },
+  { name: 'getConfiguration', from: 'auth-h3client/v1' },
   
 ] as const;
