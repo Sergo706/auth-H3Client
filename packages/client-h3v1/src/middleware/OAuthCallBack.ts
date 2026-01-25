@@ -1,6 +1,6 @@
-import { getLogger } from "@internal/shared";
+import { getLogger, safeAction } from "@internal/shared";
 import { getConfiguration } from "@internal/shared";
-import { deleteCookie, getCookie, getQuery, getRequestIP, getValidatedQuery, H3Event, readBody, sendRedirect } from "h3";
+import { deleteCookie, getCookie, getQuery, getRequestIP, H3Event, readBody, sendRedirect } from "h3";
 import throwError from "./error.js";
 import { discoverOidc } from "@internal/shared";
 import { verifyOAuthToken } from "@internal/shared";
@@ -120,18 +120,21 @@ const { code, state:stateFromIdP, error, iss } = OAuthQuery.parse(input);
       params.delete('client_secret');
     }
 
-     const tokenRes = await fetch(tokenEndpoint, {
-      method: "POST",
-      headers,
-      body: params
-    });
+     const actionLockKey = getCookie(event, 'canary_id') || state.payload.session;
+     const { tokens, ok, status } = await safeAction(actionLockKey, async () => {
+       const res = await fetch(tokenEndpoint, {
+        method: "POST",
+        headers,
+        body: params
+      });
+         const tokens = await res.json();
+         return { ok: res.ok, status: res.status, tokens };
+     })
 
-    if (!tokenRes.ok) {
-        log.error({status: 'missing_access_token' },'failed to get access token');
+    if (!ok) {
+        log.error({status: 'missing_access_token', idp: tokens, statusCode: status},'failed to get access token');
         return sendRedirect(event, match.redirectUrlOnError); 
     }
-
-   const tokens = await tokenRes.json();
 
     let user;
     if (match.kind === "oidc" && tokens.id_token) {

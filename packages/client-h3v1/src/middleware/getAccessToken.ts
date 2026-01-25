@@ -1,12 +1,12 @@
-import { makeCookie } from '../utils/cookieGenerator.js'
 import { sendToServer } from '../utils/serverToServer.js'
-import { getLogger } from "@internal/shared";
+import { getLogger, safeAction, type AccessRotationResult } from "@internal/shared";
 import { appendHeader, getCookie, H3Event, setResponseStatus , H3Error} from 'h3';
 import throwError from './error.js';
 import { parseResponseContentType } from "@internal/shared";
 import { getMetadata } from '../utils/getAccessTokenMetaData.js';
 import { cache } from "../utils/getAccessTokenMetaData.js";
 import { getOperationalConfig } from '../utils/getRemoteConfig.js';
+import { applyRotationResult } from '../utils/applyRotationResults.js';
 
 declare module 'h3' {
   interface Request {
@@ -28,7 +28,7 @@ export async function ensureAccessToken(event: H3Event) {
   const log = getLogger().child({service: 'auth', branch: `access_tokens_rotations`, reqID: event.context.rid })
   const { domain, accessTokenTTL } = await getOperationalConfig(event)
 
-  let currentToken = getCookie(event, '__Secure-a');
+  const currentToken = getCookie(event, '__Secure-a');
   const canary = getCookie(event, 'canary_id');
   const refresh = getCookie(event, 'session');  
 
@@ -36,8 +36,8 @@ export async function ensureAccessToken(event: H3Event) {
     throwError(log, event, 'AUTH_REQUIRED', 401, 'Unauthorized','Re-authentication required', 'No refresh token is found Re-authentication required.');
    }
 
- const rotate = async () => {
-    log.info('No access token found Generating a new token')
+ const rotate = async (): Promise<AccessRotationResult> => {
+    log.info('No access token found. Generating a new token')
      const cookies = [
         {label: `canary_id`,  value: canary},
         {label: `session`, value: refresh},
@@ -55,16 +55,12 @@ export async function ensureAccessToken(event: H3Event) {
         if (res.status === 429) {
             log.warn(`User rate limited`);  
             const retrySec = res.headers.get('Retry-After');
-
             if (retrySec) {
                 appendHeader(event, 'Retry-After', (retrySec as unknown as number))
-                setResponseStatus(event, 429)
-                return {error: `To many attempts, please try again later.`};
-            } 
-
-                setResponseStatus(event, 429)
-                return {error: `To many attempts, please try again later.`};
-        };
+            }
+            setResponseStatus(event, 429)
+            return {error: `Too many attempts, please try again later.`};
+        }
 
         if (res.status === 401) {
           throwError(log, event, 'AUTH_REQUIRED', 401, 'Unauthorized','Re-authentication required', `Re-authentication required. \n ${json.message} \n ${json.error}`);
@@ -90,33 +86,21 @@ export async function ensureAccessToken(event: H3Event) {
           throwError(log, event, 'AUTH_SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', `New access token and related cookies ended up null`);
         }
 
-      makeCookie(event, '__Secure-a', newToken, {
-          httpOnly: true,
-          sameSite: 'strict',
-          secure:   true,
-          path: '/',
-          domain: domain,
-          maxAge: accessTokenTTL
-      })
-      makeCookie(event, 'a-iat', accessIat, {
-          httpOnly: true,
-          sameSite: 'strict',
-          secure:   true,
-          path: '/',
-          domain: domain,
-          maxAge: accessTokenTTL
-      })
-
-        event.context.accessToken = newToken; 
+        return { type: 'access', newToken, accessIat };
        } catch(err) {
          if (err instanceof H3Error) throw err;
          throwError(log, event, 'SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', `Unexpected error type. ${err}`);
        }
     }
 
+    const rotateAndApply = async () => {
+        const result = await safeAction(refresh, rotate);
+        return applyRotationResult(event, result, domain, accessTokenTTL);
+    };
+
   if (!currentToken) {
-        log.info('No access token; rotating both tokens');
-        return await rotate();
+        log.info('No access token; rotating access token');
+        return await rotateAndApply();
    }
 
       try {
@@ -125,7 +109,7 @@ export async function ensureAccessToken(event: H3Event) {
            if ("serverError" in meta && meta.serverError) {
                log.info('Meta resolved with an error; rotating access token');
                cache.del(currentToken);
-               return await rotate();
+               return await rotateAndApply();
            }
    
            if ("mfa" in meta && meta.mfa) {
@@ -138,19 +122,20 @@ export async function ensureAccessToken(event: H3Event) {
            if ("authorized" in meta && !meta.authorized) {
                log.info('Meta not authorized; rotating access token');
                cache.del(currentToken);
-               return await rotate();
+               return await rotateAndApply();
            }
    
            if ("shouldRotate" in meta && meta.shouldRotate) {
                log.info({ msUntilExp: meta.msUntilExp }, 'Meta suggests rotation; rotating access token');
                cache.del(currentToken);
-               return await rotate();
+               return await rotateAndApply();
            }
 
            event.context.accessToken = currentToken;
        }  catch (err) {
-           log.warn({ err }, 'Meta check failed; rotating both tokens');
+           log.warn({ err }, 'Meta check failed; rotating access token');
            cache.del(currentToken);
-           return await rotate();
+           return await rotateAndApply();
        }
 }
+

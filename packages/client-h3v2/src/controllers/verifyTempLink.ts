@@ -1,8 +1,9 @@
 import { sendToServer } from "../utils/serverToServer.js";
 import { getLogger } from "@internal/shared";
 import { notFoundHandler } from "../middleware/notFound.js"
-import { defineHandler, getCookie, getQuery, getRequestURL, getRouterParam, H3Event, redirect } from "h3";
+import { getCookie, getQuery, getRequestURL, getRouterParam, H3Event, redirect } from "h3";
 import throwError from "../middleware/error.js";
+import { defineDeduplicatedEventHandler } from "../utils/requestDedupHandler.js";
 
 
 /**
@@ -15,7 +16,7 @@ import throwError from "../middleware/error.js";
  * @example
  * router.get('/auth/verify-mfa/:visitor', verifyLink);
  */
-export default defineHandler(async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 
 const { temp } = getQuery(event)
 const visitor = getRouterParam(event, "visitor");

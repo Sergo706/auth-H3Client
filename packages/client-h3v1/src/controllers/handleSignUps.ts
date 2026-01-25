@@ -7,6 +7,7 @@ import { appendHeader, assertMethod, defineEventHandler, getCookie, getHeader, g
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";
+import { defineDeduplicatedEventHandler } from "../utils/requestDedupHandler.js";
 
 /**
  * Handles user signup by validating the payload, delegating to the auth server,
@@ -18,7 +19,7 @@ import { getConfiguration } from "@internal/shared";
  * @example
  * router.post('/signup', signupHandler, { middleware: [...] });
  */
-export default defineEventHandler(async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 
 const log = getLogger().child({service: 'auth', branch: 'classic', type: 'signup'});
 const { domain, accessTokenTTL } = await getOperationalConfig(event)

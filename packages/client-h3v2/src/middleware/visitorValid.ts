@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { createSignedCookie } from "@internal/shared"
+import { createSignedCookie, safeAction } from "@internal/shared"
 import { verifySignedCookie } from "@internal/shared"
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { banIp } from "@internal/shared";
@@ -8,6 +8,7 @@ import { getCookie, getRequestIP, getRequestURL, H3Event, HTTPError, parseCookie
 import { sendToServer } from "../utils/serverToServer.js";
 import throwError from "./error.js";
 import { getConfiguration } from "../main.js";
+import { checkForBots } from "../utils/checkForBots.js";
 
 /**
  * Validates visitor canary cookies, bootstrapping tracking metadata and banning
@@ -36,7 +37,6 @@ export const validator = async (event: H3Event): Promise<any> => {
     
     if (rawCookie && canary) {
       if (!verifySignedCookie(rawCookie, 'normal').valid) {
-        const imageUrl = '/assets/tea.png';
         log.warn('[FE] Host-dr_i_n Not verified tempering detected');
 
         throw new HTTPError({
@@ -52,55 +52,16 @@ export const validator = async (event: H3Event): Promise<any> => {
       const cookieValue = createSignedCookie(newUuid, 1000 * 60 * 60 * 2, 'normal');
       log.info({cookies: parseCookies(event)},`Sending request for /check`)
  
-  try {
-    const trackRes = await sendToServer(true, `/check`, event.req.method, event, false)
-    if (!trackRes) {
-      throwError(log,event,'AUTH_SERVER_ERROR',502,'Not reachable','','Auth server is not reachable!')
-    };
-
-    const status = trackRes.status;
-    
-    if (status === 403) {
-    const message = await trackRes.text();
-     log.info('Detected malicious user starting banning');
-     if (enableFireWallBans) {
-       banIp(getRequestIP(event)!);
-     }
-     log.info('Banning completed');
-     throw new HTTPError({
-        body: { date: new Date().toJSON(), code: 'NOT_ALLOWED' },
-        status: 403,
-        statusText: "Forbidden",
-        message: message
-     })
-    }
-    
-    const setCookies = trackRes.headers.get('set-cookie');
-    if (setCookies) {
-       event.res.headers.append('Set-Cookie', setCookies) 
-    }
-
-    const results = await trackRes.json(); 
-    log.info({results}, `Checking completed.`);
-    event.context.trackingResult = results;
-
-    
-    makeCookie(event, COOKIE_NAME, cookieValue, {
-      httpOnly: true,
-      sameSite: "strict", 
-      maxAge: 60 * 60 * 2,
-      secure: true,
-    })
-    return;
-  } catch (err: any) {
-    log.error({ err }, `Error in frontend botDetector`);
-    throw new HTTPError({
-        body: { date: new Date().toJSON(), code: 'SERVER_ERROR' },
-        status: 502,
-        statusText: "Server Error",
-        message: 'Something went wrong, please try restarting the page, and try again.' ,
-    })
-  };
+      if (canary || rawCookie) {
+        const key = canary || rawCookie as string;
+        return safeAction(key, 
+        async () => 
+          await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.req.method, log, enableFireWallBans)
+       )
+      } else {
+        return await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.req.method, log, enableFireWallBans)
+      }
+  
 }
 };
 

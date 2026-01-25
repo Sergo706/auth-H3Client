@@ -1,10 +1,11 @@
-import { assertMethod, deleteCookie, getCookie, getQuery, getRequestIP, getRequestProtocol, H3Event, redirect } from "h3";
+import { assertMethod, deleteCookie, getCookie, getQuery, getRequestIP, getRequestProtocol, redirect } from "h3";
 import { getLogger } from "@internal/shared";
 import { sendToServer } from "../utils/serverToServer.js";
 import throwError from "../middleware/error.js";
 import { cache as accessTokenCache } from "../utils/getAccessTokenMetaData.js";
 import { cache as refreshTokenCache } from "../utils/getRefreshTokenMetaData.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 
 /**
  * Logs the user out by validating the request, notifying the auth server,
@@ -16,7 +17,7 @@ import { getOperationalConfig } from "../utils/getRemoteConfig.js";
  * @example
  * router.post('/logout', handleLogout, { middleware: [...] });
  */
-export async function handleLogout(event: H3Event) {
+export default defineDeduplicatedEventHandler(async (event) =>  {
     assertMethod(event, "POST")
     const body = event.context.body;
     const { domain } = await getOperationalConfig(event)
@@ -97,4 +98,4 @@ export async function handleLogout(event: H3Event) {
         throwError(log,event,'SERVER_ERROR', 500, 'Logout error', 'Server error please try again later');
     } 
 
-}
+})

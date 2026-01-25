@@ -1,8 +1,9 @@
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from "@internal/shared";
 import { banIp } from "@internal/shared";
-import { assertMethod, defineHandler, getRequestIP, HTTPError } from 'h3';
+import { assertMethod, getRequestIP, HTTPError } from 'h3';
 import throwError from '../middleware/error.js';
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 
 
 
@@ -17,7 +18,7 @@ import throwError from '../middleware/error.js';
  * @example
  * router.post('/auth/password-reset', initPasswordReset, { middleware: [...] });
  */
-export default defineHandler(async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 
   const log = getLogger().child({service: 'auth', branch: 'password-reset'})
   assertMethod(event, "POST")
