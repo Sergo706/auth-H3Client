@@ -404,3 +404,4 @@ Refer to the TSDoc comments across `src/` for parameter descriptions and usage s
 - [defineVerifiedCsrfHandler](docs/wrappers/csrfVerifier.md) - CSRF protection
 - [getAuthStatusHandler](docs/wrappers/getAuthStatus.md) - Pre-built auth status endpoint
 - [getCachedUserData](docs/wrappers/getCachedUserData.md) - Low-level user data caching
+- [defineDeduplicatedEventHandler](docs/wrappers/defineDeduplicatedEventHandler.md) - Request serializing/deduplication
