@@ -16,7 +16,7 @@ export interface AuthState {
  * Updates the global `useState('auth')` reactive reference.
  * 
  * @param authStatusUrl - Optional custom endpoint URL for auth status check. Defaults to '/users/authStatus'.
- * @returns A reactive ref containing the authentication state.
+ * @returns {Promise<Ref<AuthState>>} A promise that resolves to a reactive ref containing the authentication state.
  * 
  * @example
  * // In app.vue or middleware
