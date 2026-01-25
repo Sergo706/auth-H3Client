@@ -3,11 +3,11 @@ import { banIp } from "@internal/shared";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from "@internal/shared";
-import { assertMethod, defineHandler, getCookie, getRequestIP, redirect } from "h3";
+import { assertMethod, getCookie, getRequestIP, redirect } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";
-
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 /**
  * Handles user signup by validating the payload, delegating to the auth server,
  * managing issued cookies, and translating server responses into structured errors.
@@ -18,7 +18,7 @@ import { getConfiguration } from "@internal/shared";
  * @example
  * router.post('/signup', signupHandler, { middleware: [...] });
  */
-export default defineHandler(async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 
 const log = getLogger().child({service: 'auth', branch: 'classic', type: 'signup'});
 const { domain, accessTokenTTL } = await getOperationalConfig(event)

@@ -1,10 +1,9 @@
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from "@internal/shared";
 import { banIp } from "@internal/shared";
-import { appendHeader, assertMethod, defineEventHandler, getCookie, getHeader, getQuery, getRequestIP, getRouterParam, setResponseStatus } from 'h3';
+import { appendHeader, assertMethod, getCookie, getHeader, getQuery, getRequestIP, getRouterParam, setResponseStatus } from 'h3';
 import throwError from '../middleware/error.js';
-
-
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 
 /**
  * Submits a new password for visitors who passed link validation, enforcing payload rules
@@ -16,7 +15,7 @@ import throwError from '../middleware/error.js';
  * @example
  * router.post('/auth/reset-password/:visitor', sendNewPassword, { middleware: [...] });
  */
-export default defineEventHandler (async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 
 assertMethod(event, "POST")
 const visitor = getRouterParam(event, "visitor");

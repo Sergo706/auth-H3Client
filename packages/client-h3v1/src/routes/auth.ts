@@ -2,7 +2,7 @@ import signup from "../controllers/handleSignUps.js";
 import { contentType } from "../middleware/validateContentType.js";
 import checkCsrf from "../middleware/verifyCsrf.js"
 import  login  from "../controllers/handleLogin.js";
-import { handleLogout } from "../controllers/handleLogout.js";
+import handleLogout  from "../controllers/handleLogout.js";
 import { defineEventHandler, Router } from "h3";
 import { limitBytes } from "../middleware/limitBytes.js";
 

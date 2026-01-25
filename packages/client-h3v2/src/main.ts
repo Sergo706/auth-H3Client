@@ -9,13 +9,15 @@ import throwError from "./middleware/error.js";
 import isValidIP from "./middleware/isValidIP.js";
 import signatureMiddleware from "./middleware/signatureMiddleware.js";
 import verifyCsrf from "./middleware/verifyCsrf.js";
+import handleLogout from "./controllers/handleLogout.js";
+import OAuthCallBack from "./controllers/OAuthSuccessCallBack.js";
 
 export { configuration, getConfiguration } from "@internal/shared";
-export const loginHandler = handleLogin
-export {handleLogout} from "./controllers/handleLogout.js";
+export const loginHandler = handleLogin;
+export const logoutHandler = handleLogout;
 export const signUpHandler = handleSignUps;
+export const OAuthSuccessCallBack = OAuthCallBack;
 export { OAuthRedirect } from "./controllers/OAuthRedirect.js";
-export { OAuthCallback } from "./controllers/OAuthSuccessCallBack.js";
 export const restartPasswordHandler = restartPasswordController;
 export const sendMfaCodeHandler = sendMfaCode;
 export const sendNewPasswordHandler = sendNewPassword;
@@ -58,7 +60,10 @@ export { signature } from "@internal/shared";
 export { sendToServer as serviceToService} from "./utils/serverToServer.js";
 export { sendLog as sendTelegramMessage } from "@internal/shared";
 export { verifyOAuthToken } from "@internal/shared";
-
+export {applyRotationResult} from "./utils/applyRotationResults.js"
+export {safeAction as lockAsyncAction} from "@internal/shared"
+export {checkForBots} from "./utils/checkForBots.js";
+export { defineDeduplicatedEventHandler } from "./utils/requestDedupHandler.js";
 export { defineAuthenticatedEventPostHandlers } from "./utils/authenticatedPostHandler.js";
 export { defineVerifiedCsrfHandler } from "./utils/csrfVerifier.js";
 export { defineAuthenticatedEventHandler, type MfaResponse } from "./utils/defineAuthRoute.js";

@@ -5,6 +5,7 @@ import { appendHeader, assertMethod, defineEventHandler, getHeader, getRequestIP
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";
+import { defineDeduplicatedEventHandler } from "../utils/requestDedupHandler.js";
 
 /**
  * Handles login submissions by validating payloads, proxying the request to the
@@ -17,7 +18,7 @@ import { getConfiguration } from "@internal/shared";
  * // In an H3 router:
  * router.post('/login', loginHandler, { middleware: [...] });
  */
-export default defineEventHandler(async(event) => { 
+export default defineDeduplicatedEventHandler(async (event) => {
 
 assertMethod(event, "POST")
 const log = getLogger().child({service: 'auth', branch: 'classic', type: 'login', ip: getRequestIP(event)});

@@ -1,8 +1,9 @@
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from "@internal/shared";
 import { banIp } from "@internal/shared";
-import { assertMethod, defineHandler, getCookie, getQuery, getRequestIP, getRouterParam } from 'h3';
+import { assertMethod,  getCookie, getQuery, getRequestIP, getRouterParam } from 'h3';
 import throwError from '../middleware/error.js';
+import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 
 
 
@@ -16,7 +17,7 @@ import throwError from '../middleware/error.js';
  * @example
  * router.post('/auth/reset-password/:visitor', sendNewPassword, { middleware: [...] });
  */
-export default defineHandler (async (event) => {
+export default defineDeduplicatedEventHandler(async (event) => {
 
 assertMethod(event, "POST")
 const visitor = getRouterParam(event, "visitor");

@@ -6,7 +6,7 @@ export async function safeAction<T>(token: string, action: () => Promise<T>): Pr
     const log = getLogger().child({service: 'auth-client', branch: 'utils', type: 'safeAction'});
 
     if (rotationLocks.has(token)) {
-        log.info('Rotation already in progress, waiting for leader...');
+        log.info('Action already in progress, waiting for leader...');
         return await rotationLocks.get(token) as T;
     }
     
@@ -19,7 +19,7 @@ export async function safeAction<T>(token: string, action: () => Promise<T>): Pr
 
    } finally {
         rotationLocks.delete(token);
-        log.info('Rotation finished. Lock released.');
+        log.info('Action finished. Lock released.');
     }
 
 }
