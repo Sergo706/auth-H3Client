@@ -67,8 +67,8 @@ function applyRefreshRotation(
 ): void {
     const { newRefresh, rawSetCookie } = result;
 
-    deleteCookie(event, 'session', { domain, path: '/' });
-    deleteCookie(event, 'iat', { domain, path: '/' });
+    // deleteCookie(event, 'session', { domain, path: '/' });
+    // deleteCookie(event, 'iat', { domain, path: '/' });
     
     rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
 
@@ -83,8 +83,8 @@ function applyBothRotation(
 ): void {
     const { newToken, newRefresh, accessIat, rawSetCookie } = result;
 
-    deleteCookie(event, 'session', { domain, path: '/' });
-    deleteCookie(event, 'iat', { domain, path: '/' });
+    // deleteCookie(event, 'session', { domain, path: '/' });
+    // deleteCookie(event, 'iat', { domain, path: '/' });
     rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
 
     makeCookie(event, '__Secure-a', newToken, {
