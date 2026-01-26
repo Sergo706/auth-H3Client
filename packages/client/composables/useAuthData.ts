@@ -1,6 +1,7 @@
-import { useState, useRequestHeaders, useFetch } from 'nuxt/app';
+import { useState, useRequestHeaders, useFetch, useNuxtApp } from 'nuxt/app';
 import type { Ref } from 'vue';
 import type { ServerResponse } from "@internal/shared";
+import { appendResponseHeader } from 'auth-h3client/v1';
 
 export interface AuthState {
     id?: string;    
@@ -55,6 +56,14 @@ export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<
           onResponse ({ response }) {
             const json = response._data;
 
+            if (import.meta.server) {
+                const nuxtApp = useNuxtApp();
+                const cookies = response.headers.getSetCookie();
+                const event = nuxtApp.ssrContext?.event;
+                if (event) {
+                    appendResponseHeader(event, 'set-cookie', cookies);
+                }
+            }
             if (!json || response.status === 401) {
                 authorized.value = { 
                     authorized: false,

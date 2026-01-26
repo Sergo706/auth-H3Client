@@ -47,30 +47,22 @@ This pattern is ideal for token rotation or similar operations where:
  */
 export async function safeAction<T>(token: string, action: () => Promise<T>, recentResultsTTL = 3000): Promise<T> {
     const log = getLogger().child({service: 'auth-client', branch: 'utils', type: 'safeAction'});
-    const tokenHash = token.substring(0, 10) + '...';
  
     if (recentResults.has(token)) {
-        log.info({ tokenHash }, 'Action recently completed, returning cached result.');
-        log.info({cachedData: recentResults.get(token)})
         return recentResults.get(token) as T;
     }
 
     if (rotationLocks.has(token)) {
-        log.info({ tokenHash }, 'Action already in progress, waiting for leader...');
        
         const result = await rotationLocks.get(token);
         
          if (recentResults.has(token)) {
-             log.info({ tokenHash }, 'Leader finished, returning cached result.');
-             log.info({cachedData: recentResults.get(token)})
              return recentResults.get(token) as T;
          }
-         log.info(result);
-         log.warn({ tokenHash }, 'Leader finished but NO cache found. Returning raw result.');
          return result as T;
     }
     
-    log.info({ tokenHash }, 'No lock/cache found. Becoming leader.');
+    log.info('No lock/cache found. Becoming leader.');
     const promise = action();
     rotationLocks.set(token, promise);
 
@@ -78,18 +70,18 @@ export async function safeAction<T>(token: string, action: () => Promise<T>, rec
         const result = await promise;
         log.info({PromiseResults: result})
         recentResults.set(token, result);
-        log.info({ tokenHash }, 'Action succeeded. Caching result.');
+        log.info('Action succeeded. Caching result.');
         
         setTimeout(() => {
             recentResults.delete(token);
-            log.info({ tokenHash }, 'Cache expired.'); 
+            log.info('Cache expired.'); 
         }, recentResultsTTL);
 
         return result;
 
    } finally {
         rotationLocks.delete(token);
-        log.info({ tokenHash }, 'Action finished. Lock released.');
+        log.info('Action finished. Lock released.');
     }
 
 }

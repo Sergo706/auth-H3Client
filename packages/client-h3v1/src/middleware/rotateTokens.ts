@@ -84,8 +84,6 @@ export async function ensureValidCredentials(event: H3Event) {
 
             const sessionLine = rawSetCookie.find(c => c.trim().startsWith('session=')) ?? '';
             const sessionValue = sessionLine.split(';', 1)[0].split('=')[1] || refresh;
-            log.info({authServerResults: json})
-            log.info({newToken, newRefresh: sessionValue, accessIat, rawSetCookie})
 
             return { type: 'both', newToken, newRefresh: sessionValue, accessIat, rawSetCookie };
         } catch(err) {
@@ -96,7 +94,6 @@ export async function ensureValidCredentials(event: H3Event) {
 
     const rotateAndApply = async () => {
         const result = await safeAction(refresh, rotateBoth);
-        log.info({...result})
         return applyRotationResult(event, result, domain, accessTokenTTL);
     };
 

@@ -71,4 +71,4 @@ export { defineVerifiedCsrfHandler } from "./utils/csrfVerifier.js";
 export { defineAuthenticatedEventPostHandlers } from "./utils/authenticatedPostHandler.js";
 export { defineDeduplicatedEventHandler } from "./utils/requestDedupHandler.js";
 export { getCachedUserData } from "./utils/getCachedUserData.js";
-export { type H3Event, defineEventHandler, getRequestURL, isMethod, sendNoContent, getHeader } from 'h3';
+export { type H3Event, defineEventHandler, appendResponseHeader, getRequestURL, isMethod, sendNoContent, getHeader } from 'h3';
