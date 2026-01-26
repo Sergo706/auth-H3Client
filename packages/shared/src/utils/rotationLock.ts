@@ -48,7 +48,7 @@ This pattern is ideal for token rotation or similar operations where:
 export async function safeAction<T>(token: string, action: () => Promise<T>, recentResultsTTL = 3000): Promise<T> {
     const log = getLogger().child({service: 'auth-client', branch: 'utils', type: 'safeAction'});
     const tokenHash = token.substring(0, 10) + '...';
-
+ 
     if (recentResults.has(token)) {
         log.info({ tokenHash }, 'Action recently completed, returning cached result.');
         return recentResults.get(token) as T;
