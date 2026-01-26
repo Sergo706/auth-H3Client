@@ -51,6 +51,7 @@ export async function safeAction<T>(token: string, action: () => Promise<T>, rec
  
     if (recentResults.has(token)) {
         log.info({ tokenHash }, 'Action recently completed, returning cached result.');
+        log.info({cachedData: recentResults.get(token)})
         return recentResults.get(token) as T;
     }
 
@@ -61,8 +62,10 @@ export async function safeAction<T>(token: string, action: () => Promise<T>, rec
         
          if (recentResults.has(token)) {
              log.info({ tokenHash }, 'Leader finished, returning cached result.');
+             log.info({cachedData: recentResults.get(token)})
              return recentResults.get(token) as T;
          }
+         log.info(result);
          log.warn({ tokenHash }, 'Leader finished but NO cache found. Returning raw result.');
          return result as T;
     }
@@ -73,7 +76,7 @@ export async function safeAction<T>(token: string, action: () => Promise<T>, rec
 
     try {
         const result = await promise;
-
+        log.info({PromiseResults: result})
         recentResults.set(token, result);
         log.info({ tokenHash }, 'Action succeeded. Caching result.');
         
