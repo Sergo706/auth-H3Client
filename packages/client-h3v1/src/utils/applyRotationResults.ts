@@ -66,16 +66,11 @@ function applyRefreshRotation(
     domain: string
 ): void {
     const { newRefresh, rawSetCookie } = result;
-    console.log(`[DEBUG] applyRefreshRotation: setting cookies. Count: ${rawSetCookie?.length}`);
 
     // deleteCookie(event, 'session', { domain, path: '/' });
     // deleteCookie(event, 'iat', { domain, path: '/' });
 
-   // rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
-    rawSetCookie.forEach(line => {
-        console.log(`[DEBUG] Appending Header: Set-Cookie=${line.substring(0, 20)}...`);
-        appendHeader(event, 'Set-Cookie', line);
-    });
+   rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
 
     event.context.session = newRefresh;
 }
@@ -87,16 +82,11 @@ function applyBothRotation(
     accessTokenTTL: number
 ): void {
     const { newToken, newRefresh, accessIat, rawSetCookie } = result;
-    console.log(`[DEBUG] applyBothRotation: setting cookies. Count: ${rawSetCookie?.length}`);
 
     // deleteCookie(event, 'session', { domain, path: '/' });
     // deleteCookie(event, 'iat', { domain, path: '/' });
 
-    // rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
-    rawSetCookie.forEach(line => {
-        console.log(`[DEBUG] Appending Header: Set-Cookie=${line.substring(0, 20)}...`);
-        appendHeader(event, 'Set-Cookie', line);
-    });
+    rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
 
     makeCookie(event, '__Secure-a', newToken, {
         httpOnly: true,
