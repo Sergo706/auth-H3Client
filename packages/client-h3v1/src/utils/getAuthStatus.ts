@@ -27,6 +27,7 @@ export const getAuthStatusHandler = defineAuthenticatedEventHandler(
             throwHttpError(log, event, 'AUTH_CLIENT_ERROR', 400, 'Bad request', '', 
                 'Failed to get userId.');
         }
+        log.info({ ...user }, 'Auth status check user');
 
         return {
             ...user

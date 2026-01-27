@@ -25,6 +25,12 @@ export function applyRotationResult(
             applyRefreshRotation(event, result, domain);
             break;
         case 'both':
+            console.log('DEBUG', 'APPLYING ROTATION')
+            console.log('DEBUG', result)
+            console.log('DEBUG', domain)
+            console.log('DEBUG', event)
+            console.log('DEBUG', accessTokenTTL)
+
             applyBothRotation(event, result, domain, accessTokenTTL);
             break;
     }
@@ -67,8 +73,8 @@ function applyRefreshRotation(
 ): void {
     const { newRefresh, rawSetCookie } = result;
 
-    // deleteCookie(event, 'session', { domain, path: '/' });
-    // deleteCookie(event, 'iat', { domain, path: '/' });
+    deleteCookie(event, 'session', { domain, path: '/' });
+    deleteCookie(event, 'iat', { domain, path: '/' });
 
    rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
 
@@ -83,8 +89,8 @@ function applyBothRotation(
 ): void {
     const { newToken, newRefresh, accessIat, rawSetCookie } = result;
 
-    // deleteCookie(event, 'session', { domain, path: '/' });
-    // deleteCookie(event, 'iat', { domain, path: '/' });
+    deleteCookie(event, 'session', { domain, path: '/' });
+    deleteCookie(event, 'iat', { domain, path: '/' });
 
     rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
 
@@ -107,5 +113,10 @@ function applyBothRotation(
 
     event.context.session = newRefresh;
     event.context.accessToken = newToken;
+    console.log('DEBUG', event.context.session)
+    console.log('DEBUG', accessIat)
+    console.log('DEBUG', newToken)
+    console.log('DEBUG', event.context.accessToken)
+
 }
 
