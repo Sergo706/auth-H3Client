@@ -9,7 +9,6 @@ export async function executeRequest<T>(
     method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH", 
     body?: object, 
     customHeaders: Record<string, string> = {},
-
     customOptions: FetchOptions<'json'> = {}
 ): Promise<Results<T>> {
     try {
@@ -47,11 +46,12 @@ export async function executeRequest<T>(
 
         if (import.meta.server) {
             const cookies = results.headers.getSetCookie();
+            console.log(cookies)
             if (cookies && cookies.length > 0) {
                 const nuxtApp = useNuxtApp();
                 const event = nuxtApp.ssrContext?.event as unknown as H3Event;
-                if (event) {
-                    appendResponseHeader(event, 'set-cookie', cookies);
+                for (const cookie of cookies) {
+                    appendResponseHeader(event, 'set-cookie', cookie);
                 }
             }
         }
