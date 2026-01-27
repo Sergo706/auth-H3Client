@@ -2,6 +2,7 @@
   "name": "@internal/client-h3v2",
   "private": true,
   "type": "module",
+  "sideEffects": false,
   "dependencies": {
     "@internal/shared": "*"
   },
