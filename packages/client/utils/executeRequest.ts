@@ -1,4 +1,4 @@
-import { $fetch, FetchOptions } from "ofetch";
+import { $fetch, type FetchOptions } from "ofetch";
 import { getCsrfToken } from "./getCsrfToken.js";
 import { appendResponseHeader, type H3Event } from "auth-h3client/v1";
 import { type Results } from "@internal/shared";
@@ -6,9 +6,10 @@ import { useNuxtApp, useRequestHeaders } from "nuxt/app";
 
 export async function executeRequest<T>(
     url: string,
-    method: "GET" | "POST" | "DELETE" | "PUT", 
+    method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH", 
     body?: object, 
     customHeaders: Record<string, string> = {},
+    customOptions: FetchOptions<'json'> = {}
 ): Promise<Results<T>> {
     try {
         const dataType = method === "GET" ? {query: body} : {body: body};
@@ -40,6 +41,7 @@ export async function executeRequest<T>(
             ignoreResponseError: true,
             ...dataType,
             headers,
+            ...customOptions
         });
 
         if (import.meta.server) {
