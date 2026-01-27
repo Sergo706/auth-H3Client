@@ -1,4 +1,4 @@
-// import { $fetch, type FetchOptions } from "ofetch";
+import { $fetch, type FetchOptions } from "ofetch";
 import { getCsrfToken } from "./getCsrfToken.js";
 import { appendResponseHeader, type H3Event } from "auth-h3client/v1";
 import { type Results } from "@internal/shared";
@@ -9,7 +9,7 @@ export async function executeRequest<T>(
     method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH", 
     body?: object, 
     customHeaders: Record<string, string> = {},
-    // @ts-ignore
+
     customOptions: FetchOptions<'json'> = {}
 ): Promise<Results<T>> {
     try {
@@ -35,7 +35,7 @@ export async function executeRequest<T>(
             const reqHeaders = useRequestHeaders();
             Object.assign(headers, reqHeaders);
         }
-        // @ts-ignore
+    
         const results = await $fetch.raw<Results<T>>(url, {
             method,
             timeout: 15000,
