@@ -25,12 +25,6 @@ export function applyRotationResult(
             applyRefreshRotation(event, result, domain);
             break;
         case 'both':
-            console.log('DEBUG', 'APPLYING ROTATION')
-            console.log('DEBUG', result)
-            console.log('DEBUG', domain)
-            console.log('DEBUG', event)
-            console.log('DEBUG', accessTokenTTL)
-
             applyBothRotation(event, result, domain, accessTokenTTL);
             break;
     }
@@ -113,10 +107,5 @@ function applyBothRotation(
 
     event.context.session = newRefresh;
     event.context.accessToken = newToken;
-    console.log('DEBUG', event.context.session)
-    console.log('DEBUG', accessIat)
-    console.log('DEBUG', newToken)
-    console.log('DEBUG', event.context.accessToken)
-
 }
 
