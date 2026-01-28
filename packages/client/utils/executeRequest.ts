@@ -52,7 +52,8 @@ export async function executeRequest<T>(
             const reqHeaders = useRequestHeaders();
             Object.assign(headers, reqHeaders);
         }
-    
+        
+        const event = useRequestEvent()
         const results = await $fetch.raw<Results<T>>(url, {
             method,
             timeout: 15000,
@@ -61,7 +62,7 @@ export async function executeRequest<T>(
             headers,
             ...customOptions
         });
-        const event = useRequestEvent()
+        
         if (import.meta.server) {
             const cookies = results.headers.getSetCookie();
             if (cookies && cookies.length > 0 && event) {

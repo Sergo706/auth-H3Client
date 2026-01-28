@@ -1,7 +1,7 @@
-import { useState, useRequestHeaders, useFetch, useNuxtApp, useRequestEvent } from 'nuxt/app';
+import { useState, useRequestHeaders, useFetch, useRequestEvent } from 'nuxt/app';
 import type { Ref } from 'vue';
 import type { ServerResponse } from "@internal/shared";
-import { appendResponseHeader, H3Event } from 'auth-h3client/v1';
+import { appendResponseHeader } from 'auth-h3client/v1';
 
 export interface AuthState {
     id?: string;    
@@ -33,6 +33,7 @@ export interface AuthState {
 export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<Ref<AuthState>> => {
   const authorized = useState<AuthState>('auth', () => ({ authorized: false, mfaRequired: false }));
   const headers = useRequestHeaders();
+  const event = useRequestEvent();
 
       try {
          await useFetch<ServerResponse | Omit<AuthState, 'authorized'>>(authStatusUrl, {
@@ -55,7 +56,6 @@ export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<
 
           onResponse ({ response }) {
             const json = response._data;
-             const event = useRequestEvent()
             if (import.meta.server) {
                 const cookies = response.headers.getSetCookie();
                 if (cookies && cookies.length > 0 && event) {
