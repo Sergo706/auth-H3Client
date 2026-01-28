@@ -108,8 +108,7 @@ const rotate = async (): Promise<RefreshRotationResult> => {
 
 
  try {
-    const meta = await getMetadata(log, false, refresh,canary,iat,event);
-
+    const meta = await safeAction(refresh, () => getMetadata(log, false, refresh,canary,iat,event))
      if ("authorized" in meta && !meta.authorized) {
          log.warn('Meta not authorized; re login required');
          cache.del(refresh);
