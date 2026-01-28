@@ -2,7 +2,7 @@ import { $fetch, type FetchOptions } from "ofetch";
 import { getCsrfToken } from "./getCsrfToken.js";
 import { appendResponseHeader, type H3Event } from "auth-h3client/v1";
 import { type Results } from "@internal/shared";
-import { useNuxtApp, useRequestHeaders } from "nuxt/app";
+import { useNuxtApp, useRequestEvent, useRequestHeaders } from "nuxt/app";
 
 export async function executeRequest<T>(
     url: string,
@@ -43,19 +43,16 @@ export async function executeRequest<T>(
             headers,
             ...customOptions
         });
-
+        const event = useRequestEvent()
         if (import.meta.server) {
             const cookies = results.headers.getSetCookie();
-            console.log(cookies)
-            if (cookies && cookies.length > 0) {
-                const nuxtApp = useNuxtApp();
-                const event = nuxtApp.ssrContext?.event as unknown as H3Event;
+            if (cookies && cookies.length > 0 && event) {
                 for (const cookie of cookies) {
                     appendResponseHeader(event, 'set-cookie', cookie);
                 }
             }
         }
-
+        
         const json = results._data;
 
         if (!json) return { 
