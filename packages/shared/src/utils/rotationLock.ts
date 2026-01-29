@@ -68,13 +68,13 @@ export async function safeAction<T>(token: string, action: () => Promise<T>, rec
 
     try {
         const result = await promise;
-        log.info({PromiseResults: result})
+        log.debug({PromiseResults: result})
         recentResults.set(token, result);
         log.info('Action succeeded. Caching result.');
         
         setTimeout(() => {
             recentResults.delete(token);
-            log.info('Cache expired.'); 
+            log.debug('Cache expired.'); 
         }, recentResultsTTL);
 
         return result;
