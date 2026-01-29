@@ -1,4 +1,4 @@
-import { $fetch, type FetchOptions } from "ofetch";
+import { $fetch, FetchResponse, type FetchOptions } from "ofetch";
 import { getCsrfToken } from "./getCsrfToken.js";
 import { appendResponseHeader} from "auth-h3client/v1";
 import { type Results } from "@internal/shared";
@@ -54,39 +54,53 @@ export async function executeRequest<T>(
         }
         
         const event = useRequestEvent()
-        const results = await fetcher.raw<Results<T>>(url, {
+        let upstreamResponse: FetchResponse<Results<T>> | undefined;
+
+        const results = await fetcher<Results<T>>(url, {
             method,
             timeout: 15000,
             ignoreResponseError: true,
             ...dataType,
             headers,
-            ...customOptions
-        });
-        
-        if (import.meta.server) {
-            const cookies = results.headers.getSetCookie();
-            if (cookies && cookies.length > 0 && event) {
-                for (const cookie of cookies) {
-                    appendResponseHeader(event, 'set-cookie', cookie);
+            ...customOptions,
+
+            onResponse({ response }) {
+                upstreamResponse = response;
+                if (import.meta.server) {
+                    const cookies = response.headers.getSetCookie();
+                    if (cookies && cookies.length > 0 && event) {
+                        for (const cookie of cookies) {
+                            appendResponseHeader(event, 'set-cookie', cookie);
+                        }
+                    }
                 }
             }
-        }
+        });
         
-        const json = results._data;
+
+        if (!upstreamResponse) {
+             return { 
+                ok: false,
+                date: new Date().toISOString(), 
+                reason: 'Server Error. No response captured.' 
+            };
+        }
+
+        const json = results;
+
+        if (!upstreamResponse.ok && upstreamResponse.status !== 200) {
+             return { 
+                ok: false,
+                date: new Date().toISOString(), 
+                reason: `Server Error. Status ${upstreamResponse.status}.`
+            };
+        }
 
         if (!json) return { 
              ok: false,
              date: new Date().toISOString(),
-            reason: 'Server Error. Empty response.' 
+            reason: 'Server Error. Empty response body.' 
         };
-
-        if (!results.ok || results.status !== 200) {
-             return { 
-                ok: false,
-                date: new Date().toISOString(), 
-                reason: 'Server Error. Status not 200.' 
-            };
-        }
 
         if ('ok' in json && !json.ok) {
              return json as Results<T>;
