@@ -2,7 +2,7 @@ import { $fetch, type FetchOptions } from "ofetch";
 import { getCsrfToken } from "./getCsrfToken.js";
 import { appendResponseHeader} from "auth-h3client/v1";
 import { type Results } from "@internal/shared";
-import { useRequestEvent, useRequestHeaders } from "nuxt/app";
+import { useRequestEvent, useRequestFetch, useRequestHeaders } from "nuxt/app";
 
 /**
  * Executes a network request to an internal or external API, handling authentication,
@@ -32,7 +32,7 @@ export async function executeRequest<T>(
     try {
         const dataType = method === "GET" ? {query: body} : {body: body};
         let token;
-        
+        let fetcher = $fetch; 
         if (import.meta.client) {
              token = getCsrfToken();
         }
@@ -47,14 +47,14 @@ export async function executeRequest<T>(
             headers['X-CSRF-Token'] = token;
         }
 
-      
         if (import.meta.server) {
+            fetcher = useRequestFetch();
             const reqHeaders = useRequestHeaders();
             Object.assign(headers, reqHeaders);
         }
         
         const event = useRequestEvent()
-        const results = await $fetch.raw<Results<T>>(url, {
+        const results = await fetcher.raw<Results<T>>(url, {
             method,
             timeout: 15000,
             ignoreResponseError: true,
