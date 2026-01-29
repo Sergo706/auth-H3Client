@@ -104,8 +104,7 @@ export async function ensureAccessToken(event: H3Event) {
    }
 
       try {
-           const meta = await getMetadata(log, false, currentToken, refresh, canary, event);
-           
+           const meta = await safeAction(refresh, () => getMetadata(log, false, currentToken, refresh, canary, event))
            if ("serverError" in meta && meta.serverError) {
                log.info('Meta resolved with an error; rotating access token');
                cache.del(currentToken);

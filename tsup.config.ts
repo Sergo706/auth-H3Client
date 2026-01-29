@@ -77,6 +77,7 @@ const clientConfig: Options = {
     'telegraf',
     'undici',
     'unstorage',
+    'ofetch',
   ],
   treeshake: true,
 };

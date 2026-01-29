@@ -25,3 +25,4 @@ export * from './types/signup.js';
 export * from './utils/rotationLock.js';
 export * from './types/cookiesSetter.js'
 export * from './types/rotationResult.js'
+export type * from './types/Results.js'
