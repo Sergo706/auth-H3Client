@@ -43,7 +43,7 @@ const clearCookies = () => {
     deleteCookie(event,`state${match.name}`);
 }
 const httpMethod = event.method;
-const input = httpMethod === 'POST' ?  await readBody(event) : await getQuery(event);
+const input = httpMethod === 'POST' ?  await readBody(event) : getQuery(event);
 const { code, state:stateFromIdP, error, iss } = OAuthQuery.parse(input);
 
     if (error) {

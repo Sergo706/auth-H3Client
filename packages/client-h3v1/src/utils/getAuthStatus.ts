@@ -15,7 +15,7 @@ export const getAuthStatusHandler = defineAuthenticatedEventHandler(
         const log = getLogger().child({ service: 'auth-client-status', branch: 'status', type: 'handler' });
         const user = event.context.authorizedData;
         
-        log.info({ userId: user?.userId }, 'Auth status check');
+        log.debug({ userId: user?.userId }, 'Auth status check');
         
         if (!user) {
             throwHttpError(log, event, 'AUTH_REQUIRED', 401, 'UnAuthorized', 'Un Authorized action', 
