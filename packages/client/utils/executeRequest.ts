@@ -1,9 +1,13 @@
 import { $fetch, FetchResponse, type FetchOptions } from "ofetch";
 import { getCsrfToken } from "./getCsrfToken.js";
-import { appendResponseHeader} from "auth-h3client/v1";
+import { appendResponseHeader, H3Event} from "auth-h3client/v1";
 import { type Results } from "@internal/shared";
-import { useRequestEvent, useRequestFetch, useRequestHeaders } from "nuxt/app";
 
+export interface ApiContext {
+    fetcher?: typeof $fetch;
+    event?: H3Event | undefined;
+    headers?: Record<string, string>;
+}
 /**
  * Executes a network request to an internal or external API, handling authentication,
  * CSRF protection, and server-side cookie propagation.
@@ -27,12 +31,15 @@ export async function executeRequest<T>(
     method: "GET" | "POST" | "DELETE" | "PUT" | "PATCH", 
     body?: object, 
     customHeaders: Record<string, string> = {},
-    customOptions: FetchOptions<'json'> = {}
+    customOptions: FetchOptions<'json'> = {},
+    context: ApiContext = {}
 ): Promise<Results<T>> {
     try {
         const dataType = method === "GET" ? {query: body} : {body: body};
         let token;
-        let fetcher = $fetch; 
+        let upstreamResponse: FetchResponse<Results<T>> | undefined;
+        const fetcher = context.fetcher ?? $fetch;
+        const event = context.event;
         if (import.meta.client) {
              token = getCsrfToken();
         }
@@ -47,14 +54,10 @@ export async function executeRequest<T>(
             headers['X-CSRF-Token'] = token;
         }
 
-        if (import.meta.server) {
-            fetcher = useRequestFetch();
-            const reqHeaders = useRequestHeaders();
-            Object.assign(headers, reqHeaders);
+        if (import.meta.server && context.headers) {
+            Object.assign(headers, context.headers);
         }
         
-        const event = useRequestEvent()
-        let upstreamResponse: FetchResponse<Results<T>> | undefined;
 
         const results = await fetcher<Results<T>>(url, {
             method,
