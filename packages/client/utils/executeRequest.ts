@@ -1,10 +1,11 @@
-import { $fetch, FetchResponse, type FetchOptions } from "ofetch";
+import { $fetch, type FetchResponse, type FetchOptions } from "ofetch";
 import { getCsrfToken } from "./getCsrfToken.js";
 import { appendResponseHeader, H3Event} from "auth-h3client/v1";
 import { type Results } from "@internal/shared";
+import type { $Fetch, NitroFetchRequest, H3Event$Fetch } from "nitropack";
 
 export interface ApiContext {
-    fetcher?: typeof $fetch;
+    fetcher?: H3Event$Fetch | $Fetch<unknown, NitroFetchRequest>
     event?: H3Event | undefined;
     headers?: Record<string, string>;
 }
@@ -38,7 +39,7 @@ export async function executeRequest<T>(
         const dataType = method === "GET" ? {query: body} : {body: body};
         let token;
         let upstreamResponse: FetchResponse<Results<T>> | undefined;
-        const fetcher = context.fetcher ?? $fetch;
+        const fetcher = (context.fetcher ?? $fetch) as H3Event$Fetch | $Fetch<unknown, NitroFetchRequest>;
         const event = context.event;
         if (import.meta.client) {
              token = getCsrfToken();
@@ -67,7 +68,7 @@ export async function executeRequest<T>(
             headers,
             ...customOptions,
 
-            onResponse({ response }) {
+            onResponse({ response }: { response: FetchResponse<Results<T>> }) {
                 upstreamResponse = response;
                 if (import.meta.server) {
                     const cookies = response.headers.getSetCookie();
