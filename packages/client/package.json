@@ -7,9 +7,11 @@
     },
     "peerDependencies": {
         "nuxt": "^4.2.1",
-        "vue": "^3.5.18"
+        "vue": "^3.5.18",
+        "ofetch": "^1.5.1"
     },
     "devDependencies": {
-        "typescript": "^5.6.3"
+        "typescript": "^5.6.3",
+        "ofetch": "^1.5.1"
     }
 }

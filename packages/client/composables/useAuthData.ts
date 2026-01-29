@@ -1,6 +1,7 @@
-import { useState, useRequestHeaders, useFetch } from 'nuxt/app';
+import { useState, useRequestHeaders, useFetch, useRequestEvent } from 'nuxt/app';
 import type { Ref } from 'vue';
 import type { ServerResponse } from "@internal/shared";
+import { appendResponseHeader } from 'auth-h3client/v1';
 
 export interface AuthState {
     id?: string;    
@@ -12,17 +13,26 @@ export interface AuthState {
 
 /**
  * Composable that checks and returns the current authentication state.
- * Implements a singleton pattern - multiple simultaneous calls result in only one network request.
- * Updates the global `useState('auth')` reactive reference.
+ * Implements a singleton pattern using `useState` to prevent duplicate network requests during hydration.
  * 
  * @param authStatusUrl - Optional custom endpoint URL for auth status check. Defaults to '/users/authStatus'.
  * @returns {Promise<Ref<AuthState>>} A promise that resolves to a reactive ref containing the authentication state.
+ * 
+ * Features:
+ * - **State Management**: Updates the global `useState('auth')` reactive reference.
+ * - **Server-Side Handling**: Automatically forwards `Set-Cookie` headers from the API response to the client response when running on the server.
+ * - **MFA Support**: Detects 202 status codes and updates `mfaRequired` state accordingly.
+ * - **Error Handling**: Gracefully handles 401s and other errors by resetting auth state.
  * 
  * @example
  * // In app.vue or middleware
  * const auth = await useAuthData();
  * if (!auth.value.authorized) {
- *   navigateTo('/login');
+ *   if (auth.value.mfaRequired) {
+ *     navigateTo('/mfa-verify');
+ *   } else {
+ *     navigateTo('/login');
+ *   }
  * }
  * 
  * @example
@@ -32,6 +42,7 @@ export interface AuthState {
 export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<Ref<AuthState>> => {
   const authorized = useState<AuthState>('auth', () => ({ authorized: false, mfaRequired: false }));
   const headers = useRequestHeaders();
+  const event = useRequestEvent();
 
       try {
          await useFetch<ServerResponse | Omit<AuthState, 'authorized'>>(authStatusUrl, {
@@ -54,7 +65,14 @@ export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<
 
           onResponse ({ response }) {
             const json = response._data;
-
+            if (import.meta.server) {
+                const cookies = response.headers.getSetCookie();
+                if (cookies && cookies.length > 0 && event) {
+                    for (const cookie of cookies) {
+                        appendResponseHeader(event, 'set-cookie', cookie);
+                    }
+            }
+            }
             if (!json || response.status === 401) {
                 authorized.value = { 
                     authorized: false,
