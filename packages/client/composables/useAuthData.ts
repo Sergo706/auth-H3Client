@@ -13,17 +13,26 @@ export interface AuthState {
 
 /**
  * Composable that checks and returns the current authentication state.
- * Implements a singleton pattern - multiple simultaneous calls result in only one network request.
- * Updates the global `useState('auth')` reactive reference.
+ * Implements a singleton pattern using `useState` to prevent duplicate network requests during hydration.
  * 
  * @param authStatusUrl - Optional custom endpoint URL for auth status check. Defaults to '/users/authStatus'.
  * @returns {Promise<Ref<AuthState>>} A promise that resolves to a reactive ref containing the authentication state.
+ * 
+ * Features:
+ * - **State Management**: Updates the global `useState('auth')` reactive reference.
+ * - **Server-Side Handling**: Automatically forwards `Set-Cookie` headers from the API response to the client response when running on the server.
+ * - **MFA Support**: Detects 202 status codes and updates `mfaRequired` state accordingly.
+ * - **Error Handling**: Gracefully handles 401s and other errors by resetting auth state.
  * 
  * @example
  * // In app.vue or middleware
  * const auth = await useAuthData();
  * if (!auth.value.authorized) {
- *   navigateTo('/login');
+ *   if (auth.value.mfaRequired) {
+ *     navigateTo('/mfa-verify');
+ *   } else {
+ *     navigateTo('/login');
+ *   }
  * }
  * 
  * @example
