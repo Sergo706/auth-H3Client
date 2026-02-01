@@ -68,6 +68,9 @@
       "server/middleware": [
         "dist/server/middleware.d.ts"
       ],
+      "server/routes": [
+            "./dist/server/routes.d.ts"
+      ],
       "server/templates": [
         "dist/server/templates.d.ts"
       ],
