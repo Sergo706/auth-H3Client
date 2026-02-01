@@ -1,12 +1,8 @@
 import crypto from "crypto";
 import { createSignedCookie, safeAction } from "@internal/shared";
 import { verifySignedCookie } from "@internal/shared";
-import { makeCookie } from "../utils/cookieGenerator.js";
-import { banIp } from "@internal/shared";
 import { getLogger} from "@internal/shared";
-import { getCookie, getRequestIP, getRequestURL, H3Event, createError, parseCookies, appendHeader } from "h3";
-import { sendToServer } from "../utils/serverToServer.js";
-import throwError from "./error.js";
+import { getCookie, getRequestURL, H3Event, createError, parseCookies } from "h3";
 import { getConfiguration } from "../main.js";
 import { checkForBots } from "../utils/checkForBots.js";
 
@@ -56,10 +52,10 @@ export const validator = async (event: H3Event): Promise<any> => {
         const key = canary || rawCookie as string;
         return safeAction(key, 
         async () => 
-          await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.method, log, enableFireWallBans)
+          await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.method, log, enableFireWallBans, canary)
       )
       } else {
-       return await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.method, log, enableFireWallBans)
+       return await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.method, log, enableFireWallBans, canary)
       }
 }
 };
