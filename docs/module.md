@@ -147,11 +147,11 @@ For `configDefaultsWithOAuth`, you also need:
 
 ## Client-Side Composables
 
-The module auto-imports these composables. You do NOT need to import them manually.
+The module auto-imports these utilities. You do NOT need to import them manually.
 
 ### `useAuthData`
 
-A reactive, singleton composable that returns the current user's authentication state. It checks the `/users/authStatus` endpoint (or your custom URL) once and caches the result.
+A reactive, singleton composable that returns the current user's authentication state. It checks the `/auth/users/authStatus` endpoint (or your custom URL) once and caches the result.
 
 **Usage:**
 ```vue
@@ -183,12 +183,20 @@ const token = getCsrfToken();
 // Use in headers: { 'X-CSRF-Token': token }
 ```
 
-### `AuthBase`
+### `executeRequest<T>()`
 
-A base class that wraps `useAuthData`. Useful if you are building class-based services or stores.
+A universal fetch wrapper that handles CSRF injection, header proxying, and cookie propagation between server and client.
+
+**Usage:**
+```typescript
+const result = await executeRequest<{ user: User }>('/api/profile', 'GET');
+if (result.ok) {
+  console.log(result.data.user);
+}
+```
 
 > [!TIP]
-> **Advanced Patterns**: For detailed strategies on avoiding token race conditions, "Fail Fast" optimizations, and advanced `AuthBase` usage, read the [Client-Side Guide](./client.md).
+> **Advanced Patterns**: For detailed API reference and usage patterns, read the [Client-Side Guide](./client.md).
 
 ## Server-Side Integrations
 
