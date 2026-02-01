@@ -7,6 +7,7 @@ const serverConfig: Options = {
     'module': 'packages/client/module.ts',
     'server/middleware': 'packages/client/server/middleware/auth.ts',
     'server/templates': 'packages/client/server/templates/index.ts',
+    'server/routes': 'packages/client/server/routes/authStatus.ts',
   },
   format: ['esm'],
   tsconfig: 'tsconfig.prod.json',
