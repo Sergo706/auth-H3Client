@@ -78,6 +78,54 @@ export default defineNitroPlugin((nitroApp) => {
 > [!NOTE]
 > For a detailed explanation of every configuration field, see the [Configuration Guide](./configuration.md).
 
+### Using Config Templates (Recommended)
+
+Instead of writing all configuration from scratch, use the provided templates as a base and override what you need:
+
+```typescript
+// server/plugins/auth.ts
+import { defineNitroPlugin } from 'nitropack/runtime/plugin';
+import { useStorage } from 'nitropack/runtime/storage';
+import { configDefaults } from 'auth-h3client/server/templates';
+import { defineAuthConfiguration } from 'auth-h3client/v1';
+
+export default defineNitroPlugin((nitroApp) => {
+  defineAuthConfiguration(nitroApp, {
+    ...configDefaults,
+    // Override what you need:
+    onSuccessRedirect: '/dashboard',
+    uStorage: {
+      storage: useStorage('cache'),
+      cacheOptions: { successTtl: 60 * 60 * 24 * 7, rateLimitTtl: 10 }
+    }
+  });
+});
+```
+
+**Available Templates:**
+
+| Import | Description |
+|--------|-------------|
+| `configDefaults` | Basic config with HMAC, storage, and standard settings |
+| `configDefaultsWithOAuth` | Includes pre-configured Google, GitHub, X, and LinkedIn providers |
+
+The templates read from environment variables:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `AUTH_SERVER_LOCATION` | Yes | Hostname of your Auth Service |
+| `AUTH_PORT_LOCATION` | Yes | Port of your Auth Service |
+| `HMAC_CLIENT_ID` | No | Auto-generated if not set |
+| `HMAC_SHARED_SECRET` | No | Auto-generated if not set |
+| `AUTH_CRYPTO_COOKIES` | No | Auto-generated if not set |
+
+For `configDefaultsWithOAuth`, you also need:
+- `BASEURL` - Your app's base URL (e.g., `https://myapp.com`)
+- `OAUTH_GOOGLE_CLIENT_ID`, `OAUTH_GOOGLE_CLIENT_SECRET`
+- `OAUTH_GITHUB_CLIENT_ID`, `OAUTH_GITHUB_CLIENT_SECRET`
+- `OAUTH_X_CLIENT_ID`, `OAUTH_X_CLIENT_SECRET`
+- `OAUTH_LINKEDIN_CLIENT_ID`, `OAUTH_LINKEDIN_CLIENT_SECRET`
+
 ## Module Options
 
 | Option | Type | Default | Description |

@@ -1,0 +1,1 @@
+export { getAuthStatusHandler as default } from 'auth-h3client/v1';

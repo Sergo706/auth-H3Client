@@ -6,6 +6,7 @@ const serverConfig: Options = {
     'v2': 'packages/client-h3v2/src/main.ts',
     'module': 'packages/client/module.ts',
     'server/middleware': 'packages/client/server/middleware/auth.ts',
+    'server/templates': 'packages/client/server/templates/index.ts',
   },
   format: ['esm'],
   tsconfig: 'tsconfig.prod.json',

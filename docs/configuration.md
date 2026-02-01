@@ -9,6 +9,14 @@ This guide explains every configuration option available.
 
 ## Initialization
 
+> [!TIP]
+> **Quick Start:** Instead of configuring everything manually, use the pre-built templates:
+> ```typescript
+> import { configDefaults } from 'auth-h3client/server/templates';
+> defineAuthConfiguration(nitroApp, { ...configDefaults, /* overrides */ });
+> ```
+> See [Config Templates](./module.md#using-config-templates-recommended) for details.
+
 You must call the `configuration()` function **exactly once** when your server starts (e.g., in a Nuxt plugin or server entry file).
 
 ```ts

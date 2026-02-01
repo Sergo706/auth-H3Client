@@ -39,6 +39,11 @@
       "import": "./dist/server/middleware.js",
       "default": "./dist/server/middleware.js"
     },
+    "./server/templates": {
+      "types": "./dist/server/templates.d.ts",
+      "import": "./dist/server/templates.js",
+      "default": "./dist/server/templates.js"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -57,6 +62,9 @@
       ],
       "server/middleware": [
         "dist/server/middleware.d.ts"
+      ],
+      "server/templates": [
+        "dist/server/templates.d.ts"
       ],
       "*": [
         "dist/v1.d.ts"

@@ -39,7 +39,7 @@ export interface AuthState {
  * // With custom endpoint
  * const auth = await useAuthData('/api/custom-auth-check');
  */
-export const useAuthData = async (authStatusUrl = '/users/authStatus'): Promise<Ref<AuthState>> => {
+export const useAuthData = async (authStatusUrl = '/auth/users/authStatus'): Promise<Ref<AuthState>> => {
   const authorized = useState<AuthState>('auth', () => ({ authorized: false, mfaRequired: false }));
   const headers = useRequestHeaders();
   const event = useRequestEvent();

@@ -7,6 +7,11 @@ export interface ModuleOptions  {
    * @default true
    */
   enableMiddleware?: boolean;
+    /**
+   * default auth status url to use
+   * @default '/auth/users/authStatus'
+   */
+  authStatusUrl?: string;
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -18,7 +23,8 @@ export default defineNuxtModule<ModuleOptions>({
     }
   },
   defaults: {
-    enableMiddleware: true
+    enableMiddleware: true,
+    authStatusUrl: '/auth/users/authStatus'
   },
   async setup(options, nuxt) {
 
@@ -43,6 +49,12 @@ export default defineNuxtModule<ModuleOptions>({
       addServerHandler({
         middleware: true,
         handler: await resolvePath('auth-h3client/server/middleware')
+      });
+      addServerHandler({
+        middleware: false,
+        handler: await resolvePath('auth-h3client/server/routes/authStatus'),
+        method: 'get',
+        route: options.authStatusUrl,
       });
     }
 
