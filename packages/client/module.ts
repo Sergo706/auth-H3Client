@@ -35,10 +35,10 @@ export default defineNuxtModule<ModuleOptions>({
       },
       {
         name: 'getCsrfToken',
-         from: 'auth-h3client/client'
+        from: 'auth-h3client/client'
       },
       {
-        name: 'AuthBase',
+        name: 'executeRequest',
         from: 'auth-h3client/client'
       }
     ]);
