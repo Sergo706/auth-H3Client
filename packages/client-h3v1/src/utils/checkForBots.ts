@@ -6,10 +6,13 @@ import { sendToServer } from "./serverToServer.js";
 import { makeCookie } from "./cookieGenerator.js";
 
 
-export async function checkForBots(cookies: {name: string, value: string}, event: H3Event, method: string, log: pino.Logger, enableFireWallBans: boolean): Promise<void | H3Error<unknown>> {
+export async function checkForBots(cookies: {name: string, value: string}, event: H3Event, method: string, log: pino.Logger, enableFireWallBans: boolean, canary?: string): Promise<void | H3Error<unknown>> {
 
  try {
-    const trackRes = await sendToServer(true, `/check`, method, event, false)
+    const trackRes = await sendToServer(true, `/check`, method, event, false, 
+    canary ? 
+    { label: 'canary_id', value: canary } : undefined)
+    
     if (!trackRes) {
       throwError(log,event,'AUTH_SERVER_ERROR',502,'Not reachable','','Auth server is not reachable!')
     };

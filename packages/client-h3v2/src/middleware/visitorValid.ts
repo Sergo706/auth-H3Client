@@ -56,10 +56,10 @@ export const validator = async (event: H3Event): Promise<any> => {
         const key = canary || rawCookie as string;
         return safeAction(key, 
         async () => 
-          await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.req.method, log, enableFireWallBans)
+          await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.req.method, log, enableFireWallBans, canary)
        )
       } else {
-        return await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.req.method, log, enableFireWallBans)
+        return await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.req.method, log, enableFireWallBans, canary)
       }
   
 }

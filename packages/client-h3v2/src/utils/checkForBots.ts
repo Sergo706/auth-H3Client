@@ -5,9 +5,12 @@ import throwError from "../middleware/error.js";
 import { banIp } from "@internal/shared";
 import { makeCookie } from "./cookieGenerator.js";
 
-export async function checkForBots(cookies: {name: string, value: string}, event: H3Event, method: string, log: pino.Logger, enableFireWallBans: boolean): Promise<void | HTTPError<unknown>> { 
+export async function checkForBots(cookies: {name: string, value: string}, event: H3Event, method: string, log: pino.Logger, enableFireWallBans: boolean, canary?: string): Promise<void | HTTPError<unknown>> { 
   try {
-    const trackRes = await sendToServer(true, `/check`, event.req.method, event, false)
+    const trackRes = await sendToServer(true, `/check`, event.req.method, event, false,
+    canary ? 
+    { label: 'canary_id', value: canary } : undefined)
+
     if (!trackRes) {
       throwError(log,event,'AUTH_SERVER_ERROR',502,'Not reachable','','Auth server is not reachable!')
     };
