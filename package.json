@@ -39,6 +39,11 @@
       "import": "./dist/server/middleware.js",
       "default": "./dist/server/middleware.js"
     },
+    "./server/routes": {
+          "types": "./dist/server/routes.d.ts",
+          "import": "./dist/server/routes.js",
+          "default": "./dist/server/routes.js"
+    },
     "./server/templates": {
       "types": "./dist/server/templates.d.ts",
       "import": "./dist/server/templates.js",
