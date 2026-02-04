@@ -62,6 +62,7 @@ export { sendLog as sendTelegramMessage } from "@internal/shared";
 export { verifyOAuthToken } from "@internal/shared";
 export {applyRotationResult} from "./utils/applyRotationResults.js"
 export {safeAction as lockAsyncAction} from "@internal/shared"
+export { sanitizeInputString, sanitizeBaseName, validateImage, makeSafeString } from "@internal/shared";
 export {checkForBots} from "./utils/checkForBots.js";
 export { defineAuthConfiguration } from "./nitroPluginStarter.js";
 export { defineAuthenticatedEventHandler, type MfaResponse } from "./utils/defineAuthRoute.js";
