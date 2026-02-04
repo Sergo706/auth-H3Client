@@ -85,6 +85,26 @@ export const configurationSchema = z.strictObject({
       ]),
       cryptoCookiesSecret: z.string()
    }),
+    htmlSanitizer: z.object({
+      /** 
+       * The number of time to run the sanitizer in a loop before breaking.
+       * keep number high but not to high to prevent ddos.
+       * default 50
+       * */
+      IrritationCount: z.number().default(50),
+      /**
+       * The max allowed input length for the sanitizer to process.
+       * If the input is larger than this, it will be rejected.
+       * default 50000
+       */
+      maxAllowedInputLength: z.number().default(50000)
+   }),
+   imageUploader:  z.object({
+      allowedBytes: z.number().default(5_000_000),
+      allowedMimes: z.array(z.string()).default(['image/png', 'image/jpeg', 'image/webp']),
+      allowedExtensions: z.array(z.string()).default(['png', 'webp', 'jpeg', 'jpg']),
+      key: z.function({input: z.any(), output: z.string()}).optional()
+   }),
    uStorage: z.object({
       storage: z.custom<Storage>((val) => {
          return val !== null &&

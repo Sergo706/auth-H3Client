@@ -40,9 +40,9 @@
       "default": "./dist/server/middleware.js"
     },
     "./server/routes": {
-          "types": "./dist/server/routes.d.ts",
-          "import": "./dist/server/routes.js",
-          "default": "./dist/server/routes.js"
+      "types": "./dist/server/routes.d.ts",
+      "import": "./dist/server/routes.js",
+      "default": "./dist/server/routes.js"
     },
     "./server/templates": {
       "types": "./dist/server/templates.d.ts",
@@ -69,7 +69,7 @@
         "dist/server/middleware.d.ts"
       ],
       "server/routes": [
-            "./dist/server/routes.d.ts"
+        "./dist/server/routes.d.ts"
       ],
       "server/templates": [
         "dist/server/templates.d.ts"
@@ -94,14 +94,18 @@
   "license": "ISC",
   "peerDependencies": {
     "h3": "^1.15.4 || ^2.0.0-beta.4",
-    "nuxt": "^4.2.2 || ^3.0.0",
     "nitropack": "^2.13.1",
+    "nuxt": "^4.2.2 || ^3.0.0",
     "vue": "^3.5.18"
   },
   "dependencies": {
     "@nuxt/kit": "^3.17.0",
+    "file-type": "^21.3.0",
+    "he": "^1.2.0",
     "jose": "^6.1.0",
     "pino": "^9.11.0",
+    "sanitize-html": "^2.17.0",
+    "sharp": "^0.34.5",
     "telegraf": "^4.16.3",
     "ts-node": "^10.9.2",
     "undici": "^7.16.0",
