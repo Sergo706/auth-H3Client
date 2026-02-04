@@ -30,6 +30,15 @@ export const configDefaults: Configuration = {
 
     cryptoCookiesSecret: process.env.AUTH_CRYPTO_COOKIES ?? random(),
     },
+    htmlSanitizer: {
+        IrritationCount: 50,
+        maxAllowedInputLength: 50000
+    },
+    imageUploader: {
+        allowedBytes: 5_000_000,
+        allowedMimes: ['image/png', 'image/jpeg', 'image/webp'],
+        allowedExtensions: ['png', 'webp', 'jpeg', 'jpg']
+    },
     uStorage: {
         storage: useStorage('cache'),
         cacheOptions: {

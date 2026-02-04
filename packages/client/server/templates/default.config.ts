@@ -33,6 +33,15 @@ export const configDefaults: Configuration = {
     },
     onSuccessRedirect: `/`,
     enableFireWallBans: false,
+    htmlSanitizer: {
+        IrritationCount: 50,
+        maxAllowedInputLength: 50000
+    },
+    imageUploader: {
+        allowedBytes: 5_000_000,
+        allowedMimes: ['image/png', 'image/jpeg', 'image/webp'],
+        allowedExtensions: ['png', 'webp', 'jpeg', 'jpg']
+    },
     telegram: {
         enableTelegramLogger: false as const,
     },
