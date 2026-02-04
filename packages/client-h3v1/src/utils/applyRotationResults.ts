@@ -58,6 +58,7 @@ function applyAccessRotation(
     });
 
     event.context.accessToken = newToken;
+    event.context.isRotated = true;
 }
 
 function applyRefreshRotation(
@@ -73,6 +74,7 @@ function applyRefreshRotation(
    rawSetCookie.forEach(line => appendHeader(event, 'Set-Cookie', line));
 
     event.context.session = newRefresh;
+    event.context.isRotated = true;
 }
 
 function applyBothRotation(
@@ -107,5 +109,6 @@ function applyBothRotation(
 
     event.context.session = newRefresh;
     event.context.accessToken = newToken;
+    event.context.isRotated = true;
 }
 
