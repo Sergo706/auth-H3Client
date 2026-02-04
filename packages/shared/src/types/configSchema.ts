@@ -6,6 +6,10 @@ type ExtraCB = (accessToken: string) => Promise<Record<string, unknown>>;
 const emailCB = z.custom<EmailCB>((v) => typeof v === "function");
 const extraCB = z.custom<ExtraCB>((v) => typeof v === "function");
 
+/**
+ * Schema for defining OAuth/OIDC providers.
+ * Supports both generic OAuth2 and OIDC (OpenID Connect) providers with auto-discovery.
+ */
 export const OAuthProviders = z.array(z.discriminatedUnion("kind", [
    z.object({
       kind: z.literal("oidc"),
@@ -43,17 +47,32 @@ export const OAuthProviders = z.array(z.discriminatedUnion("kind", [
 )).optional()
 
 
+/**
+ * Settings shared between the client and the auth server.
+ * These are typically fetched remotely by the client.
+ */
 export const sharedSettings = z.strictObject({
+   /** The domain validation for cookies (e.g., ".example.com") */
    domain: z.string(),
+   /** Access token time-to-live in milliseconds */
    accessTokenTTL: z.number(),
 })
 
+/**
+ * The main configuration schema for the Auth Client.
+ * All options required to run the client-side middleware and utilities.
+ */
 export const configurationSchema = z.strictObject({
+   /** Server connection and security settings */
    server: z.object({
+      /** Location of the upstream Auth Server */
       auth_location: z.object({
+         /** Hostname or DNS of the auth server */
          serverOrDNS: z.string(),
+         /** Port number of the auth server */
          port: z.number()
       }),
+      /** HMAC signature settings for request integrity */
       hmac: z.discriminatedUnion('enableHmac', [
          z.object({
             enableHmac: z.literal(false),
@@ -67,6 +86,10 @@ export const configurationSchema = z.strictObject({
          }),
       ]),
 
+      /**
+       * SSL/TLS configuration for secure communication.
+       * Required if the Auth Server uses self-signed certs or client certificate authentication.
+       */
       ssl: z.discriminatedUnion('enableSSL', [
          z.object({
          enableSSL: z.literal(true),
@@ -83,6 +106,10 @@ export const configurationSchema = z.strictObject({
             clientKeyPath: z.string().optional()
        }) 
       ]),
+      /**
+       * Secret used for signing/encrypting cookies.
+       * Must match the server's secret.
+       */
       cryptoCookiesSecret: z.string()
    }),
     htmlSanitizer: z.object({
@@ -100,12 +127,35 @@ export const configurationSchema = z.strictObject({
       maxAllowedInputLength: z.number().default(50000)
    }),
    imageUploader:  z.object({
+      /**
+       * Max allowed file size in bytes.
+       * Default: 5MB (5_000_000)
+       */
       allowedBytes: z.number().default(5_000_000),
+      /**
+       * List of allowed MIME types.
+       * Default: ['image/png', 'image/jpeg', 'image/webp']
+       */
       allowedMimes: z.array(z.string()).default(['image/png', 'image/jpeg', 'image/webp']),
+      /**
+       * List of allowed file extensions.
+       * Must match the allowed MIME types for strict validation.
+       * Default: ['png', 'webp', 'jpeg', 'jpg']
+       */
       allowedExtensions: z.array(z.string()).default(['png', 'webp', 'jpeg', 'jpg']),
+      /**
+       * Optional function to generate custom filenames (keys).
+       * If omitted, a random UUID will be used.
+       * @example (input) => `my-folder/${input.id}`
+       */
       key: z.function({input: z.any(), output: z.string()}).optional()
    }),
+   /**
+    * Unified storage configuration for caching and session data.
+    * Uses `unstorage` drivers (Redis, FS, Memory, etc.).
+    */
    uStorage: z.object({
+      /** The unstorage instance */
       storage: z.custom<Storage>((val) => {
          return val !== null &&
                 typeof val === 'object' &&
@@ -118,9 +168,16 @@ export const configurationSchema = z.strictObject({
            rateLimitTtl: z.number().default(10),
       }).optional()
    }),
+   /** URL to redirect the user to after a successful login */
    onSuccessRedirect: z.url(),
+   /** List of OAuth providers (optional) */
    OAuthProviders,
+   /** Whether to enable automatic banning of suspicious IPs (requires server support) */
    enableFireWallBans: z.boolean(),
+   /**
+    * Telegram notification settings.
+    * Useful for receiving real-time security alerts (e.g., bans, errors).
+    */
    telegram: z.discriminatedUnion("enableTelegramLogger", [
       z.object({
       enableTelegramLogger: z.literal(false),
@@ -135,6 +192,7 @@ export const configurationSchema = z.strictObject({
       allowedUser: z.string()
    }),
 ]),
+   /** Minimum logging level for the client logger */
    logLevel: z.enum(['debug', 'info', 'warn', 'error', 'fatal'])
 }).strict()
 
