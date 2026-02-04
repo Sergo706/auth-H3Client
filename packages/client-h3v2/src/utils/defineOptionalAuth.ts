@@ -33,8 +33,9 @@ export const defineOptionalAuthenticationEvent = <T extends EventHandlerRequest,
 
     hmacSignatureMiddleware(event);
     const interruption = await ensureValidCredentials(event);
+    const rotated = event.context.isRotated;
 
-    if (interruption) {
+    if (interruption && !rotated) {
         throw new Error(`Credential interruption returned, ${JSON.stringify(interruption)}`);
     }
 
