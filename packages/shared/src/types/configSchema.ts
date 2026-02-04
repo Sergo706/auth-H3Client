@@ -125,6 +125,9 @@ export const configurationSchema = z.strictObject({
        * default 50000
        */
       maxAllowedInputLength: z.number().default(50000)
+   }).default({
+      IrritationCount: 50,
+      maxAllowedInputLength: 50000
    }),
    imageUploader:  z.object({
       /**
@@ -149,6 +152,10 @@ export const configurationSchema = z.strictObject({
        * @example (input) => `my-folder/${input.id}`
        */
       key: z.function({input: z.any(), output: z.string()}).optional()
+   }).default({
+      allowedBytes: 5_000_000,
+      allowedMimes: ['image/png', 'image/jpeg', 'image/webp'],
+      allowedExtensions: ['png', 'webp', 'jpeg', 'jpg']
    }),
    /**
     * Unified storage configuration for caching and session data.
