@@ -26,6 +26,7 @@ export * from './utils/rotationLock.js';
 export * from './types/cookiesSetter.js'
 export * from './types/rotationResult.js'
 export type * from './types/Results.js'
+export * from './types/PasswordValidation.js'
 export * from './utils/safeStringMaker.js'
 export { default as sanitizeInputString } from './utils/htmlSanitizer.js'
 export * from './utils/sanitizeFileName.js'

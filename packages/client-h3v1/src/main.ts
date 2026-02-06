@@ -73,3 +73,4 @@ export { defineAuthenticatedEventPostHandlers } from "./utils/authenticatedPostH
 export { defineDeduplicatedEventHandler } from "./utils/requestDedupHandler.js";
 export { getCachedUserData } from "./utils/getCachedUserData.js";
 export { type H3Event, defineEventHandler, appendResponseHeader, getRequestURL, isMethod, sendNoContent, getHeader } from 'h3';
+export { validateUserPassword } from "./utils/validatePassword.js"

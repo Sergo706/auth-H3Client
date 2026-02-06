@@ -71,3 +71,4 @@ export { defineAuthenticatedEventHandler, type MfaResponse } from "./utils/defin
 export { defineOptionalAuthenticationEvent } from "./utils/defineOptionalAuth.js";
 export { getAuthStatusHandler } from "./utils/getAuthStatus.js";
 export { getCachedUserData } from "./utils/getCachedUserData.js";
+export { validateUserPassword } from "./utils/validatePassword.js"
