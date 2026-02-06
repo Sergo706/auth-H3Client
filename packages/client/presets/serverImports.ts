@@ -77,5 +77,5 @@ export const serverImports = [
   { name: 'sanitizeBaseName', from: 'auth-h3client/v1' },
   { name: 'validateImage', from: 'auth-h3client/v1' },
   { name: 'makeSafeString', from: 'auth-h3client/v1' },
-  
+  { name: 'validateUserPassword', from: 'auth-h3client/v1' }
 ] as const;
