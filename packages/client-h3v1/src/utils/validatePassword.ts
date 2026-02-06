@@ -108,7 +108,6 @@ export async function validateUserPassword(
 
             log.info({ 
                 accessIat: results.accessIat,
-                // Redacting sensitive tokens from logs
                 hasAccessToken: !!results.accessToken,
                 cookiesCount: cookies.length
             }, `User entered a valid password, action allowed`)
