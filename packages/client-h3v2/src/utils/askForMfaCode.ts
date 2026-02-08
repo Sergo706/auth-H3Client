@@ -3,6 +3,36 @@ import { Results, safeAction, type UtilsResponse } from "@internal/shared";
 import { getCookie, H3Event } from "h3";
 import { sendToServer } from "./serverToServer.js";
 
+/**
+ * Initiates a custom MFA verification flow by requesting the auth server to send
+ * a verification email to the user.
+ *
+ * This function validates the user's session cookies, constructs the MFA request,
+ * and communicates with the authentication server. Upon success, the server sends
+ * a verification email containing either a magic link or a code.
+ *
+ * @param event - The H3 event object containing the request context and cookies
+ * @param log - Pino logger instance for structured logging
+ * @param reason - A short identifier for the MFA flow purpose (max 100 chars)
+ *                 Examples: "password-reset", "email-change", "sensitive-action"
+ * @param random - A cryptographic hash/token for request verification (254-500 chars)
+ *                 This should be generated server-side and stored for later validation
+ *
+ * @returns A promise resolving to a {@link UtilsResponse} containing:
+ *   - On success: `{ ok: true, data: "Please check your email..." }`
+ *   - On failure: `{ ok: false, reason: string, code: ErrorCode }`
+ *
+ * @example
+ * ```typescript
+ * const result = await askForMfaFlow(event, log, "password-reset", cryptoHash);
+ * if (result.ok) {
+ *   return { message: result.data };
+ * }
+ * throw createError({ statusCode: 400, message: result.reason });
+ * ```
+ *
+ * @throws Never throws - all errors are returned as failed responses
+ */
 export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: string, random: string): Promise<UtilsResponse<string>> {
     const canary = getCookie(event, "canary_id");
     const refresh = getCookie(event, 'session');

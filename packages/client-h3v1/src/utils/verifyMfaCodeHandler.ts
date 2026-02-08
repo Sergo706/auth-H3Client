@@ -6,6 +6,49 @@ import { limitBytes, applyRotationResult, getOperationalConfig } from "../main.j
 import { type Code, type RotationResult, type VerificationLinkSchema, code, validateZodSchema, verificationLink, getLogger, safeAction } from "@internal/shared";
 import { parseResponseContentType } from "@internal/shared";
 
+/**
+ * Creates an H3 event handler that verifies MFA codes before executing
+ * the provided handler. This is a higher-order function that wraps your handler
+ * with CSRF protection, body parsing, and MFA code validation.
+ *
+ * The wrapper performs the following validations:
+ * 1. Verifies the request method is POST
+ * 2. Validates CSRF token via {@link defineVerifiedCsrfHandler}
+ * 3. Limits request body size to 8MB
+ * 4. Checks for required session cookies (`canary_id`, `session`)
+ * 5. Validates query parameters against {@link VerificationLinkSchema}
+ * 6. Validates the MFA code from request body (7-digit numeric code)
+ * 7. Verifies the code with the authentication server
+ * 8. Applies token rotation on successful verification
+ *
+ * Upon successful verification, tokens are automatically rotated and the
+ * handler receives the event with updated authentication context.
+ *
+ * @typeParam T - The event handler request type
+ * @typeParam D - The return type of the wrapped handler
+ *
+ * @param handler - The event handler to execute after successful code verification
+ *
+ * @returns A wrapped event handler with MFA code verification
+ *
+ * @example
+ * ```typescript
+ * export default defineMfaCodeVerifierHandler(async (event) => {
+ *   // MFA verified, tokens rotated - proceed with sensitive action
+ *   await performSensitiveAction(event);
+ *   return { success: true };
+ * });
+ * ```
+ *
+ * @throws {H3Error} Throws HTTP errors for validation failures:
+ *   - 401: Missing credentials
+ *   - 400: Invalid query parameters or MFA code
+ *   - 500: Server communication errors
+ *
+ * @remarks
+ * The MFA code must be provided in `event.context.body.code` as a 7-digit string.
+ * This typically requires a body parser middleware to be applied beforehand.
+ */
 export const defineMfaCodeVerifierHandler = <T extends EventHandlerRequest, D>(
   handler: EventHandler<T, D>
 ): EventHandler<T, Promise<D>> => { 

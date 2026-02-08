@@ -6,6 +6,43 @@ import { VerificationLinkSchema, verificationLink } from "@internal/shared";
 import { validateZodSchema } from "@internal/shared";
 import { defineVerifiedCsrfHandler } from "./csrfVerifier.js";
 
+/**
+ * Creates an H3 event handler that verifies magic link parameters before executing
+ * the provided handler. This is a higher-order function that wraps your handler
+ * with CSRF protection and magic link validation.
+ *
+ * The wrapper performs the following validations:
+ * 1. Verifies the request method is GET
+ * 2. Validates CSRF token via {@link defineVerifiedCsrfHandler}
+ * 3. Checks for required session cookies (`canary_id`, `session`)
+ * 4. Validates query parameters against {@link VerificationLinkSchema}
+ * 5. Verifies the magic link with the authentication server
+ *
+ * Upon successful verification, the handler receives an event with:
+ * - `event.context.link` - The verified action link
+ * - `event.context.reason` - The MFA flow reason identifier
+ *
+ * @typeParam T - The event handler request type
+ * @typeParam D - The return type of the wrapped handler
+ *
+ * @param handler - The event handler to execute after successful verification
+ *
+ * @returns A wrapped event handler with magic link verification
+ *
+ * @example
+ * ```typescript
+ * export default defineVerifiedMagicLinkGetHandler(async (event) => {
+ *   const { link, reason } = event.context;
+ *   // Handle the verified magic link action
+ *   return { success: true, action: reason };
+ * });
+ * ```
+ *
+ * @throws {H3Error} Throws HTTP errors for validation failures:
+ *   - 401: Missing credentials
+ *   - 400: Invalid query parameters
+ *   - 500: Server communication errors
+ */
 export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest, D>(
   handler: EventHandler<T, D>
 ): EventHandler<T, Promise<D>> => {
