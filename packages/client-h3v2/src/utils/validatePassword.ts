@@ -1,7 +1,7 @@
 import { getCookie, H3Event } from "h3";
 import pino from "pino";
 import { sendToServer } from "./serverToServer.js";
-import { safeAction, type ValidatePasswordResults, type AuthServerLoginResponse } from "@internal/shared";
+import { safeAction, type UtilsResponse, type AuthServerLoginResponse } from "@internal/shared";
 
 /**
  * Validates a user's password by making a request to the auth server.
@@ -10,14 +10,14 @@ import { safeAction, type ValidatePasswordResults, type AuthServerLoginResponse 
  * @param email - The user's email address.
  * @param log - Pino logger instance for tracking the request.
  * @param event - H3 event for request context and cookie access.
- * @returns A promise resolving to a ValidatePasswordResults object.
+ * @returns A promise resolving to a UtilsResponse object.
  */
 export async function validateUserPassword(
     password: string, 
     email: string, 
     log: pino.Logger, 
     event: H3Event
-): Promise<ValidatePasswordResults> {
+): Promise<UtilsResponse<string>> {
     const canary = getCookie(event, "canary_id");
 
     if (!canary) {
@@ -123,7 +123,7 @@ export async function validateUserPassword(
                 ok: false,
                 date: new Date().toISOString(),
                 reason: 'Something went wrong, please try restarting the page, and try again',
-                code: 'SERVER_ERROR'
+                code: 'UNEXPECTED_ERROR'
             }
     }
 }

@@ -1,18 +1,6 @@
 import { H3Event, createError } from "h3";
 import pino from "pino";
-
-type AppCode = 
-'AUTH_REQUIRED' | 
- 'SERVER_ERROR' | 
- 'TEMPERING' | 
- 'FORBIDDEN' | 
- 'AUTH_SERVER_ERROR' | 
- 'AUTH_CLIENT_ERROR' |
- 'MISSING_BODY' |
- 'INVALID_CREDENTIALS' |
- 'INVALID_CONTENT_TYPE' |
- 'NOT_FOUND'
-
+import {type AppCode } from "@internal/shared";
 /**
  * Logs a structured error and throws an HTTPError with the provided application status metadata.
  *
