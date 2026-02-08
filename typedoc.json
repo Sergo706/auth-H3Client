@@ -1,15 +1,18 @@
-{ 
+{
   "readme": "./README.md",
   "entryPoints": ["packages/client-h3v1/src/main.ts", "packages/client-h3v2/src/main.ts", "packages/shared/src/index.ts", "packages/client/main.ts"],
   "out": "./docs/api",
   "tsconfig": "tsconfig.prod.json",
   "hideGenerator": true, 
   "includeVersion": true,
-  "name": "auth-h3client",
-  "plugin": ["typedoc-plugin-markdown"],
+  "name": "API Reference",
+  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
   "logLevel": "Verbose",
   "lightHighlightTheme": "github-light",
   "darkHighlightTheme": "github-dark",
-  "theme": "markdown",
-  "entryPointStrategy": "expand",
+  "entryPointStrategy": "resolve",
+  "flattenOutputFiles": true,
+  "fileExtension": ".md",
+  "modulesFileName": "index",
+  "publicPath": "/api/"
 }

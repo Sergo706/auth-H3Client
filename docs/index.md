@@ -8,10 +8,10 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /api/README
+      link: /api/index
     - theme: alt
       text: API Reference
-      link: /api/modules
+      link: /api/client-h3v1.src.main.Function.appendResponseHeader
 
 features:
   - title: H3 Compatible

@@ -1,4 +1,80 @@
 import { defineConfig } from 'vitepress'
+import typedocSidebar from '../docs/api/typedoc-sidebar.json'
+
+function flattenSidebar(sidebar: any[]) {
+  const moduleNameMap: Record<string, string> = {
+    'client-h3v1': 'H3 v1',
+    'client-h3v2': 'H3 v2',
+    'shared': 'Shared Utils',
+    'client': 'Client (Nuxt)'
+  };
+  
+  return sidebar.map((module: any) => {
+    let moduleName = module.text;
+    if (moduleNameMap[moduleName]) {
+      moduleName = moduleNameMap[moduleName];
+    }
+
+    const methodsAndClasses: any[] = []; 
+    const types: any[] = [];
+
+
+    const scan = (items: any[]) => {
+      if (!items) return;
+      for (const item of items) {
+        if (['Functions', 'Variables', 'Classes'].includes(item.text)) {
+
+          if (item.items) {
+             methodsAndClasses.push(...processItems(item.items));
+          }
+
+        } else if (['Interfaces', 'Type Aliases'].includes(item.text)) {
+
+           if (item.items) {
+             types.push(...processItems(item.items));
+           }
+        } else {
+
+          if (item.items) {
+            scan(item.items);
+          }
+        }
+      }
+    };
+
+
+    const processItems = (items: any[]) => {
+      return items.map((item: any) => {
+          let link = item.link;
+          if (link) {
+            const parts = link.split('/');
+            const filename = parts[parts.length - 1]; 
+            const basename = filename.replace(/\.md$/, '');
+            link = `/api/${basename}`;
+          }
+          return { text: item.text, link };
+      });
+    };
+
+    if (module.items) {
+      scan(module.items);
+    }
+    
+    methodsAndClasses.sort((a, b) => a.text.localeCompare(b.text));
+    types.sort((a, b) => a.text.localeCompare(b.text));
+
+    return {
+      text: moduleName,
+      collapsed: true, 
+      items: [
+        { text: 'Methods & Classes', collapsed: true, items: methodsAndClasses },
+        { text: 'Types', collapsed: true, items: types }
+      ]
+    };
+  });
+}
+
+const flatSidebar = flattenSidebar(typedocSidebar);
 
 export default defineConfig({
   title: 'auth-H3Client',
@@ -17,7 +93,7 @@ export default defineConfig({
 
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Getting Started', link: '/api/README' },
+      { text: 'Getting Started', link: '/api/index' },
       { text: 'Features', link: '/features' },
       {
         text: 'Guides',
@@ -37,7 +113,7 @@ export default defineConfig({
       {
         text: 'Getting Started',
         items: [
-          { text: 'Introduction', link: '/api/README' },
+          { text: 'Introduction', link: '/api/index' },
           { text: 'Features', link: '/features' },
           {
               text: 'Nuxt Modules',
@@ -90,13 +166,7 @@ export default defineConfig({
       {
         text: 'API Reference',
         collapsed: true,
-        items: [
-          { text: 'All Modules', link: '/api/modules' },
-          { text: 'H3 v2 (Latest)', link: '/api/client-h3v2/src/main/README' },
-          { text: 'H3 v1', link: '/api/client-h3v1/src/main/README' },
-          { text: 'Shared Utils', link: '/api/shared/src/README' },
-          { text: 'Client (Nuxt)', link: '/api/client/main/README' }
-        ]
+        items: flatSidebar
       }
     ],
 
