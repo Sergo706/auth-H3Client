@@ -106,7 +106,7 @@ export default defineConfig({
           { text: 'MFA Flows', link: '/mfa-flow/overview' }
         ]
       },
-      { text: 'API Reference', link: '/api/modules' }
+      { text: 'API Reference', link: '/api/client-h3v1.src.main.Function.appendResponseHeader' }
     ],
 
     sidebar: [
