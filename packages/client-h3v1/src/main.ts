@@ -74,3 +74,7 @@ export { defineDeduplicatedEventHandler } from "./utils/requestDedupHandler.js";
 export { getCachedUserData } from "./utils/getCachedUserData.js";
 export { type H3Event, defineEventHandler, appendResponseHeader, getRequestURL, isMethod, sendNoContent, getHeader } from 'h3';
 export { validateUserPassword } from "./utils/validatePassword.js"
+export { askForMfaFlow } from "./utils/askForMfaCode.js"
+export { defineVerifiedMagicLinkGetHandler } from "./utils/verifyCustomMfaFlowGET.js"
+export { defineMfaCodeVerifierHandler } from "./utils/verifyMfaCodeHandler.js"
+export { type UtilsResponse, type AppCode, validateZodSchema, type VerificationLinkSchema, type Results } from "@internal/shared";

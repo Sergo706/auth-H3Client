@@ -20,7 +20,7 @@ import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js'
  */
 export default defineDeduplicatedEventHandler(async (event) => {
 
-  const log = getLogger().child({service: 'auth', branch: 'password-reset'})
+  const log = getLogger().child({service: 'auth-client', branch: 'password-reset'})
   assertMethod(event, "POST")
 
 

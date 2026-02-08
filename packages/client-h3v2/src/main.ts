@@ -72,3 +72,7 @@ export { defineOptionalAuthenticationEvent } from "./utils/defineOptionalAuth.js
 export { getAuthStatusHandler } from "./utils/getAuthStatus.js";
 export { getCachedUserData } from "./utils/getCachedUserData.js";
 export { validateUserPassword } from "./utils/validatePassword.js"
+export { askForMfaFlow } from "./utils/askForMfaCode.js"
+export { defineVerifiedMagicLinkGetHandler } from "./utils/verifyCustomMfaFlowGET.js"
+export { defineMfaCodeVerifierHandler } from "./utils/verifyMfaCodeHandler.js"
+export { type UtilsResponse, type AppCode, validateZodSchema, type VerificationLinkSchema, type Results } from "@internal/shared";
