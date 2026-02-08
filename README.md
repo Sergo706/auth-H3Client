@@ -388,6 +388,7 @@ Refer to the TSDoc comments across `src/` for parameter descriptions and usage s
 
 - [Token rotation and metadata](docs/token-rotation.md)
 - [OAuth/OIDC flow](docs/oauth.md)
+- [MFA flows](docs/mfa-flow/overview.md) - Built-in and custom MFA implementation
 - [CSRF and visitor validation](docs/csrf-and-visitor.md)
 - [Routes and controllers](docs/routes-and-controllers.md)
 - [Server-to-server requests](docs/server-to-server.md)
