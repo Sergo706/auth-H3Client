@@ -8,7 +8,7 @@ let cfg: Configuration | undefined;
 // // @ts-check
 // main routes and middlewares// The ones that make the lib usable, the "Default"
 /**
- * @description
+ * 
  * The JWT auth library’s client configuration object.
  * Contains the core configuration to make the library usable client side.
  *  

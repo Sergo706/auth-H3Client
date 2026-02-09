@@ -19,7 +19,7 @@ interface Error  {
 }
 
 /**
- * @description
+ * 
  * Validates an image buffer against allowed file types and extensions configured in the application.
  * It also processes the image using Sharp to resize and convert it to WebP format.
  *

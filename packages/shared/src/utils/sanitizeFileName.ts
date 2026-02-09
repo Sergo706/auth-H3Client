@@ -1,6 +1,6 @@
 
 /**
- * @description
+ * 
  * Sanitizes a filename to be safe for use in the filesystem.
  * It removes paths, file extensions, accents, and special characters.
  *

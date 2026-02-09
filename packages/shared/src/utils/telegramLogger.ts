@@ -48,7 +48,7 @@
       .replace(/>/g, '&gt;');
   }
 /**
- * @description
+ * 
  * Logs a message to your configured Telegram chat.
  *
  * @param {string} title

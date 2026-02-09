@@ -11,7 +11,7 @@ interface html {
 }
 
 /**
- * @description
+ * 
  * Decode URI-encoded characters to Unicode (NFKC) and sanitize arbitrary HTML from the input string.
  *
  * @param {string} vall

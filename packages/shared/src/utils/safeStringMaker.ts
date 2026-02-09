@@ -3,7 +3,7 @@ import sanitizeInputString from "./htmlSanitizer.js";
 
 
 /**
- * @description
+ * 
  * Make a safe Zod string that will be sanitized.
  *
  * @param {Object} opt - Configuration options.
