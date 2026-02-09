@@ -2,10 +2,11 @@ import pino from "pino";
 import { Results, safeAction, type UtilsResponse } from "@internal/shared";
 import { getCookie, H3Event } from "h3";
 import { sendToServer } from "./serverToServer.js";
-
+export interface MfaResponse { mfaRequired: string; message: string };
 /**
  * Initiates a custom MFA verification flow by requesting the auth server to send
  * a verification email to the user.
+ * Requires a fully authenticated and health session to succeed, will throw "MFA_REQUIRED" if the current session is not health and start an mfa flow.
  *
  * This function validates the user's session cookies, constructs the MFA request,
  * and communicates with the authentication server. Upon success, the server sends
@@ -17,6 +18,7 @@ import { sendToServer } from "./serverToServer.js";
  *                 Examples: "password-reset", "email-change", "sensitive-action"
  * @param random - A cryptographic hash/token for request verification (254-500 chars)
  *                 This should be generated server-side and stored for later validation
+ * @param accessToken - Provide an access token. If not provided will attempts to get it from the cookie, throws "INVALID_CREDENTIALS" if missing
  *
  * @returns A promise resolving to a {@link UtilsResponse} containing:
  *   - On success: `{ ok: true, data: "Please check your email..." }`
@@ -33,11 +35,12 @@ import { sendToServer } from "./serverToServer.js";
  *
  * @throws Never throws - all errors are returned as failed responses
  */
-export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: string, random: string): Promise<UtilsResponse<string>> {
+export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: string, random: string, accessToken?: string): Promise<UtilsResponse<string>> {
     const canary = getCookie(event, "canary_id");
     const refresh = getCookie(event, 'session');
+    const token = getCookie(event, '__Secure-a') ?? accessToken;
 
-    if (!canary || !refresh) {
+    if (!canary || !refresh || !token) {
         log.error("Missing Tokens")
         return {
             ok: false,
@@ -72,7 +75,7 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
     }
     try {
         const res = await safeAction(`${canary}_${reason}`, async () => {
-            return await sendToServer(false, `/custom/mfa/${reason}?random=${encodeURIComponent(random)}`, 'POST', event, false, cookies)
+            return await sendToServer(false, `/custom/mfa/${reason}?random=${encodeURIComponent(random)}`, 'POST', event, false, cookies, undefined, token)
         })
        if (!res) {
                 log.error('Api Call Failed')
@@ -84,7 +87,7 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
                 }
        }
        log.info(`Got results, validating...`);  
-        const results = await res.json() as Results<string>
+        const results = await res.json() as Results<string> | MfaResponse
        
        if (res.status === 401 || res.status === 400) {
             log.warn({...results}, 'Missing credentials or Bad data')
@@ -93,6 +96,16 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
                 date: new Date().toISOString(),
                 reason: "Invalid email or password",
                 code: 'INVALID_CREDENTIALS',
+            }
+        }
+
+        if (res.status === 202 && "mfaRequired" in results) {
+            log.info(`Anomaly detected, standard MFA required first.`);
+            return {
+                ok: false,
+                date: new Date().toISOString(),
+                reason: results.message || "Please verify your session first. check your email.",
+                code: "MFA_REQUIRED", 
             }
         }
 
@@ -119,6 +132,16 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
 
         if (res.status === 500 || res.status !== 200) {
             log.error({...results}, `API Server Error`)
+            return {
+                ok: false,
+                date: new Date().toISOString(),
+                reason: 'Something went wrong, please try restarting the page, and try again',
+                code: 'AUTH_SERVER_ERROR'
+            }
+        }
+
+        if (!("ok" in results)) {
+            log.error({...results}, `Unexpected data or error type`)
             return {
                 ok: false,
                 date: new Date().toISOString(),

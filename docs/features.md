@@ -47,6 +47,12 @@ Secure flows for password resets involving email verification.
 - **Forgot Password**: Initiates email sending.
 - **Verify Link**: Validates the temporary link token.
 - **Reset Password**: updates the credential.
+51: 
+52: ### Email Change
+53: Secure flow for updating user email addresses.
+54: - **Initiation**: Sends verification code to current email.
+55: - **Verification**: Uses magic link or code entry.
+56: - **Update**: Verifies password and rotates tokens upon success.
 
 ---
 

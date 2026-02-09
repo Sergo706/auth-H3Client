@@ -4,19 +4,20 @@ import { assertMethod, defineEventHandler, EventHandler, EventHandlerRequest, ge
 import throwError  from "../middleware/error.js";
 import { VerificationLinkSchema, verificationLink } from "@internal/shared";
 import { validateZodSchema } from "@internal/shared";
-import { defineVerifiedCsrfHandler } from "./csrfVerifier.js";
 
 /**
  * Creates an H3 event handler that verifies magic link parameters before executing
  * the provided handler. This is a higher-order function that wraps your handler
- * with CSRF protection and magic link validation.
+ * with magic link validation.
+ *
+ * **Note:** This handler does NOT verify CSRF tokens; it is intended for GET requests 
+ * that verify a link signature and potentially seed a new CSRF token.
  *
  * The wrapper performs the following validations:
  * 1. Verifies the request method is GET
- * 2. Validates CSRF token via {@link defineVerifiedCsrfHandler}
- * 3. Checks for required session cookies (`canary_id`, `session`)
- * 4. Validates query parameters against {@link VerificationLinkSchema}
- * 5. Verifies the magic link with the authentication server
+ * 2. Checks for required session cookies (`canary_id`, `session`)
+ * 3. Validates query parameters against {@link VerificationLinkSchema}
+ * 4. Verifies the magic link with the authentication server
  *
  * Upon successful verification, the handler receives an event with:
  * - `event.context.link` - The verified action link
@@ -48,8 +49,7 @@ export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest,
 ): EventHandler<T, Promise<D>> => {
   const log = getLogger().child({ service: 'auth-client', branch: 'custom-mfa', type: 'link-verifier' });
 
-  return defineVerifiedCsrfHandler(
-    defineEventHandler(async (event) => {
+  return defineEventHandler(async (event) => {
         assertMethod(event, "GET")
         log.info('Verifying link...')
         const query = getQuery<VerificationLinkSchema>(event)
@@ -93,6 +93,5 @@ export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest,
 
         log.info( {...results},`link verification failed: invalid link`)
         throwError(log,event, "TEMPERING", res.status, "Server Error", "Server error please try again later", 'Failed magic link verification')
-    }) 
-  ) as EventHandler<T, Promise<D>>;
+    })  as EventHandler<T, Promise<D>>;
 };

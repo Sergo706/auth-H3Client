@@ -5,6 +5,9 @@ import  checkCsrf  from "../middleware/verifyCsrf.js";
 import  { contentType }  from "../middleware/validateContentType.js";
 import  initPasswordReset  from "../controllers/restartPasswordController.js";
 import  sendNewPassword  from "../controllers/sendNewPassword.js";
+import  initChangeEmailFlow  from "../controllers/initChangeEmailFlow.js";
+import  changeEmailGetAPI  from "../controllers/changeEmailApi.js";
+import  updateNewEmail  from "../controllers/sendNewEmailUpdate.js";
 import { defineHandler, H3 } from "h3";
 import { limitBytes } from "../middleware/limitBytes.js";
 
@@ -57,6 +60,13 @@ export function magicLinksRouter(router: H3, prefix?: string) {
         {middleware: [verifyLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
     )
 
+    router.post(p('/auth/change-email'), initChangeEmailFlow);
+
+    router.get(p('/auth/update-email/:visitor'), changeEmailGetAPI, 
+        { middleware: [noStore, csrfToken] }
+    );
+
+    router.post(p('/auth/update-email/:visitor'), updateNewEmail);
 }
 
 

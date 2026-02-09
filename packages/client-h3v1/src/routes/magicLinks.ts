@@ -5,6 +5,9 @@ import  checkCsrf  from "../middleware/verifyCsrf.js";
 import  { contentType }  from "../middleware/validateContentType.js";
 import  initPasswordReset  from "../controllers/restartPasswordController.js";
 import  sendNewPassword  from "../controllers/sendNewPassword.js";
+import  initChangeEmailFlow  from "../controllers/initChangeEmailFlow.js";
+import  changeEmailGetAPI  from "../controllers/changeEmailApi.js";
+import  updateNewEmail  from "../controllers/sendNewEmailUpdate.js";
 import { defineEventHandler, isMethod, Router, setHeader } from "h3";
 import { limitBytes } from "../middleware/limitBytes.js";
 
@@ -76,6 +79,16 @@ const resetPostPipeline = defineEventHandler(async (event) => {
   });
   router.post(p('/auth/reset-password/:visitor'), resetPostPipeline);
 
+  router.post(p('/auth/change-email'), initChangeEmailFlow);
+  
+  const emailChangeGetPipeline = defineEventHandler(async (event) => {
+      await noStore(event);
+      await csrfToken(event); 
+      return changeEmailGetAPI(event);
+  });
+  router.get(p('/auth/update-email/:visitor'), emailChangeGetPipeline);
+
+  router.post(p('/auth/update-email/:visitor'), updateNewEmail);
 }
 
 
