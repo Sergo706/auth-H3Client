@@ -81,5 +81,8 @@ export const serverImports = [
   { name: 'askForMfaFlow', from: 'auth-h3client/v1' },
   { name: 'defineVerifiedMagicLinkGetHandler', from: 'auth-h3client/v1' },
   { name: 'defineMfaCodeVerifierHandler', from: 'auth-h3client/v1' },
+  { name: 'initEmailChangeFlow', from: 'auth-h3client/v1' },
+  { name: 'changeEmailGetAPI', from: 'auth-h3client/v1' },
+  { name: 'updateNewEmail', from: 'auth-h3client/v1' },
   { name: 'validateZodSchema', from: 'auth-h3client/v1' }
 ] as const;

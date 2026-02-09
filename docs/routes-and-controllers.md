@@ -34,6 +34,9 @@ The library uses three registrars to map endpoints to their respective controlle
     -   `POST /auth/password-reset` to `initPasswordReset`
     -   `GET /auth/reset-password/:visitor` to `verifyTempLink`
     -   `POST /auth/reset-password/:visitor` to `sendNewPassword`
+    -   `POST /auth/change-email` to `initChangeEmailFlow`
+    -   `GET /auth/update-email/:visitor` to `changeEmailGetAPI`
+    -   `POST /auth/update-email/:visitor` to `updateNewEmail`
 
 3.  **`useOAuthRoutes`** (Social Login)
     -   `GET /oauth/:provider` to `OAuthRedirect`
@@ -138,6 +141,9 @@ useOAuthRoutes(router);
 | POST | `/auth/password-reset` | `checkCsrf`, `contentType`, `limitBytes` | `initPasswordReset` |
 | GET | `/auth/reset-password/:visitor` | `noStore`, `csrfToken` | `verifyTempLink` |
 | POST | `/auth/reset-password/:visitor` | `verifyLink`, `checkCsrf`, `contentType`, `limitBytes` | `sendNewPassword` |
+| POST | `/auth/change-email` | `checkCsrf` | `initChangeEmailFlow` |
+| GET | `/auth/update-email/:visitor` | `noStore`, `csrfToken` | `changeEmailGetAPI` |
+| POST | `/auth/update-email/:visitor` | `checkCsrf` | `updateNewEmail` |
 
 **Query parameters for verification:**
 
@@ -329,6 +335,64 @@ For JSON requests:
 ```
 
 For HTML requests: HTTP 303 redirect.
+
+---
+
+### `initChangeEmailFlow`
+
+Initiates the email change process by sending a verification code to the current email.
+
+**Request:**
+```typescript
+POST /auth/change-email
+Content-Type: application/json
+
+{
+    "email": "new-email@example.com"
+}
+```
+
+**Response (200):**
+```typescript
+{
+    "ok": true,
+    "data": "Please verify its you. check your email address."
+}
+```
+
+---
+
+### `changeEmailGetAPI`
+
+Verifies the email change magic link when clicked.
+
+**Query parameters:** `visitor`, `temp`, `random`, `reason`
+
+**Response (200):**
+```typescript
+{
+    "ok": true,
+    "data": "change_email"
+}
+```
+
+---
+
+### `updateNewEmail`
+
+Finalizes the email change by verifying the code and password.
+
+**Request:**
+```typescript
+POST /auth/update-email/123?temp=...
+Content-Type: application/json
+
+{
+    "code": "1234567",
+    "password": "current-password",
+    "newEmail": "new@example.com"
+}
+```
 
 ---
 
