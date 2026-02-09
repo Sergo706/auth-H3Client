@@ -23,7 +23,7 @@ export { OAuthTokensValidations } from "./middleware/OAuthCallBack.js";
 export { ensureValidCredentials } from "./middleware/rotateTokens.js";
 export { default as hmacSignatureMiddleware } from "./middleware/signatureMiddleware.js";
 export { contentType } from "./middleware/validateContentType.js";
-export { default as verifyCsrfCookie } from "./middleware/verifyCsrf.js";
+export { verifyCsrfCookie } from "./middleware/verifyCsrf.js";
 export { validator as botDetectorMiddleware } from "./middleware/visitorValid.js";
 export { useAuthRoutes } from "./routes/auth.js";
 export { magicLinksRouter } from "./routes/magicLinks.js";

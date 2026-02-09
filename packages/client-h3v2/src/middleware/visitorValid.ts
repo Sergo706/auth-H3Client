@@ -1,13 +1,9 @@
 import crypto from "crypto";
 import { createSignedCookie, safeAction } from "@internal/shared"
 import { verifySignedCookie } from "@internal/shared"
-import { makeCookie } from "../utils/cookieGenerator.js";
-import { banIp } from "@internal/shared";
 import { getLogger} from "@internal/shared";
-import { getCookie, getRequestIP, getRequestURL, H3Event, HTTPError, parseCookies } from "h3";
-import { sendToServer } from "../utils/serverToServer.js";
-import throwError from "./error.js";
-import { getConfiguration } from "../main.js";
+import { getCookie, getRequestURL, H3Event, HTTPError, parseCookies } from "h3";
+import { getConfiguration } from "@internal/shared";
 import { checkForBots } from "../utils/checkForBots.js";
 
 /**

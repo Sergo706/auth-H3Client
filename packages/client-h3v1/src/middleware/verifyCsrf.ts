@@ -13,7 +13,7 @@ import { getLogger } from "@internal/shared";
  * @example
  * router.post('/dangerous', handler, { middleware: [verifyCsrf] });
  */
-export default defineEventHandler( async (event) => {
+export const verifyCsrfCookie = defineEventHandler( async (event) => {
 
     const log = getLogger().child({service: `csrf`, branch: `general`})
     const name = '__Host-csrf';

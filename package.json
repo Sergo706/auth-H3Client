@@ -103,26 +103,26 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.17.0 || ^4.0.0",
-    "file-type": "^21.3.0",
-    "he": "^1.2.0",
-    "jose": "^6.1.0",
-    "pino": "^9.11.0",
-    "sanitize-html": "^2.17.0",
-    "sharp": "^0.34.5",
-    "telegraf": "^4.16.3",
-    "ts-node": "^10.9.2",
-    "undici": "^7.16.0",
-    "zod": "^4.1.11"
+    "file-type": "21.3.0",
+    "he": "1.2.0",
+    "jose": "6.1.0",
+    "pino": "9.11.0",
+    "sanitize-html": "2.17.0",
+    "sharp": "0.34.5",
+    "telegraf": "4.16.3",
+    "ts-node": "10.9.2",
+    "undici": "7.16.0",
+    "zod": "4.1.11"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
-    "dotenv": "^17.2.3",
-    "tsup": "^8.5.1",
-    "typedoc": "^0.28.16",
-    "typedoc-plugin-markdown": "^4.10.0",
-    "typedoc-vitepress-theme": "^1.1.2",
-    "typescript": "^5.6.3",
-    "unstorage": "^1.17.4",
-    "vitepress": "^1.6.4"
+    "@types/node": "24.10.1",
+    "dotenv": "17.2.3",
+    "tsup": "8.5.1",
+    "typedoc": "0.28.16",
+    "typedoc-plugin-markdown": "4.10.0",
+    "typedoc-vitepress-theme": "1.1.2",
+    "typescript": "5.6.3",
+    "unstorage": "1.17.4",
+    "vitepress": "1.6.4"
   }
 }

@@ -17,7 +17,7 @@ import {
   getResponseStatusText,
 } from 'h3';
 import { getSafeUrl } from '../utils/getSafeUrl.js';
-import { getConfiguration } from '../main.js';
+import { getConfiguration } from "@internal/shared";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

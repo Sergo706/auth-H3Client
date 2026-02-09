@@ -1,5 +1,6 @@
 import { defineAuthenticatedEventHandler } from "./defineAuthRoute.js";
-import { getLogger, throwHttpError } from "../main.js";
+import throwHttpError from "../middleware/error.js";
+import { getLogger } from "@internal/shared";
 
 /**
  * Authenticated status endpoint handler.

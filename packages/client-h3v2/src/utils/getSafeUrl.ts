@@ -1,6 +1,6 @@
 import { getRequestURL, H3Event } from "h3";
 import { getBaseUrl } from "@internal/shared";
-import { getConfiguration } from "../main.js";
+import { getConfiguration } from "@internal/shared";
 
 export function getSafeUrl(event: H3Event) {
     try {

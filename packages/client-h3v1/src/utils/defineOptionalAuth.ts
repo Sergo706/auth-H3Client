@@ -1,4 +1,7 @@
-import { ensureValidCredentials,hmacSignatureMiddleware, throwHttpError, getLogger } from '../main.js';
+import { ensureValidCredentials } from "../middleware/rotateTokens.js";
+import hmacSignatureMiddleware from "../middleware/signatureMiddleware.js";
+import throwHttpError from "../middleware/error.js";
+import { getLogger } from "@internal/shared";
 import { getCachedUserData } from './getCachedUserData.js';
 import { appendHeader, getCookie, H3Error, type EventHandler, type EventHandlerRequest } from 'h3';
 import { defineEventHandler } from 'h3';

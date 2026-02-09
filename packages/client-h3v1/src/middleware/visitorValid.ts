@@ -3,7 +3,7 @@ import { createSignedCookie, safeAction } from "@internal/shared";
 import { verifySignedCookie } from "@internal/shared";
 import { getLogger} from "@internal/shared";
 import { getCookie, getRequestURL, H3Event, createError, parseCookies } from "h3";
-import { getConfiguration } from "../main.js";
+import { getConfiguration } from "@internal/shared";
 import { checkForBots } from "../utils/checkForBots.js";
 
 /**

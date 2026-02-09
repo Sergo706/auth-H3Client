@@ -1,5 +1,10 @@
 import { getLogger, type UtilsResponse, validateZodSchema, dataSchema, type UpdateEmailSchemaType, safeAction, parseResponseContentType, VerificationLinkSchema, verificationLink, RotationResult } from '@internal/shared'
-import { throwHttpError, limitBytes, getOperationalConfig, applyRotationResult, MfaResponse, defineVerifiedCsrfHandler } from '../main.js'
+import throwHttpError from '../middleware/error.js';
+import { limitBytes } from '../middleware/limitBytes.js';
+import { getOperationalConfig } from '../utils/getRemoteConfig.js';
+import { applyRotationResult } from '../utils/applyRotationResults.js';
+import { MfaResponse } from '../utils/defineAuthRoute.js';
+import { defineVerifiedCsrfHandler } from '../utils/csrfVerifier.js';
 import { sendToServer } from '../utils/serverToServer.js'
 import { assertMethod, getCookie, getHeader, getQuery } from 'h3'
 
