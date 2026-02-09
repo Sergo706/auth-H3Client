@@ -1,5 +1,5 @@
 import { defineEventHandler, type EventHandler, type EventHandlerRequest } from 'h3';
-import verifyCsrfCookie from '../middleware/verifyCsrf.js';
+import { verifyCsrfCookie } from '../middleware/verifyCsrf.js';
 
 /**
  * Wraps an H3 event handler with CSRF token verification.

@@ -1,6 +1,7 @@
 import type { ServerResponse } from "@internal/shared";
 import type {  H3Event } from 'h3';
-import { serviceToService, getLogger, parseResponseContentType } from '../main.js';
+import { sendToServer as serviceToService} from "./serverToServer.js";
+import { getLogger, parseResponseContentType } from "@internal/shared";
 import { createHash } from 'node:crypto';
 import type { Storage } from 'unstorage';
 import type { CachedAuthResponse, CacheOptions } from "@internal/shared";

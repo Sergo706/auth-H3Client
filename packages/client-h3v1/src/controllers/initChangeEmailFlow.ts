@@ -1,5 +1,8 @@
 import { initSchema, getLogger, type InitSchemaType, type UtilsResponse, validateZodSchema } from '@internal/shared'
-import { askForMfaFlow, defineVerifiedCsrfHandler, limitBytes, throwHttpError } from '../main.js'
+import { askForMfaFlow } from '../utils/askForMfaCode.js';
+import { defineVerifiedCsrfHandler } from '../utils/csrfVerifier.js';
+import { limitBytes } from '../middleware/limitBytes.js';
+import throwHttpError from '../middleware/error.js';
 import { assertMethod, getHeader } from 'h3'
 import crypto from 'node:crypto'
 

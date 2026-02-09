@@ -1,5 +1,6 @@
 import { getLogger, type UtilsResponse } from '@internal/shared'
-import { defineVerifiedMagicLinkGetHandler, throwHttpError } from '../main.js'
+import { defineVerifiedMagicLinkGetHandler } from '../utils/verifyCustomMfaFlowGET.js';
+import throwHttpError from '../middleware/error.js';
 import { assertMethod } from 'h3'
 
 

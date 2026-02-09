@@ -2,7 +2,9 @@ import { sendToServer } from "./serverToServer.js";
 import { assertMethod, defineEventHandler, EventHandler, EventHandlerRequest, getCookie, getQuery } from "h3";
 import throwError  from "../middleware/error.js";
 import { defineVerifiedCsrfHandler } from "./csrfVerifier.js";
-import { limitBytes, applyRotationResult, getOperationalConfig } from "../main.js";
+import { limitBytes } from "../middleware/limitBytes.js";
+import { applyRotationResult } from "./applyRotationResults.js";
+import { getOperationalConfig } from "./getRemoteConfig.js";
 import { type Code, type RotationResult, type VerificationLinkSchema, code, validateZodSchema, verificationLink, getLogger, safeAction } from "@internal/shared";
 import { parseResponseContentType } from "@internal/shared";
 

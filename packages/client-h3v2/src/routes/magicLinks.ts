@@ -1,7 +1,7 @@
 import  verifyLink  from "../controllers/verifyTempLink.js";
 import  sendCode  from "../controllers/sendMfaCode.js";
 import csrfToken from "../middleware/csrf.js"
-import  checkCsrf  from "../middleware/verifyCsrf.js";
+import { verifyCsrfCookie as checkCsrf } from "../middleware/verifyCsrf.js";
 import  { contentType }  from "../middleware/validateContentType.js";
 import  initPasswordReset  from "../controllers/restartPasswordController.js";
 import  sendNewPassword  from "../controllers/sendNewPassword.js";

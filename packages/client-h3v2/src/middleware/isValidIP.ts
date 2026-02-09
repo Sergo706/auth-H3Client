@@ -1,7 +1,7 @@
 import { defineHandler, getRequestIP } from 'h3'
 import { isIP } from 'node:net';
 import throwError from './error.js';
-import { getLogger } from '../main.js';
+import { getLogger } from "@internal/shared";
 
 /**
  * Rejects requests lacking a valid client IP by throwing a 403 HTTPError.
