@@ -54,10 +54,9 @@ import { parseResponseContentType } from "@internal/shared";
 export const defineMfaCodeVerifierHandler = <T extends EventHandlerRequest, D>(
   handler: EventHandler<T, D>
 ): EventHandler<T, Promise<D>> => { 
-   const log = getLogger().child({ service: 'auth-client', branch: 'custom-mfa', type: 'code-verifier' });
-
       return defineVerifiedCsrfHandler(
         defineHandler(async (event) => { 
+            const log = getLogger().child({ service: 'auth-client', branch: 'custom-mfa', type: 'code-verifier' });
             assertMethod(event, "POST")
             log.info('Verifying link...')
 
