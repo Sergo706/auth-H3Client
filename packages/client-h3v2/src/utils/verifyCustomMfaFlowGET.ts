@@ -47,9 +47,8 @@ import { validateZodSchema } from "@internal/shared";
 export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest, D>(
   handler: EventHandler<T, D>
 ): EventHandler<T, Promise<D>> => {
-  const log = getLogger().child({ service: 'auth-client', branch: 'custom-mfa', type: 'link-verifier' });
-
   return defineHandler(async (event) => {
+        const log = getLogger().child({ service: 'auth-client', branch: 'custom-mfa', type: 'link-verifier' });
         assertMethod(event, "GET")
         log.info('Verifying link...')
         const query = getQuery<VerificationLinkSchema>(event)
