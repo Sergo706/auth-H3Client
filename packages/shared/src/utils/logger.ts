@@ -41,7 +41,7 @@ const transport = pino.transport({
 let logger: pino.Logger;  
 
 /**
- * @description
+ * 
  * Get the logger of the client and log custom events you need.  
  * 3 files will be created under node_modules/@riavzon/auth-H3Client, in a structured json lines.
  * 

@@ -6,7 +6,7 @@ type MergeMode = "drop" | "throw";
  * @param src The object to merge properties from.
  * @param opts Options to control the merge behavior.
  * @param reservedKeys A set of keys to protect from being overwritten in the `target`.
- * @description Reserved keys in `target` are never overwritten. They can only be
+ *  Reserved keys in `target` are never overwritten. They can only be
  * set if they are initially null or undefined in the `target`.
  */
 export function safeObjectMerge(

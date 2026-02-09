@@ -9,7 +9,7 @@ export { default as sendMfaCodeHandler } from "./controllers/sendMfaCode.js";
 export { default as sendNewPasswordHandler } from "./controllers/sendNewPassword.js";
 export { default as verifyTempLinkHandler } from "./controllers/verifyTempLink.js";
 export { default as generateCsrfCookie } from "./middleware/csrf.js";
-export { default as initEmailChangeFlow } from "./controllers/changeEmailApi.js";
+export { default as initEmailChangeFlow } from "./controllers/initChangeEmailFlow.js";
 export { default as changeEmailGetAPI } from "./controllers/changeEmailApi.js";
 export { default as updateNewEmail } from "./controllers/sendNewEmailUpdate.js";
 export { default as throwHttpError } from "./middleware/error.js";

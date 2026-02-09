@@ -2,7 +2,7 @@ import { type EventHandler, type EventHandlerRequest, defineEventHandler, getCoo
 import { safeAction } from '@internal/shared';
 
 /**
- * @description A wrapper that serializes concurrent requests for the same user.
+ *  A wrapper that serializes concurrent requests for the same user.
  * 
  * Prevents race conditions by ensuring multiple requests from the same user run sequentially
  * rather than in parallel. Useful for critical actions like payments, inventory updates, or

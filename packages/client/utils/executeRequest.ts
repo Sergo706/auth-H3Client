@@ -21,7 +21,7 @@ export interface ApiContext {
  * @param customOptions Additional options to pass to `$fetch`.
  * @returns {Promise<Results<T>>} A promise resolving to a standardized `Results` object.
  * 
- * @description
+ * 
  * - **Client Side**: Auto-injects `X-CSRF-Token` if available.
  * - **Server Side**: Auto-proxies headers from the incoming request (including cookies/auth tokens).
  * - **Cookie Propagation**: Captures `Set-Cookie` headers from the API response and
