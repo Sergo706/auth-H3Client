@@ -1,13 +1,13 @@
-services:
+ services:
   mysql-test:
     image: mysql:8.0
     restart: unless-stopped
     command: --local-infile=1
     environment:
-      MYSQL_ROOT_PASSWORD: ${TEST_DB_PASSWORD}
-      MYSQL_DATABASE: ${TEST_DB_NAME}
-      MYSQL_USER: ${TEST_DB_USER}
-      MYSQL_PASSWORD: ${TEST_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: very_secure_password_for_tests
+      MYSQL_DATABASE: my_auth_tests_db
+      MYSQL_USER: sergio
+      MYSQL_PASSWORD: very_secure_password_for_tests
     ports:
       - "3308:3306" 
     healthcheck:
@@ -16,64 +16,56 @@ services:
       timeout: 8s 
       retries: 5
       start_period: 7m
-    volumes:
-      - sql_db_test:/var/lib/mysql
-      - ./secrets/mysql:/etc/mysql/conf.d:ro 
     tmpfs:
-      - /tmp/secrets-dec:rw,noexec,nosuid,nodev,size=2m,uid=999,gid=999,mode=0700 
+      - /var/lib/mysql:rw,noexec,nosuid,nodev,size=512m 
     networks:
-      backend:
-        ipv4_address: 172.20.5.3
-      egress: 
-        ipv4_address: 172.22.20.2
+      test_backend_h3client:
+        ipv4_address: 172.28.5.3  
+      test_h3client_egress: 
+        ipv4_address: 172.29.20.2 
         
   auth-test:
     image: jwtauth-service:latest
     pull_policy: never
-    read_only: true
+    entrypoint: ["node", "dist/service.js"]
+    read_only: false
+    environment:
+      CONFIG_PATH: /app/configs/auth-config.json
+      SKIP_CONFIG_UNLINK: "true"
     restart: unless-stopped
     cap_drop: ["ALL"]
-    user: 10001:10001
+    user: 0:0
     volumes: 
       - ./auth-logs/server:/app/logs:rw
       - ./auth-logs/server/bot-detector:/app/node_modules/@riavzon/botdetector/logs:rw
-    tmpfs:
-      - /run/app:rw,noexec,nosuid,nodev,uid=10001,gid=10001,size=1m
+      - ./test/setup/configs/:/app/configs/:rw
     pids_limit: 200
     depends_on:
       mysql-test:
         condition: service_healthy
     ports:
       - "10002:10000"
-    secrets:
-      - age_key
     security_opt: 
       - "no-new-privileges:true"
     networks:
-      backend:
-        ipv4_address: 172.20.5.2 
-      egress: 
-        ipv4_address: 172.22.20.2
+      test_backend_h3client:
+        ipv4_address: 172.28.5.4  
+      test_h3client_egress: 
+        ipv4_address: 172.29.20.3 
 
-volumes:
-  sql_db_test:  
-
-networks: 
-  backend: 
+ networks: 
+  test_backend_h3client: 
     internal: true
     enable_ipv6: false
     ipam:
       config:
-        - subnet: 172.20.0.0/16
-          ip_range: 172.20.5.0/24
-          gateway: 172.20.5.1
-  egress:
+        - subnet: 172.28.0.0/16
+          ip_range: 172.28.5.0/24
+          gateway: 172.28.5.1
+  test_h3client_egress:
     internal: false
     enable_ipv6: false
     ipam:
       config:
-        - subnet: 172.22.20.0/24
-          gateway: 172.22.20.1
-secrets:
-  age_key:
-    file: ./age_key
+        - subnet: 172.29.20.0/24
+          gateway: 172.29.20.1
