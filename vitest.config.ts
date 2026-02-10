@@ -29,6 +29,7 @@ export default defineConfig(async () => ({
           include: ['test/integration/**/*.{test,spec}.ts'],
           environment: 'node',
           setupFiles: ['test/setup.ts'],
+          globalSetup: ['./test/globalSetup.ts'],
           hookTimeout: 60000 * 25,
           fileParallelism: false,
           maxConcurrency: 2,

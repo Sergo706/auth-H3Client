@@ -48,15 +48,15 @@ export async function createTestUser(email: string = 'test@example.com'): Promis
   
 }
 
-export async function cleanupTestDatabase(): Promise<void> {
+export async function cleanupTestDatabase(email: string, canary: string): Promise<void> {
     const connection = await mysql2.createConnection(DB_CONFIG);
   
   try {
-    await connection.execute('DELETE FROM refresh_tokens WHERE user_id IN (SELECT id FROM users WHERE email LIKE "%test%")');
-    await connection.execute('DELETE FROM mfa_codes WHERE user_id IN (SELECT id FROM users WHERE email LIKE "%test%")');
-    await connection.execute('DELETE FROM users WHERE email LIKE "%test%"');
-    await connection.execute('DELETE FROM visitors WHERE canary_id LIKE "test-canary-%"');
+    await connection.execute(`DELETE FROM refresh_tokens WHERE user_id IN (SELECT id FROM users WHERE email LIKE "%${email}%")`);
+    await connection.execute(`DELETE FROM mfa_codes WHERE user_id IN (SELECT id FROM users WHERE email LIKE "%${email}%")`);
+    await connection.execute(`DELETE FROM users WHERE email LIKE "%${email}%"`);
+    await connection.execute(`DELETE FROM visitors WHERE canary_id LIKE "${canary}"`);
   } catch (error) {
     console.warn('Cleanup warning:', error);
-  } 
+  }
 }
