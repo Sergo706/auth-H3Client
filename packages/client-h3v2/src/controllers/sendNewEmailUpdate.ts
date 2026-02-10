@@ -53,17 +53,6 @@ export default defineVerifiedCsrfHandler(async (event): Promise<UtilsResponse<st
         throwHttpError(log,event,'FORBIDDEN',401, "UnAuthorized", "Un Authorized",`Missing credentials`);
     }
 
-    const user = event.context.authorizedData;
-    if (!user) {
-        throwHttpError(log,event,'AUTH_REQUIRED',401,'UnAuthorized', 'Un Authorized action',`Un Authorized action detected.`);
-    }
-    
-    const id = user.userId;
-    if (!id || isNaN(Number(id))) {
-        throwHttpError(log,event,'AUTH_CLIENT_ERROR',400,'Bad request', '',`Failed to get userId.
-        `);
-    }
-
     const queryValidation = validateZodSchema(verificationLink, query, log);
 
     if ('valid' in queryValidation) {
