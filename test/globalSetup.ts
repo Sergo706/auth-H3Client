@@ -1,26 +1,11 @@
-import { configuration, getLogger } from 'auth-h3client/v2';
-import child from 'node:child_process'
+import { configuration } from 'auth-h3client/v2';
 import { config } from './setup/configs/config.js';
 import { DB_CONFIG } from './setup/dbHooks.js';
 import mysql2 from 'mysql2/promise';
-import util from 'node:util';
 import { createTablesForTesting } from './setup/setupTestDB.js';
 import { serviceToService } from "auth-h3client/v2";
 import { createMockEvent } from "./setup/utils/cookieJar.js";
-
-const exec = util.promisify(child.exec);
-
-const run = async (command: string) => {
-    try {
-        const { stdout, stderr } = await exec(command);
-        console.log('stdout:', stdout);
-        if (stderr) console.error('stderr:', stderr);
-    } catch (error) {
-        console.error(`exec error: ${error}`);
-        throw error;
-    }
-}
-
+import { run } from './setup/utils/run.js'
 
 async function waitForDatabase() {
   const maxRetries = 30;
