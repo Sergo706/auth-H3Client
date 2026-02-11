@@ -28,8 +28,8 @@ export const config: Configuration = {
     },
     imageUploader: {
       allowedBytes: 5_000_000,
-      allowedMimes: ['image/png', 'image/jpeg', 'image/webp'],
-      allowedExtensions: ['png', 'webp', 'jpeg', 'jpg']
+      allowedMimes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif'],
+      allowedExtensions: ['png', 'webp', 'jpeg', 'jpg', 'gif']
     },
     uStorage: {
         storage: storage,

@@ -1,3 +1,14 @@
+import sanitizeInputString from "./htmlSanitizer.js";
+import { makeSafeString } from "./safeStringMaker.js";
+
+/**
+ * Zod schema for validating and sanitizing filenames.
+ */
+export const fileNameSchema = makeSafeString({
+  min: 1,
+  max: 50,
+  pattern: /^[a-zA-Z0-9._-]+$/
+});
 
 /**
  * 
@@ -14,7 +25,8 @@
  * sanitizeBaseName('Café', 10) // 'cafe'
  */
 export function sanitizeBaseName(input: string, max: number): string {
-  const noPath = input.replace(/[/\\]/g, '');
+  const { vall } = sanitizeInputString(input);
+  const noPath = vall.replace(/[/\\]/g, '');
   const dot = noPath.lastIndexOf('.');
   const base = dot > -1 ? noPath.slice(0, dot) : noPath;
 

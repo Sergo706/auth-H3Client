@@ -1,9 +1,8 @@
-import { beforeAll, afterAll, afterEach, beforeEach, TestContext } from 'vitest'
+import { beforeAll, afterAll, beforeEach, TestContext } from 'vitest'
 import { configuration, getLogger } from 'auth-h3client/v2';
-import { config } from './setup/configs/config.js';
-import { cleanupTestDatabase, DB_CONFIG } from './setup/dbHooks.js';
-import { createUser, TestUser } from './setup/utils/createTestUsers.js';
-import mysql2 from 'mysql2/promise';
+import { config } from '../setup/configs/config.js';
+import { cleanupTestDatabase } from '../setup/dbHooks.js';
+import { createUser, TestUser } from '../setup/utils/createTestUsers.js';
 
 let testUser: TestUser;
 let anotherUser: TestUser;
@@ -38,9 +37,4 @@ afterAll(async () => {
 beforeEach(async (context: CustomTestContext) => {
   context.testUser = testUser;
   context.anotherUser = anotherUser;
-});
-
-afterEach(async () => {
-  const connection = await mysql2.createConnection(DB_CONFIG);
-  await connection.execute('DELETE FROM refresh_tokens WHERE 1=1');
 });
