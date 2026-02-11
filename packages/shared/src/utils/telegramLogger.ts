@@ -1,5 +1,6 @@
   import { Telegraf } from 'telegraf';
   import { getConfiguration } from '../config/config.js';
+  import { getLogger } from './logger.js';
 
 
   type TgCtx = {
@@ -31,7 +32,7 @@
   tg = {
     bot,
     allowed: Number(telegram.allowedUser),
-    logChatId: Number(telegram.chatId)
+    logChatId: Number(LOG_CHAT_ID)
   };
   return tg;
 
@@ -74,16 +75,15 @@
     if (!telegram.enableTelegramLogger) return;
 
     try { 
-    const header    = '<b>New Event Occurred</b>';
+    const header = '<b>New Event Occurred</b>';
     const boldTitle = `<b>${escapeHtml(title)}</b>`;
-    const body      = `<pre>${escapeHtml(message)}</pre>`;
+    const body = `<pre>${escapeHtml(message)}</pre>`;
   
     const text = [header, boldTitle, '', body].join('\n');
   
     return bot.telegram
       .sendMessage(logChatId, text, { parse_mode: 'HTML' })
-    }catch(err) {
-      console.log('Telegram Logger Error:', err)
+    } catch(err) {
+      throw err
     };
-      
   }
