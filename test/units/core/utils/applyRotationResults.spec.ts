@@ -1,6 +1,6 @@
 import { applyRotationResult } from 'auth-h3client/v2';
 import {it,describe, expect } from 'vitest'
-import { createMockEvent } from '../../setup/utils/cookieJar.js';
+import { createMockEvent } from '../../../setup/utils/cookieJar.js';
 
 
 describe('applyRotationResult', () => {

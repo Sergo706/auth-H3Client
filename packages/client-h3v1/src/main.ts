@@ -67,3 +67,4 @@ export { askForMfaFlow } from "./utils/askForMfaCode.js"
 export { defineVerifiedMagicLinkGetHandler } from "./utils/verifyCustomMfaFlowGET.js"
 export { defineMfaCodeVerifierHandler } from "./utils/verifyMfaCodeHandler.js"
 export { type UtilsResponse, type AppCode, validateZodSchema, type VerificationLinkSchema, type Results } from "@internal/shared";
+export { getSafeUrl} from "./utils/getSafeUrl.js";

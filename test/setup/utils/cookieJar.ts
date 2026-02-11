@@ -59,11 +59,21 @@ export function createMockEvent(options: MockEventOptions = {}): H3Event {
     'Sec-Fetch-Dest': 'document',
   };
 
+  const normalizedDefaultHeaders: Record<string, string> = {};
+  for (const [key, value] of Object.entries(defaultHeaders)) {
+    normalizedDefaultHeaders[key.toLowerCase()] = value;
+  }
+
+  const normalizedOptionsHeaders: Record<string, string> = {};
+  for (const [key, value] of Object.entries(headers)) {
+    normalizedOptionsHeaders[key.toLowerCase()] = value;
+  }
+
   return mockEvent(url, {
     method,
     headers: {
-      ...defaultHeaders,
-      ...headers
+      ...normalizedDefaultHeaders,
+      ...normalizedOptionsHeaders
     }
   });
 }
