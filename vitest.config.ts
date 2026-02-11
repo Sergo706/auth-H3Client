@@ -8,7 +8,7 @@ export default defineConfig(async () => ({
       enabled: true,
       reporter: ['html'],
       cleanOnRerun: true,
-      include: ['packages/client-h3v2/src/**', 'packages/client-h3v1/src/**', 'packages/client/composables/**', 'packages/client/server/**', 'packages/client/utils/**'],
+      include: ['packages/client-h3v2/src/**', 'packages/client-h3v1/src/**', 'packages/client/composables/**', 'packages/client/server/**', 'packages/client/utils/**', 'packages/shared/src/utils/**'],
     },
     projects: [
       {
