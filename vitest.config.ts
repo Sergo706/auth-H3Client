@@ -28,7 +28,7 @@ export default defineConfig(async () => ({
           name: 'integration',
           include: ['test/integration/**/*.{test,spec}.ts'],
           environment: 'node',
-          setupFiles: ['test/setup.ts'],
+          setupFiles: ['test/integration/setup.ts'],
           globalSetup: ['./test/globalSetup.ts'],
           hookTimeout: 60000 * 25,
           fileParallelism: false,
@@ -51,6 +51,7 @@ export default defineConfig(async () => ({
         test: {
           name: 'units',
           include: ['test/units/**/*.{test,spec}.ts'],
+          setupFiles: ['test/units/setup.ts'],
           environment: 'node',
         },
       },

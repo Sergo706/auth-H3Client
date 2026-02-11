@@ -14,7 +14,7 @@ import type { Response } from 'undici';
  */
 export async function parseResponseContentType(log: pino.Logger, response: Response): Promise<any> {
 
-    const contentType = response.headers.get('Content-Type') || '';
+    const contentType = (response.headers.get('Content-Type') || '').toLowerCase();
     let bodyRequest;
     try {
         if (contentType.includes('application/json')) {
