@@ -13,10 +13,6 @@ import type { TestProject } from 'vitest/node'
 let testUser: TestUser;
 let anotherUser: TestUser;
 
-interface CustomTestContext {
-  testUser: TestUser;
-  anotherUser: TestUser;
-}
 
 async function waitForDatabase() {
   const maxRetries = 30;
