@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import mysql2 from 'mysql2/promise';
 import { DB_CONFIG } from '../setup/dbHooks.js';
+import { inject } from 'vitest'
 
 describe('Environment Health Check', () => {
     
@@ -15,9 +16,10 @@ describe('Environment Health Check', () => {
         }
     });
 
-    it('should have seeded test users from global setup', async (context) => {
-        const { testUser, anotherUser } = context as any;
-
+    it('should have seeded test users from global setup', async () => {
+        const testUser = inject('testUser');
+        const anotherUser = inject('anotherUser');
+        
         expect(testUser).toBeDefined();
         expect(anotherUser).toBeDefined();
         console.log(`Verifying users: ${testUser.email}, ${anotherUser.email}`);
