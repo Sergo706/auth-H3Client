@@ -4,7 +4,7 @@ import { parseResponseContentType } from "auth-h3client/v2";
 import pino from "pino";
 import { ResponseSign } from "@internal/shared";
 import { getCanaryCookie } from "./getCanaryCookie.js";
-import { getCookie } from "h3";
+
 
 export interface TestUser {
     name: string,
