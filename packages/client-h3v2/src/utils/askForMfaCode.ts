@@ -2,7 +2,7 @@ import pino from "pino";
 import { Results, safeAction, type UtilsResponse } from "@internal/shared";
 import { getCookie, H3Event } from "h3";
 import { sendToServer } from "./serverToServer.js";
-export interface MfaResponse { mfaRequired: string; message: string };
+export interface MfaResponse { mfaRequired?: string; mfa?: boolean; message: string };
 /**
  * Initiates a custom MFA verification flow by requesting the auth server to send
  * a verification email to the user.
@@ -35,7 +35,7 @@ export interface MfaResponse { mfaRequired: string; message: string };
  *
  * @throws Never throws - all errors are returned as failed responses
  */
-export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: string, random: string, accessToken?: string): Promise<UtilsResponse<string>> {
+export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: string, random: Buffer | NonSharedBuffer, accessToken?: string): Promise<UtilsResponse<string>> {
     const canary = getCookie(event, "canary_id");
     const refresh = getCookie(event, 'session');
     const token = getCookie(event, '__Secure-a') ?? accessToken;
@@ -55,8 +55,17 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
             {label: `session`, value: refresh},
         ];
 
-    if (random.length < 254 || random.length > 500) {
-        log.error(`Hash to short or long. (Allowed min 254 to 500) Provided: ${random.length}`)
+    if (!Buffer.isBuffer(random)) {
+        log.error(`Random is not a buffer. provided: ${random}`)
+        return {
+            ok: false,
+            date: new Date().toISOString(),
+            reason: 'Random is not a buffer.',
+            code: "HASH"
+        }
+    }
+    if (random.toString('hex').length < 254 || random.toString('hex').length > 500) {
+        log.error(`Hash to short or long. (Allowed min 254 to 500) Provided: ${random.toString('hex').length}`)
         return {
             ok: false,
             date: new Date().toISOString(),
@@ -74,22 +83,34 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
         }
     }
     try {
-        const res = await safeAction(`${canary}_${reason}`, async () => {
-            return await sendToServer(false, `/custom/mfa/${reason}?random=${encodeURIComponent(random)}`, 'POST', event, false, cookies, undefined, token)
+        const resultsCache = await safeAction(`${canary}_${reason}`, async () => {
+
+             const res = await sendToServer(false, `/custom/mfa/${reason}?random=${encodeURIComponent(random.toString('hex'))}`, 'POST', event, true, cookies, {}, token)
+
+             if (!res) return null;
+             const results = await res.json() as Results<string> | MfaResponse;
+
+             return {
+                 status: res.status,
+                 retryAfter: res.headers.get('Retry-After'),
+                 results
+             }
         })
-       if (!res) {
-                log.error('Api Call Failed')
+
+        if (!resultsCache) {
+                log.error(`Api Call Failed: resultsCache is null for canary ${canary} and reason ${reason}. This usually means sendToServer failed or timed out.`)
                 return {
                     ok: false,
                     date: new Date().toISOString(),
                     reason: "Server error please try again later",
                     code: 'AUTH_SERVER_ERROR'
                 }
-       }
-       log.info(`Got results, validating...`);  
-        const results = await res.json() as Results<string> | MfaResponse
+        }
+
+        const { status, results, retryAfter } = resultsCache;
+        log.info(`Got results, validating...`);  
        
-       if (res.status === 401 || res.status === 400) {
+       if (status === 401 || status === 400) {
             log.warn({...results}, 'Missing credentials or Bad data')
             return {
                 ok: false,
@@ -99,7 +120,7 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
             }
         }
 
-        if (res.status === 202 && "mfaRequired" in results) {
+        if (status === 202 && ("mfaRequired" in results || "mfa" in results)) {
             log.info(`Anomaly detected, standard MFA required first.`);
             return {
                 ok: false,
@@ -109,7 +130,7 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
             }
         }
 
-        if (res.status === 403) {
+        if (status === 403) {
             log.warn({...results }, `User has been banned / blacklisted or bad client`)
             return {
                 ok: false,
@@ -118,19 +139,18 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
                 code: 'FORBIDDEN'
             }
         }
-        if (res.status === 429) {
+        if (status === 429) {
             log.warn(`User rate limited`);  
-            const retrySec = res.headers.get('Retry-After');
             return {
                 ok: false,
                 date: new Date().toISOString(),
                 reason: `Too many attempts, please try again later.`,
                 code: "RATE_LIMIT",
-                retryAfter: retrySec
+                retryAfter: retryAfter ?? undefined
             }
         };
 
-        if (res.status === 500 || res.status !== 200) {
+        if (status === 500 || status !== 200) {
             log.error({...results}, `API Server Error`)
             return {
                 ok: false,

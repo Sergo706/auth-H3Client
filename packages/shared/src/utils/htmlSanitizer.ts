@@ -46,10 +46,9 @@ export default function sanitizeInputString(vall: string): {vall :string, result
         log.warn({ length: vall.length }, 'Input rejected: Exceeded max length');
         throw new Error("Input too large for sanitization");
   }
-
   let clean = vall
   .normalize('NFKC') 
-  .replace(/[\uFEFF\u200B-\u200D\u202A-\u202E\uFF1C\uFF1E]/g, '')
+  .replace(/[\u0000\u00AD\uFEFF\u200B-\u200D\u202A-\u202E\uFF1C\uFF1E]/g, '')
   .replace(/[\uFF01-\uFF5E]/g, ch =>
     String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)
   );
@@ -97,6 +96,8 @@ export default function sanitizeInputString(vall: string): {vall :string, result
     if (loopCount > 1) {
         log.info(`Sanitization required ${loopCount} iterations.`);
     }
+    clean = clean.replace(/[\u0000\u00AD\uFEFF\u200B-\u200D\u202A-\u202E\uFF1C\uFF1E]/g, '')
+    clean = clean.replace(/(<[^>]+>)/g, (match) => match.replace(/[\t\n\r]/g, ''));
 
     const tagRx = /<\s*\/?\s*[A-Za-z][A-Za-z0-9-]*(?:\s+[^>]*?)?\s*>/i;
     if (
@@ -116,6 +117,7 @@ export default function sanitizeInputString(vall: string): {vall :string, result
     nestingLimit: 10,
     allowProtocolRelative: false,
     disallowedTagsMode: 'discard',
+    nonTextTags: ['script', 'style', 'noscript', 'iframe', 'svg'],
     textFilter(text) {
       if (tagRx.test(text)) results.htmlFound = true;
       return text;

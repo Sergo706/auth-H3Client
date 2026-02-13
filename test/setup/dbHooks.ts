@@ -10,7 +10,7 @@ export const DB_CONFIG = {
   multipleStatements: true,
   flags: ['+LOCAL_FILES'],
   waitForConnections: true,
-  connectionLimit: 5,
+  connectionLimit: 50,
   queueLimit: 0,
   infileStreamFactory: (path: string) => fs.createReadStream(path)
 };

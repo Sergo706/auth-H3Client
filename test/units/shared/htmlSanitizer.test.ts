@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizeInputString } from '@internal/shared';
+import { configuration, sanitizeInputString } from '@internal/shared';
+import { config } from '../../setup/configs/config.js';
 
 describe('sanitizeInputString', () => {
 
@@ -87,5 +88,201 @@ describe('sanitizeInputString', () => {
         const { results } = sanitizeInputString(input);
         expect(results.htmlFound).toBe(true);
         expect(results.tags?.tagName).toBe('lenght is !== after a clean.');
+    });
+    
+
+    it('should allow valid algebra without false positives', () => {
+        const input = 'Use the logic: if (a < b)';
+        const { vall, results } = sanitizeInputString(input);
+        
+        expect(results.htmlFound).toBe(false); 
+        expect(vall).toBe("Use the logic: if (a &amp;lt; b)");
+    });
+
+    it('should survive recursive expansion attack', () => {
+        const tempConfig = { 
+            ...config, 
+            htmlSanitizer: {
+            maxAllowedInputLength: 500000,
+            IrritationCount: 5 
+        }
+        };
+        configuration(tempConfig);
+        
+        let attack = '%'; 
+        for (let i = 0; i < 50; i++) {
+            attack = encodeURIComponent(attack);
+        }
+        
+        const start = performance.now();
+        const {vall, results } = sanitizeInputString(attack);
+        const end = performance.now();
+
+        expect(results.htmlFound).toBe(true); 
+        expect(results.tags?.tagName).toContain('Excessive Encoding');
+        expect(end - start).toBeLessThan(100);
+        expect(vall).toBe("");
+    });
+
+    it('should catch the full width script tag bypass', () => {
+        const input = '\uFF1Cscript\uFF1Ealert(1)\uFF1C/script\uFF1E';
+        const { vall, results } = sanitizeInputString(input);
+
+        expect(results.htmlFound).toBe(true);
+        expect(vall).not.toContain('script');
+        expect(vall).toBe("");
+    });
+
+    it('should handle attributes containing greater-than signs', () => {
+        const input = '<div title=">">Secret Content</div>'; 
+        const { vall } = sanitizeInputString(input);
+
+        expect(vall).toBe('Secret Content');
+        expect(vall).not.toContain('">'); 
+    });
+});
+
+
+describe('sanitizeInputString stress and nesting tests', () => {
+
+    it('should handle deep nesting', () => {
+        const depth = 500;
+        const input = '<div>'.repeat(depth) + 'Content' + '</div>'.repeat(depth);
+        
+        const start = performance.now();
+        const { vall, results } = sanitizeInputString(input);
+        const end = performance.now();
+
+        expect(vall).toBe('Content');
+        expect(results.htmlFound).toBe(true);
+        expect(end - start).toBeLessThan(30); 
+    });
+
+    it('should not block the event loop and detect nested inputs', () => {
+        const depth = 500;
+        const input = '<div>'.repeat(depth) + 
+        `<svg>
+                <foreignObject>
+                    <body xmlns="http://www.w3.org/1999/xhtml">
+                        <script>alert(1)</script>
+                    </body>
+                </foreignObject>
+            </svg>`.repeat(depth) + 
+        '</div>'.repeat(depth);
+
+        const tempConfig = { 
+            ...config, 
+            htmlSanitizer: {
+            maxAllowedInputLength: 500000,
+            IrritationCount: 500 
+        }
+        };
+        configuration(tempConfig);
+        const start = performance.now();
+        const { vall, results } = sanitizeInputString(input);
+        const end = performance.now();
+
+        expect(results.htmlFound).toBe(true);
+        expect(vall).not.toContain('<script');
+        expect(vall).toBe("");
+        expect(end - start).toBeGreaterThan(0);
+        expect(end - start).toBeLessThan(60);
+
+        const heavyInput = '%26lt%3Bscript%26gt%3Balert(1)%26lt%3B%2Fscript%26gt%3B'.repeat(1000);
+        const secondPhase = performance.now();
+        const { vall: secondPhaseValues, results: secondPhaseResults } = sanitizeInputString(heavyInput);
+        const secondEnd = performance.now();
+        expect(secondPhaseResults.htmlFound).toBe(true);
+        expect(secondPhaseValues).toBe('');
+        expect(secondEnd - secondPhase).toBeGreaterThan(0);
+        expect(secondEnd - secondPhase).toBeLessThan(30);
+});
+
+
+    it('should handle russian dolls', () => {
+        const nestedPolyglot = '%26lt%3Bscript%26gt%3Balert(1)%26lt%3B%2Fscript%26gt%3B';
+        
+        const { vall, results } = sanitizeInputString(nestedPolyglot);
+        
+        expect(results.htmlFound).toBe(true);
+        expect(vall).not.toContain('<script');
+        expect(vall).not.toContain('alert(1)');
+        expect(vall).toBe('');
+
+    });
+
+    it('should handle ghost character nesting', () => {
+        const ghosts = [
+            '<\u0000script>alert(1)</script>',
+            '<scr\u00ADipt>alert(1)</script>',
+            '<s\tcript>alert(1)</script>', 
+        ];
+
+        for (const input of ghosts) {
+            const { results, vall } = sanitizeInputString(input);
+            expect(vall).not.toContain('<script>');
+            expect(vall).toBe("");
+        }
+    });
+
+    it('should handle SVG/XML namespace nesting', () => {
+        const input = `
+            <svg>
+                <foreignObject>
+                    <body xmlns="http://www.w3.org/1999/xhtml">
+                        <script>alert(1)</script>
+                    </body>
+                </foreignObject>
+            </svg>
+        `;
+        const { vall, results } = sanitizeInputString(input);
+        
+        expect(results.htmlFound).toBe(true);
+        expect(vall).not.toContain('<script');
+        expect(vall).toBe('');
+    });
+
+    it('should handle comment obfuscation nesting', () => {
+        const input = '-->';
+        const { vall, results } = sanitizeInputString(input);
+
+        expect(vall).not.toContain('<script');
+        expect(vall).toBe('--&amp;gt;');
+    });
+
+    it('should handle unclosed tag flooding', () => {
+        const input = '<div '.repeat(100) + '><script>alert(1)</script>';
+        
+        const { vall, results } = sanitizeInputString(input);
+        
+        expect(results.htmlFound).toBe(true);
+        expect(vall).not.toContain('<script');
+        expect(vall).toBe('');
+    });
+
+    it('should handle protocol nesting in attributes', () => {
+        const inputs = [
+            '<a href="j&Tab;a&Tab;v&Tab;a&Tab;s&Tab;c&Tab;r&Tab;i&Tab;p&Tab;t&Tab;:alert(1)">Click</a>',
+            '<a href="jav&#x09;ascript:alert(1)">Click</a>',
+            '<a href="javascript:javascript:alert(1)">Click</a>'
+        ];
+
+        for (const input of inputs) {
+            const { vall } = sanitizeInputString(input);
+            expect(vall).not.toContain('javascript:');
+            expect(vall).not.toContain('alert(1)');
+            expect(vall).toBe('Click');
+        }
+    });
+
+    it('should handle unicode normalization collisions', () => {
+
+        const input = '<\u212Aeyframe onstart=alert(1)>'; 
+        const { vall, results } = sanitizeInputString(input);
+
+        expect(results.htmlFound).toBe(true);
+        expect(vall).not.toContain('<keyframe');
+        expect(vall).not.toContain('onstart');
+        expect(vall).toBe('');
     });
 });

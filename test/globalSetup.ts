@@ -65,6 +65,7 @@ export async function setup(project: TestProject) {
     configuration(config)
     
     try {
+        await run ('rm -rf auth-logs')
         await run('docker compose -f docker-compose.test.yml up -d mysql-test')
         await waitForDatabase();
         await createTablesForTesting();

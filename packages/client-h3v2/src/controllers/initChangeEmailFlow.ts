@@ -45,7 +45,7 @@ export default defineVerifiedCsrfHandler(async (event): Promise<UtilsResponse<st
         throwHttpError(log,event, 'INVALID_CREDENTIALS',400, "Invalid data", "Invalid data", `Validation failed`);
   }
 
-  const random = crypto.randomBytes(128).toString('hex');
+  const random = crypto.randomBytes(128);
 
   try {
     const res = await askForMfaFlow(event, log, 'change_email', random);

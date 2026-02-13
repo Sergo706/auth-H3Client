@@ -31,6 +31,7 @@ export default defineConfig(async () => ({
           setupFiles: ['test/integration/setup.ts'],
           globalSetup: ['./test/globalSetup.ts'],
           hookTimeout: 60000 * 25,
+          testTimeout: 15000,
           fileParallelism: false,
           watch: false,
           maxConcurrency: 2,
