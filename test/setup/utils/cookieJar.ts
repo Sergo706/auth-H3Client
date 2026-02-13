@@ -1,5 +1,4 @@
 import { mockEvent, type H3Event } from 'h3';
-import { faker } from '@faker-js/faker';
 
 /**
  * Options for creating a mock H3Event.
