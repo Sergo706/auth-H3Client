@@ -1,6 +1,6 @@
 import { test, describe, expect } from 'vitest';
 import { safeAction } from '@internal/shared';
-import { fakeLogger } from 'test/setup/utils/fakeLogger.js';
+import { fakeLogger } from '../../setup/utils/fakeLogger.js';
 
 describe('promiseLocker', () => {
     test('executes action', async () => {
