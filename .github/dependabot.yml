@@ -1,0 +1,46 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    rebase-strategy: "disabled"
+    versioning-strategy: increase-if-necessary
+    allow: 
+      dependency-type: production
+    directories: 
+      - "/"
+      - "packages/client"
+      - "packages/client-h3v1"
+      - "packages/client-h3v2"
+      - "packages/shared"
+    open-pull-requests-limit: 50
+    labels:
+      - "npm dependencies"
+      - "triage-board"
+    commit-message:
+      prefix: "npm"
+      include: "scope"
+    schedule:
+      interval: "weekly"
+    groups:
+        production-minor-patch-updates: 
+            applies-to: version-updates
+            dependency-type: "production"
+            update-types:
+            - "minor"
+            - "patch"
+        production-major-updates:
+           applies-to: version-updates
+           dependency-type: "production"
+           update-types: "major"
+        development-updates:
+            applies-to: version-updates
+            dependency-type: "development"
+            update-types:
+              - "minor"
+              - "patch"
+              - "major"
+        security-updates:
+            applies-to: security-updates
+            dependency-type: "production"
+            update-types:
+              - "minor"
+              - "patch"
