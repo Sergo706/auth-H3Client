@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import mysql2 from 'mysql2/promise';
 import { DB_CONFIG } from '../setup/dbHooks.js';
 import { inject } from 'vitest'
+import { getLogger, serviceToService } from 'auth-h3client/v2';
+import { createMockEvent } from '../setup/utils/cookieJar.js';
 
 describe('Environment Health Check', () => {
     
@@ -30,6 +32,32 @@ describe('Environment Health Check', () => {
             expect(users.length).toBe(2);
         } finally {
             await connection.end();
+        }
+    });
+
+    it('can reach the service', async () => {
+        const log = getLogger().child({service: 'tests'})
+
+        const event = createMockEvent({
+            url: '/login'
+        });
+        const testUser = inject('testUser')
+        expect(testUser.email).toBe('sergo998826@gmail.com');
+        expect(event.req.headers.get('host')).toBe('localhost');
+        
+        const response = await serviceToService(
+            false, 
+            `/login`, 
+            'POST', 
+            event, 
+            true, 
+            undefined, 
+            { email: testUser.email, password: testUser.password }
+        );
+        
+        expect(response).toBeDefined();
+        if (response) {
+             expect(response.status).toBeDefined();
         }
     });
 });
