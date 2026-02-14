@@ -75,7 +75,7 @@ export async function askForMfaFlow(event: H3Event, log: pino.Logger, reason: st
     }
     try {
         const res = await safeAction(`${canary}_${reason}`, async () => {
-            return await sendToServer(false, `/custom/mfa/${reason}?random=${encodeURIComponent(random)}`, 'POST', event, false, cookies, undefined, token)
+            return await sendToServer(false, `/custom/mfa/${reason}?random=${encodeURIComponent(random)}`, 'POST', event, true, cookies, {}, token)
         })
        if (!res) {
                 log.error('Api Call Failed')
