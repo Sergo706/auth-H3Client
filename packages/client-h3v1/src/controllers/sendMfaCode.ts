@@ -1,4 +1,4 @@
-import { getLogger } from "@internal/shared";
+import { getLogger, validateZodSchema, verificationLink, VerificationLinkSchema } from "@internal/shared";
 import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { appendHeader, assertMethod, getCookie, getHeader, getQuery, getRouterParam, sendRedirect, setResponseStatus } from "h3";
@@ -22,16 +22,23 @@ const { domain, accessTokenTTL } = await getOperationalConfig(event)
 const { onSuccessRedirect } = getConfiguration()
 
 assertMethod(event, "POST")
-const { temp } = getQuery(event)
-const visitor = getRouterParam(event, "visitor");
+const query = getQuery<VerificationLinkSchema>(event)
+const canary = getCookie(event, 'canary_id');
 
-const log = getLogger().child({service: `auth`, branch: 'mfa', reqID: event.context.rid, temp: temp, visitor: visitor, canary_id: 
-    getCookie(event, 'canary_id') })
+const log = getLogger().child({service: `auth`, branch: 'mfa', reqID: event.context.rid, canary_id: 
+    getCookie(event, 'canary_id') });
+    
+const validation = validateZodSchema(verificationLink, query, log);
 
-    const cookies = {
-    label: 'canary_id',
-    value: getCookie(event, 'canary_id')
-}
+ if ('valid' in validation) {
+        log.error({...validation.errors}, 'Validation failed');
+        throwError(log,event, 'INVALID_CREDENTIALS',400, "Invalid data", "Invalid data", `Validation failed`);
+  }
+
+ const cookies = [{
+        label: 'canary_id',
+        value: canary
+  }]
 
 log.info(`Entered sendCode Post Route`)
 
@@ -41,7 +48,7 @@ if (!contentType || contentType !== 'application/json') {
   throwError(log, event, 'INVALID_CONTENT_TYPE', 400, 'Invalid Content-Type', 'Content-Type must be application/json', `Received: ${contentType}`);
 };
 
-if (!cookies.value || typeof temp !== "string" || !temp) {
+if (!canary) {
     throwError(log,event,'INVALID_CREDENTIALS',403,'FORBIDDEN', 'INVALID_CREDENTIALS', 'Invalid temp link token. Or canary is possibly undefined')
  }
     const body = event.context.body as {code: string | undefined}
@@ -55,11 +62,12 @@ if (!cookies.value || typeof temp !== "string" || !temp) {
     if (!code) {
       throwError(log,event,'INVALID_CREDENTIALS',400, 'Invalid code attempt', 'This field is required.', 'Invalid code attempt')
     }
+    const { visitor, random, reason, temp: token } = validation.data;
+    log.info({ visitor, token, reason }, "Link parameters validated.");
 
     log.warn(`Sending code to server...`)
-
-    const serverResponse = await 
-    sendToServer(false, `/auth/verify-mfa/${visitor}?temp=${encodeURIComponent(temp)}`, 'POST', event, true, cookies, { code });
+    const url = `/auth/verify-mfa/?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`
+    const serverResponse = await sendToServer(false, url, 'POST', event, true, cookies, { code });  
 
     if (!serverResponse) {
         throwError(log,event,'SERVER_ERROR', 500, 'Server Error', 'Server error please try again later', 'Api Call Failed')

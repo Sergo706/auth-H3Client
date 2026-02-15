@@ -1,4 +1,5 @@
-import  verifyLink  from "../controllers/verifyTempLink.js";
+import  verifyPasswordLink  from "../controllers/verifyTempPasswordResetLinks.js";
+import  verifyMfaLink  from "../controllers/verifyMfaTempLink.js";
 import  sendCode  from "../controllers/sendMfaCode.js";
 import csrfToken from "../middleware/csrf.js"
 import { verifyCsrfCookie as checkCsrf } from "../middleware/verifyCsrf.js";
@@ -41,18 +42,18 @@ export function magicLinksRouter(router: Router, prefix?: string) {
   const verifyMfaGetPipeline = defineEventHandler(async (event) => {
       await noStore(event);
       await csrfToken(event);
-      return verifyLink(event);
+      return verifyMfaLink(event);
   });
-  router.get(p('/auth/verify-mfa/:visitor'), verifyMfaGetPipeline);
+  router.get(p('/auth/verify-mfa'), verifyMfaGetPipeline);
 
   const verifyMfaPostPipeline = defineEventHandler(async (event) => {
-      await verifyLink(event); 
+      await verifyMfaLink(event); 
       await checkCsrf(event);
       await contentType('application/json')(event);
       await limitBytes(1024)(event);
       return sendCode(event);
   });
-  router.post(p('/auth/verify-mfa/:visitor'), verifyMfaPostPipeline);
+  router.post(p('/auth/verify-mfa'), verifyMfaPostPipeline);
 
   const initResetPipeline = defineEventHandler(async (event) => {
       await checkCsrf(event);
@@ -66,18 +67,18 @@ export function magicLinksRouter(router: Router, prefix?: string) {
 const resetGetPipeline = defineEventHandler(async (event) => {
       await noStore(event);
       await csrfToken(event);
-      return verifyLink(event);
+      return verifyPasswordLink(event);
   });
-  router.get(p('/auth/reset-password/:visitor'), resetGetPipeline);
+  router.get(p('/auth/reset-password'), resetGetPipeline);
 
 const resetPostPipeline = defineEventHandler(async (event) => {
-      await verifyLink(event); 
+      await verifyPasswordLink(event); 
       await checkCsrf(event);
       await contentType('application/json')(event);
       await limitBytes(1024)(event);
       return sendNewPassword(event);
   });
-  router.post(p('/auth/reset-password/:visitor'), resetPostPipeline);
+  router.post(p('/auth/reset-password'), resetPostPipeline);
 
   router.post(p('/auth/change-email'), initChangeEmailFlow);
   
@@ -86,9 +87,9 @@ const resetPostPipeline = defineEventHandler(async (event) => {
       await csrfToken(event); 
       return changeEmailGetAPI(event);
   });
-  router.get(p('/auth/update-email/:visitor'), emailChangeGetPipeline);
+  router.get(p('/auth/update-email'), emailChangeGetPipeline);
 
-  router.post(p('/auth/update-email/:visitor'), updateNewEmail);
+  router.post(p('/auth/update-email'), updateNewEmail);
 }
 
 
