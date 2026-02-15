@@ -1,4 +1,5 @@
-import  verifyLink  from "../controllers/verifyTempLink.js";
+import  verifyPasswordLink  from "../controllers/verifyTempPasswordResetLinks.js";
+import  verifyMfaLink  from "../controllers/verifyMfaTempLink.js";
 import  sendCode  from "../controllers/sendMfaCode.js";
 import csrfToken from "../middleware/csrf.js"
 import { verifyCsrfCookie as checkCsrf } from "../middleware/verifyCsrf.js";
@@ -37,11 +38,11 @@ export function magicLinksRouter(router: H3, prefix?: string) {
 
     router
 
-    .get(p("/auth/verify-mfa/:visitor"), verifyLink,
+    .get(p("/auth/verify-mfa"), verifyMfaLink,
         {middleware: [noStore, csrfToken]}
     )
-    .post(p('/auth/verify-mfa/:visitor'), sendCode, 
-        {middleware: [verifyLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
+    .post(p('/auth/verify-mfa'), sendCode, 
+        {middleware: [verifyMfaLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
     );
 
 
@@ -52,21 +53,21 @@ export function magicLinksRouter(router: H3, prefix?: string) {
 
     router
     
-    .get(p("/auth/reset-password/:visitor"), verifyLink, 
+    .get(p("/auth/reset-password"), verifyPasswordLink, 
         {middleware: [noStore, csrfToken]}
     )
     
-    .post(p("/auth/reset-password/:visitor"), sendNewPassword,
-        {middleware: [verifyLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
+    .post(p("/auth/reset-password"), sendNewPassword,
+        {middleware: [verifyPasswordLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
     )
 
     router.post(p('/auth/change-email'), initChangeEmailFlow);
 
-    router.get(p('/auth/update-email/:visitor'), changeEmailGetAPI, 
+    router.get(p('/auth/update-email'), changeEmailGetAPI, 
         { middleware: [noStore, csrfToken] }
     );
 
-    router.post(p('/auth/update-email/:visitor'), updateNewEmail);
+    router.post(p('/auth/update-email'), updateNewEmail);
 }
 
 

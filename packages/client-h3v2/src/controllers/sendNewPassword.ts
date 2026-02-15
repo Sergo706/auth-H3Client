@@ -1,11 +1,9 @@
 import { sendToServer } from '../utils/serverToServer.js';
-import { getLogger } from "@internal/shared";
+import { getLogger, validateZodSchema, verificationLink, VerificationLinkSchema } from "@internal/shared";
 import { banIp } from "@internal/shared";
-import { assertMethod,  getCookie, getQuery, getRequestIP, getRouterParam } from 'h3';
+import { assertMethod, getCookie, getQuery, getRequestIP } from 'h3';
 import throwError from '../middleware/error.js';
 import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
-
-
 
 /**
  * Submits a new password for visitors who passed link validation, enforcing payload rules
@@ -20,28 +18,33 @@ import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js'
 export default defineDeduplicatedEventHandler(async (event) => {
 
 assertMethod(event, "POST")
-const visitor = getRouterParam(event, "visitor");
-const { temp } = getQuery(event)
+const query = getQuery<VerificationLinkSchema>(event)
+const canary = getCookie(event, 'canary_id');
 
-const log = 
-getLogger().child({service: `auth`, branch: 'password-reset', reqID: event.context.rid, temp: temp, visitor: visitor, 
-canary_id: getCookie(event, 'canary_id') });
+const log = getLogger().child({service: `auth`, branch: 'password-reset', reqID: event.context.rid, canary });
 
-    const cookies = {
-    label: 'canary_id',
-    value: getCookie(event, 'canary_id')
-}
+const validation = validateZodSchema(verificationLink, query, log);
+
+ if ('valid' in validation) {
+        log.error({...validation.errors}, 'Validation failed');
+        throwError(log,event, 'INVALID_CREDENTIALS',400, "Invalid data", "Invalid data", `Validation failed`);
+  }
+
+ const cookies = [{
+        label: 'canary_id',
+        value: canary
+  }]
 
 log.info(`Entered sendNewPassword Post Route`)
 
-const contentType = event.req.headers.get('Content-Type')!;
+const contentType = event.req.headers.get('Content-Type');
 
 if (!contentType || contentType !== 'application/json') {
   throwError(log, event, 'INVALID_CONTENT_TYPE', 400, 'Invalid Content-Type', 'Content-Type must be application/json', `Received: ${contentType}`);
 };
 
-if (!cookies.value || typeof temp !== "string" || !temp) {
-        throwError(log,event,'INVALID_CREDENTIALS',403,'FORBIDDEN', 'INVALID_CREDENTIALS', 'Invalid temp link token. Or canary is possibly undefined')
+if (!cookies) {
+   throwError(log,event,'INVALID_CREDENTIALS',403,'FORBIDDEN', 'INVALID_CREDENTIALS', 'Invalid temp link token. Or canary is possibly undefined')
 }
 
 
@@ -68,8 +71,9 @@ if (!password) {
     log.warn(`Sending new password to server...`)
 
     try {
-      const sendData = await 
-      sendToServer(false, `/auth/reset-password/${visitor}?temp=${encodeURIComponent(temp)}`, 'POST', event, true, cookies, { password, confirmedPassword });
+      const { visitor, random, reason, temp: token } = validation.data;
+      const url = `/auth/reset-password/?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`
+      const sendData = await sendToServer(false, url, 'POST', event, true, cookies, { password, confirmedPassword });
 
         if (!sendData) {
         throwError(log,event,'SERVER_ERROR', 500, 'Server Error', 'Server error please try again later', 'Api Call Failed')

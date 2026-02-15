@@ -31,7 +31,8 @@ export default defineVerifiedCsrfHandler(async (event): Promise<UtilsResponse<st
   assertMethod(event, "POST")
   await limitBytes(1000000)(event);
 
-  const contentType = getHeader(event, 'Content-Type')!;
+  const contentType = getHeader(event, 'Content-Type');
+
 
   if (!contentType || contentType !== 'application/json') {
     throwHttpError(log, event, 'INVALID_CONTENT_TYPE', 400, 'Invalid Content-Type', 'Content-Type must be application/json', `Received: ${contentType}`);
@@ -44,7 +45,7 @@ export default defineVerifiedCsrfHandler(async (event): Promise<UtilsResponse<st
         throwHttpError(log,event, 'INVALID_CREDENTIALS',400, "Invalid data", "Invalid data", `Validation failed`);
   }
 
-  const random = crypto.randomBytes(128).toString('hex');
+  const random = crypto.randomBytes(128);
 
   try {
     const res = await askForMfaFlow(event, log, 'change_email', random);
