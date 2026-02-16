@@ -24,9 +24,8 @@ type Data = SuccessPath & {
 export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> {
     const route = useRoute();
     const { random, token, reason, visitor} = route.query;
-console.log('[useMagicLink] Query Params:', { random, token, reason, visitor });
+
     if (!random || !token || !reason || !visitor) {
-        console.error('[useMagicLink] Missing query params');
         throw createError({
             statusCode: 404,
             statusText: 'Not Found',
@@ -37,18 +36,17 @@ console.log('[useMagicLink] Query Params:', { random, token, reason, visitor });
     let baseUrl: string | undefined;
     switch (lowC) {
         case "magic_link_mfa_checks":
-            baseUrl = '/auth/verify-mfa';
+            baseUrl = '/api/auth/verify-mfa';
             break;
         case "password_reset":
-            baseUrl = '/auth/reset-password';
+            baseUrl = '/api/auth/reset-password';
             break;
         case "change_email":
-            baseUrl = '/auth/update-email';
+            baseUrl = '/api/auth/update-email';
             break;
         default:
             baseUrl = path;
     }
-    console.log('[useMagicLink] Resolved baseUrl:', baseUrl);
 
     if (!baseUrl) {
         throw createError({
@@ -63,7 +61,6 @@ console.log('[useMagicLink] Query Params:', { random, token, reason, visitor });
     const fetcher = useRequestFetch();
     
     const { error, data } = await useAsyncData(String(reason), async () => {
-        console.log('[useMagicLink] Executing request to:', baseUrl);
         const result = await executeRequest<SuccessPath | NotFoundPath>(baseUrl, "GET", { random, token, reason, visitor }, {}, {}, { headers, event, fetcher })
         
         if (!result.ok) {
