@@ -5,7 +5,7 @@ import { defineVerifiedCsrfHandler } from "./csrfVerifier.js";
 import { limitBytes } from "../middleware/limitBytes.js";
 import { applyRotationResult } from "./applyRotationResults.js";
 import { getOperationalConfig } from "./getRemoteConfig.js";
-import { type Code, type RotationResult, type VerificationLinkSchema, code, validateZodSchema, verificationLink, getLogger, safeAction } from "@internal/shared";
+import { type Code, type RotationResult, type LimitedMetaData, type VerificationLinkSchema, code, validateZodSchema, verificationLink, getLogger, safeAction } from "@internal/shared";
 import { parseResponseContentType } from "@internal/shared";
 
 /**
@@ -79,7 +79,7 @@ export const defineMfaCodeVerifierHandler = <T extends EventHandlerRequest, D>(
                 throwError(log,event, 'INVALID_CREDENTIALS',400, "Invalid data", "Invalid data", `Validation failed`);
             }
 
-            const {visitor, random, reason, temp } = validation.data;
+            const {visitor, random, reason, token } = validation.data;
             const cookies = [{label: 'canary_id', value: canary}, { label: 'session', value: refresh }];
 
             const { code: providedCode } = event.context.body as Code;
@@ -93,22 +93,22 @@ export const defineMfaCodeVerifierHandler = <T extends EventHandlerRequest, D>(
             const validatedCode = codeValidation.data;
 
             const res = await safeAction(refresh, async () => {
-                return await sendToServer(false, `/auth/verify-custom-mfa?visitor=${visitor}&temp=${encodeURIComponent(temp)}&random=${encodeURIComponent(random)}&reason=${reason}`, "POST", event, true, cookies, { code: validatedCode })
+                return await sendToServer(false, `/auth/verify-custom-mfa?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`, "POST", event, true, cookies, { code: validatedCode })
             })
 
             if (!res) {
                 throwError(log,event, "AUTH_SERVER_ERROR", 500, "Server Error", "Server error please try again later", 'Api Call Failed')
             }
-            const results = await parseResponseContentType(log, res) as { accessIat?: string; accessToken?: string }
+            const results = await parseResponseContentType(log, res) as LimitedMetaData
 
             if (!res.ok || res.status !== 200) {
                 log.warn({status: res.status, ...results}, "Invalid or expired code");
                 throwError(log,event, "ERROR", 400, "Invalid code", "Invalid or expired code", 'Invalid or expired code')
             }
-
+            const {accessIat: accessIatRes, accessToken: accessTokenRes, ...rest} = results;
             const setCookies = res.headers.getSetCookie();
-            const accessToken = results.accessToken;
-            const accessIat = results.accessIat;
+            const accessToken = accessTokenRes;
+            const accessIat = accessIatRes;
 
             if (setCookies.length === 0 || !accessIat || !accessToken) {
                 throwError(log, event, 'AUTH_SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', `New refresh token and related cookies ended up null`);
@@ -123,7 +123,7 @@ export const defineMfaCodeVerifierHandler = <T extends EventHandlerRequest, D>(
                     accessIat: accessIat,
                     rawSetCookie: setCookies,
              }
-             
+             event.context.limitedMetaData = rest;
              log.info({serverResponse: res, code: res.status},'MFA verification completed.');
              
              const { domain, accessTokenTTL } = await getOperationalConfig(event);

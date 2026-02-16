@@ -41,14 +41,14 @@ export default defineVerifiedCsrfHandler(async (event): Promise<UtilsResponse<st
     const query = getQuery<VerificationLinkSchema>(event)
     const canary = getCookie(event, 'canary_id');
     const refresh = getCookie(event, 'session');
-    const token = getCookie(event, '__Secure-a') ?? event.context.accessToken;
+    const aToken = getCookie(event, '__Secure-a') ?? event.context.accessToken;
 
 
-    if (!canary || !refresh || !token) {
+    if (!canary || !refresh || !aToken) {
         log.error({
             refreshExists: refresh ? true : false,
             canaryExists: canary ? true : false, 
-            tokenExists: token ? true : false
+            tokenExists: aToken ? true : false
          });
         throwHttpError(log,event,'FORBIDDEN',401, "UnAuthorized", "Un Authorized",`Missing credentials`);
     }
@@ -68,12 +68,12 @@ export default defineVerifiedCsrfHandler(async (event): Promise<UtilsResponse<st
         throwHttpError(log, event, 'INVALID_CREDENTIALS', 400, "Invalid data", "Invalid data", `Validation failed`);
     }
 
-    const { visitor, temp, random, reason } = queryValidation.data;
+    const { visitor, token, random, reason } = queryValidation.data;
     const { code }  = bodyValidation.data;
     const payload = { ...bodyValidation.data, code }; 
     const cookies = [{label: 'canary_id', value: canary}, { label: 'session', value: refresh }];
 
-    const url = `/update/email?visitor=${visitor}&temp=${encodeURIComponent(temp)}&random=${encodeURIComponent(random)}&reason=${reason}`
+    const url = `/update/email?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`
     const res = await safeAction(refresh ?? canary!, async () => {
          return await sendToServer(false, url, "POST", event, true, cookies, payload, token)
     })

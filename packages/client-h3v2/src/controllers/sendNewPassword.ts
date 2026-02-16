@@ -71,7 +71,7 @@ if (!password) {
     log.warn(`Sending new password to server...`)
 
     try {
-      const { visitor, random, reason, temp: token } = validation.data;
+      const { visitor, random, reason, token } = validation.data;
       const url = `/auth/reset-password/?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`
       const sendData = await sendToServer(false, url, 'POST', event, true, cookies, { password, confirmedPassword });
 
