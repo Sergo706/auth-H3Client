@@ -24,8 +24,9 @@ type Data = SuccessPath & {
 export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> {
     const route = useRoute();
     const { random, token, reason, visitor} = route.query;
-
+console.log('[useMagicLink] Query Params:', { random, token, reason, visitor });
     if (!random || !token || !reason || !visitor) {
+        console.error('[useMagicLink] Missing query params');
         throw createError({
             statusCode: 404,
             statusText: 'Not Found',
@@ -47,6 +48,7 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
         default:
             baseUrl = path;
     }
+    console.log('[useMagicLink] Resolved baseUrl:', baseUrl);
 
     if (!baseUrl) {
         throw createError({
@@ -61,6 +63,7 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
     const fetcher = useRequestFetch();
     
     const { error, data } = await useAsyncData(String(reason), async () => {
+        console.log('[useMagicLink] Executing request to:', baseUrl);
         const result = await executeRequest<SuccessPath | NotFoundPath>(baseUrl, "GET", { random, token, reason, visitor }, {}, {}, { headers, event, fetcher })
         
         if (!result.ok) {
