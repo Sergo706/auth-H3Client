@@ -62,7 +62,7 @@ if (!canary) {
     if (!code) {
       throwError(log,event,'INVALID_CREDENTIALS',400, 'Invalid code attempt', 'This field is required.', 'Invalid code attempt')
     }
-    const { visitor, random, reason, temp: token } = validation.data;
+    const { visitor, random, reason, token } = validation.data;
     log.info({ visitor, token, reason }, "Link parameters validated.");
 
     log.warn(`Sending code to server...`)

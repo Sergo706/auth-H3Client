@@ -1,9 +1,9 @@
 import { sendToServer } from "../utils/serverToServer.js";
-import { getLogger, VerificationLinkSchema, verificationLink, validateZodSchema, getConfiguration, safeAction, parseResponseContentType } from "@internal/shared";
+import { getLogger, VerificationLinkSchema, verificationLink, validateZodSchema,  safeAction, parseResponseContentType } from "@internal/shared";
 import { notFoundHandler } from "../middleware/notFound.js"
-import { defineEventHandler, getCookie, getQuery, getRequestURL, getRouterParam, H3Event } from "h3";
+import { defineEventHandler, getCookie, getQuery } from "h3";
 import throwError from "../middleware/error.js";
-
+import type { LinkMfaVerificationResponse } from "@internal/shared";
 /**
  * Validates temporary links (MFA or password reset) by confirming signed tokens with the auth server
  * and returning structured metadata or falling back to not-found responses.
@@ -47,7 +47,7 @@ getLogger().child(
         throwError(log,event, 'INVALID_CREDENTIALS',400, "Invalid data", "Invalid data", `Validation failed`);
    }
 
-    const { visitor, random, reason, temp: token } = validation.data;
+    const { visitor, random, reason, token } = validation.data;
     const url = `/auth/verify-mfa/?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`
 
     const res = await safeAction(canary, async () => { 
@@ -58,10 +58,10 @@ getLogger().child(
         throwError(log,event,'SERVER_ERROR', 500, 'Server Error', 'Server error please try again later', 'Api Call Failed')
     };
 
-    const results = await parseResponseContentType(log, res) as {error: string | undefined, link: string | undefined} | {ok: boolean, date: string, data: {link: string, reason: string}};
+    const results = await parseResponseContentType(log, res) as LinkMfaVerificationResponse;
 
 
-    if (res.ok && 'ok' in results && results.ok && res.status === 200) {
+    if (res.ok && results && 'ok' in results && results.ok && res.status === 200) {
         log.info(`Link verified with a GET reqs. context is set.`);
         return {
             ok: true,

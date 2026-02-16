@@ -40,6 +40,10 @@ export default defineNuxtModule<ModuleOptions>({
       {
         name: 'executeRequest',
         from: 'auth-h3client/client'
+      },
+      {
+       name: 'useMagicLink',
+       from: 'auth-h3client/client'
       }
     ]);
 

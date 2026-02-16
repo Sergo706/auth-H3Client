@@ -4,6 +4,7 @@ import { assertMethod, defineHandler, EventHandler, EventHandlerRequest, getCook
 import throwError  from "../middleware/error.js";
 import { VerificationLinkSchema, verificationLink } from "@internal/shared";
 import { validateZodSchema } from "@internal/shared";
+import type { CustomMfaFlowsVerificationResponse } from "@internal/shared";
 
 /**
  * Creates an H3 event handler that verifies magic link parameters before executing
@@ -68,20 +69,20 @@ export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest,
             log.error({...validation.errors}, 'Validation failed');
             throwError(log,event, 'INVALID_CREDENTIALS',400, "Invalid data", "Invalid data", `Validation failed`);
       }
-        const {visitor, random, reason, temp } = validation.data;
+        const {visitor, random, reason, token } = validation.data;
         const cookies = [{label: 'canary_id', value: canary}, { label: 'session', value: refresh }];
 
       const res = await safeAction(refresh, async () => {
-            return await sendToServer(false, `/auth/verify-custom-mfa/?visitor=${visitor}&temp=${encodeURIComponent(temp)}&random=${encodeURIComponent(random)}&reason=${reason}`, "GET", event, false, cookies)
+            return await sendToServer(false, `/auth/verify-custom-mfa/?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`, "GET", event, false, cookies)
         })
 
       if (!res) {
           throwError(log,event, "AUTH_SERVER_ERROR", 500, "Server Error", "Server error please try again later", 'Api Call Failed')
       }
       
-      const results = await parseResponseContentType(log, res) as Results<{ link: string, reason: string }>
+      const results = await parseResponseContentType(log, res) as CustomMfaFlowsVerificationResponse;
       
-      if (res.ok && results.ok && res.status === 200) {
+      if (res.ok && results && 'ok' in results && results.ok && res.status === 200) {
         const { link, reason } = results.data;
         log.info(`Link verified with a GET reqs. context is set.`);
         
