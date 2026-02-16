@@ -144,8 +144,22 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Overview', link: '/mfa-flow/overview' },
-          { text: 'Built-in Flow', link: '/mfa-flow/built-in-flow' },
-          { text: 'Custom Flow', link: '/mfa-flow/custom-flow' },
+          {
+            text: 'Built-in Flow',
+            collapsed: false,
+            items: [
+              { text: 'Built-in Flow', link: '/mfa-flow/built-in-flow' },
+              { text: 'Frontend', link: '/mfa-flow/frontend/auth-flows' },
+            ]
+          },
+          {
+            text: 'Custom',
+            collapsed: false,
+            items: [
+              { text: 'Custom Flow', link: '/mfa-flow/custom-flow' },
+              { text: 'With Magic Links', link: '/mfa-flow/custom-flow-with-magic-link' },
+            ]
+          },
           { text: 'API Reference', link: '/mfa-flow/api-reference' },
           { text: 'Security', link: '/mfa-flow/security-considerations' }
         ]
