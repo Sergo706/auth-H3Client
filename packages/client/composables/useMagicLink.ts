@@ -63,7 +63,6 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
     const { error, data } = await useAsyncData(String(reason), async () => {
         const result = await executeRequest<SuccessPath | NotFoundPath>(baseUrl, "GET", { random, token, reason, visitor }, {}, {}, { headers, event, fetcher })
     console.log('MAGICLINKS Composable results', result)
-    console.log('MAGICLINKS Composable error', error)
         
         if (!result.ok) {
             throw createError({
@@ -76,19 +75,28 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
     })
 
     if (error.value || !data.value) {
+        console.log('MAGICLINKS Composable error path', data.value, error.value)
          throw createError({ statusCode: 404, statusMessage: `Not Found`, message: `The page you are looking for doesn't exists` });
     }
 
     const resultValue = data.value.data;
-    console.log('MAGICLINKS Composable data', data)
+    console.log('MAGICLINKS Composable data', data.value)
 
     if ('error' in resultValue) {
+    console.log('MAGICLINKS Composable error in resultValue', resultValue)
          throw createError({ 
             statusCode: 404, 
             statusMessage: `Not Found`, 
             message: `The page you are looking for doesn't exist` 
         });
     }
+    
+    console.log('MAGICLINKS final data',       {
+        token: String(token),
+        random: String(random),
+        visitor: String(visitor),
+        ...resultValue
+    })   
 
     return {
          token: String(token),
