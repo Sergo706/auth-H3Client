@@ -75,7 +75,7 @@ export default defineVerifiedCsrfHandler(async (event): Promise<UtilsResponse<st
 
     const url = `/update/email?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`
     const res = await safeAction(refresh ?? canary!, async () => {
-         return await sendToServer(false, url, "POST", event, true, cookies, payload, token)
+         return await sendToServer(false, url, "POST", event, true, cookies, payload, aToken)
     })
 
     if (!res) {
