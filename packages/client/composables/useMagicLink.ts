@@ -24,7 +24,7 @@ type Data = SuccessPath & {
 export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> {
     const route = useRoute();
     const { random, token, reason, visitor} = route.query;
-    console.log('MAGICLINKS Composable params', random, token, reason, visitor)
+
     if (!random || !token || !reason || !visitor) {
         throw createError({
             statusCode: 404,
@@ -47,7 +47,7 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
         default:
             baseUrl = path;
     }
-    console.log('MAGICLINKS Composable chosen link', baseUrl)
+
     if (!baseUrl) {
         throw createError({
             statusCode: 404,
@@ -62,7 +62,6 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
     
     const { error, data } = await useAsyncData(String(reason), async () => {
         const result = await executeRequest<SuccessPath | NotFoundPath>(baseUrl, "GET", { random, token, reason, visitor }, {}, {}, { headers, event, fetcher })
-    console.log('MAGICLINKS Composable results', result)
         
         if (!result.ok) {
             throw createError({
@@ -75,15 +74,12 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
     })
 
     if (error.value || !data.value) {
-        console.log('MAGICLINKS Composable error path', data.value, error.value)
          throw createError({ statusCode: 404, statusMessage: `Not Found`, message: `The page you are looking for doesn't exists` });
     }
 
     const resultValue = data.value.data;
-    console.log('MAGICLINKS Composable data', data.value)
 
     if ('error' in resultValue) {
-    console.log('MAGICLINKS Composable error in resultValue', resultValue)
          throw createError({ 
             statusCode: 404, 
             statusMessage: `Not Found`, 
@@ -91,13 +87,6 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
         });
     }
     
-    console.log('MAGICLINKS final data',       {
-        token: String(token),
-        random: String(random),
-        visitor: String(visitor),
-        ...resultValue
-    })   
-
     return {
          token: String(token),
          random: String(random),
