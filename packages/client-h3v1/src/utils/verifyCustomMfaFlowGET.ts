@@ -55,7 +55,6 @@ export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest,
         const canary = getCookie(event, 'canary_id');
         const refresh = getCookie(event, 'session');
         const aToken = getCookie(event, '__Secure-a') ?? event.context.accessToken;
-        const validation = validateZodSchema(verificationLink, query, log);
         
         if (!canary || !refresh || !aToken) {
             log.error({
@@ -65,6 +64,8 @@ export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest,
                 });
             throwError(log,event,'FORBIDDEN',401, "UnAuthorized", "Un Authorized",`Missing credentials`);
         }
+
+      const validation = validateZodSchema(verificationLink, query, log);
         
       if ('valid' in validation) {
             log.error({...validation.errors}, 'Validation failed');

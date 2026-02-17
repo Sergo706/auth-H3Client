@@ -68,3 +68,5 @@ export { getSafeUrl} from "./utils/getSafeUrl.js";
 export { defineMfaCodeVerifierHandler } from "./utils/verifyMfaCodeHandler.js"
 export { type UtilsResponse, type AppCode, validateZodSchema, type VerificationLinkSchema, type Results } from "@internal/shared";
 export type { CustomMfaFlowsVerificationResponse, LinkMfaVerificationResponse, LinkPasswordVerificationResponse } from "@internal/shared";
+export { safeRedirect } from './utils/safeRedirect.js'
+export { bounceRouter } from './routes/bounce.js'
