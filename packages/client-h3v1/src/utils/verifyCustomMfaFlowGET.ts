@@ -1,5 +1,5 @@
 import { sendToServer } from "./serverToServer.js";
-import { getLogger, parseResponseContentType, Results, safeAction } from "@internal/shared";
+import { getLogger, parseResponseContentType, safeAction } from "@internal/shared";
 import { assertMethod, defineEventHandler, EventHandler, EventHandlerRequest, getCookie, getQuery } from "h3";
 import throwError  from "../middleware/error.js";
 import { VerificationLinkSchema, verificationLink } from "@internal/shared";
