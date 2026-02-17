@@ -83,6 +83,7 @@ const resetPostPipeline = defineEventHandler(async (event) => {
   router.post(p('/auth/change-email'), initChangeEmailFlow);
   
   const emailChangeGetPipeline = defineEventHandler(async (event) => {
+    console.log('emailChangeGetPipeline DEBUG entered pipeline')
       await noStore(event);
       await csrfToken(event); 
       return changeEmailGetAPI(event);
