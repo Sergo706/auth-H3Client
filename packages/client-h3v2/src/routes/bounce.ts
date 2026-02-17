@@ -5,9 +5,9 @@ import { getConfiguration, VerificationLinkSchema } from "@internal/shared";
 export function bounceRouter(router: H3, prefix?: string) {
   const p = (path: string) => prefix ? `/${prefix}${path}` : path;
   const en = (e: string | number) => encodeURIComponent(e)
-  const { magicLinkRedirectPath } = getConfiguration();
+  const { magicLinkRedirectPath, magicLinkBouncePath } = getConfiguration();
   
-  router.get(p('/auth/bounce'), defineHandler((event) => {
+  router.get(p(magicLinkBouncePath), defineHandler((event) => {
     const { visitor, random, reason, token } = getQuery<VerificationLinkSchema>(event)
     
     const destination = `${magicLinkRedirectPath}?token=${en(token)}&reason=${en(reason)}&visitor=${en(visitor)}&random=${en(random)}`;

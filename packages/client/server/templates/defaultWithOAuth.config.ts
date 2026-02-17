@@ -114,5 +114,6 @@ export const configDefaults: Configuration = {
       redirectUrlOnError: `${baseUrl}/`
     }
 ],
-    magicLinkRedirectPath: '/auth/verify'
+    magicLinkRedirectPath: '/auth/verify',
+    magicLinkBouncePath: '/auth/bounce',
 }

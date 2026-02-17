@@ -43,6 +43,7 @@ export const configDefaults: Configuration = {
         allowedExtensions: ['png', 'webp', 'jpeg', 'jpg']
     },
     magicLinkRedirectPath: '/auth/verify',
+    magicLinkBouncePath: '/auth/bounce',
     telegram: {
         enableTelegramLogger: false as const,
     },
