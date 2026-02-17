@@ -54,9 +54,10 @@ export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest,
         const query = getQuery<VerificationLinkSchema>(event)
         const canary = getCookie(event, 'canary_id');
         const refresh = getCookie(event, 'session');
+        const aToken = getCookie(event, '__Secure-a') ?? event.context.accessToken;
         const validation = validateZodSchema(verificationLink, query, log);
         
-        if (!canary || !refresh) {
+        if (!canary || !refresh || !aToken) {
             log.error({
                 refreshExists: refresh ? true : false,
                 canaryExists: canary ? true : false 
