@@ -179,6 +179,7 @@ export const configurationSchema = z.strictObject({
    onSuccessRedirect: z.url(),
    /** List of OAuth providers (optional) */
    OAuthProviders,
+   magicLinkRedirectPath: z.string().default('/auth/verify'),
    /** Whether to enable automatic banning of suspicious IPs (requires server support) */
    enableFireWallBans: z.boolean(),
    /**
