@@ -1,5 +1,5 @@
 import { sendToServer } from "./serverToServer.js";
-import { getLogger, parseResponseContentType, Results, safeAction } from "@internal/shared";
+import { getLogger, parseResponseContentType, safeAction } from "@internal/shared";
 import { assertMethod, defineHandler, EventHandler, EventHandlerRequest, getCookie, getQuery } from "h3";
 import throwError  from "../middleware/error.js";
 import { VerificationLinkSchema, verificationLink } from "@internal/shared";
@@ -55,15 +55,18 @@ export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest,
         const query = getQuery<VerificationLinkSchema>(event)
         const canary = getCookie(event, 'canary_id');
         const refresh = getCookie(event, 'session');
-        const validation = validateZodSchema(verificationLink, query, log);
+        const aToken = getCookie(event, '__Secure-a') ?? event.context.accessToken;
         
-        if (!canary || !refresh) {
+        if (!canary || !refresh || !aToken) {
             log.error({
                 refreshExists: refresh ? true : false,
-                canaryExists: canary ? true : false 
+                canaryExists: canary ? true : false,
+                tokenExists: aToken ? true : false
                 });
             throwError(log,event,'FORBIDDEN',401, "UnAuthorized", "Un Authorized",`Missing credentials`);
         }
+        
+        const validation = validateZodSchema(verificationLink, query, log);
         
       if ('valid' in validation) {
             log.error({...validation.errors}, 'Validation failed');
@@ -73,7 +76,7 @@ export const defineVerifiedMagicLinkGetHandler = <T extends EventHandlerRequest,
         const cookies = [{label: 'canary_id', value: canary}, { label: 'session', value: refresh }];
 
       const res = await safeAction(refresh, async () => {
-            return await sendToServer(false, `/auth/verify-custom-mfa/?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`, "GET", event, false, cookies)
+            return await sendToServer(false, `/auth/verify-custom-mfa/?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`, "GET", event, false, cookies, {}, aToken)
         })
 
       if (!res) {

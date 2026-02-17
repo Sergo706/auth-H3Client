@@ -86,7 +86,7 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
             message: `The page you are looking for doesn't exist` 
         });
     }
-
+    
     return {
          token: String(token),
          random: String(random),

@@ -45,6 +45,8 @@ export const serverImports = [
   { name: 'fromB64', from: 'auth-h3client/v1' },
   { name: 'isSameBuffer', from: 'auth-h3client/v1' },
   
+  { name: 'safeRedirect', from: 'auth-h3client/v1'},
+  { name: 'bounceRouter', from: 'auth-h3client/v1' },
   { name: 'serviceToService', from: 'auth-h3client/v1' },
   { name: 'clientHeaders', from: 'auth-h3client/v1' },
   { name: 'signature', from: 'auth-h3client/v1' },

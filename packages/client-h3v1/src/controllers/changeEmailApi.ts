@@ -3,6 +3,10 @@ import { defineVerifiedMagicLinkGetHandler } from '../utils/verifyCustomMfaFlowG
 import throwHttpError from '../middleware/error.js';
 import { assertMethod } from 'h3'
 
+export interface SuccessPath {
+    reason: 'change_email',
+    link: "Password Reset" | "MFA Code" | 'Custom MFA'; 
+}
 
 /**
  * Verifies the validity of an email change magic link.
@@ -18,7 +22,7 @@ import { assertMethod } from 'h3'
  * 
  * @throws {H3Error} Throws HTTP 401 if the link context is invalid or missing.
  */
-export default defineVerifiedMagicLinkGetHandler(async (event): Promise<UtilsResponse<string>> => {
+export default defineVerifiedMagicLinkGetHandler(async (event): Promise<UtilsResponse<SuccessPath>> => {
 
     const log = getLogger().child({service: 'auth-client', branch: 'email-change-api'})
     assertMethod(event, "GET")
@@ -34,6 +38,9 @@ export default defineVerifiedMagicLinkGetHandler(async (event): Promise<UtilsRes
     return {
       ok: true,
       date: new Date().toISOString(),
-      data: meta.reason
+      data: {
+        link: meta.link,
+        reason: meta.reason
+      }
     };
   });
