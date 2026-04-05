@@ -14,8 +14,6 @@ export { default as initEmailChangeFlow } from "./controllers/initChangeEmailFlo
 export { default as changeEmailGetAPI } from "./controllers/changeEmailApi.js";
 export { default as updateNewEmail } from "./controllers/sendNewEmailUpdate.js";
 export { default as throwHttpError } from "./middleware/error.js";
-export { ensureAccessToken } from "./middleware/getAccessToken.js";
-export { ensureRefreshCookie } from "./middleware/getRefreshToken.js";
 export { httpLogger } from "./middleware/httpLogger.js";
 export { default as isIPValid } from "./middleware/isValidIP.js";
 export { limitBytes } from "./middleware/limitBytes.js";
@@ -39,7 +37,6 @@ export { toB64, fromB64, isSame as isSameBuffer, createSignedCookie as createSig
 export { discoverOidc } from "@internal/shared";
 export { findStringsInObject } from "@internal/shared";
 export { getMetadata as getAccessTokenMetaData } from "./utils/getAccessTokenMetaData.js";
-export { getMetadata as getRefreshTokenMetaData} from "./utils/getRefreshTokenMetaData.js";
 export { getOperationalConfig } from "./utils/getRemoteConfig.js";
 export { getLogger } from "@internal/shared";
 export { MiniCache } from "@internal/shared";

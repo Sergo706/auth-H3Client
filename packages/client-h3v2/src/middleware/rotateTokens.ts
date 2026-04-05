@@ -41,7 +41,7 @@ import { applyRotationResult } from "../utils/applyRotationResults.js";
 
        try {
           log.info('Sending Request To api...')
-          const res = await sendToServer(false, '/auth/refresh-session/rotate-every', 'POST', event, false, cookies)
+          const res = await sendToServer(false, '/auth/user/refresh-session', 'POST', event, false, cookies)
             
           if (!res) {
             throwError(log, event, 'SERVER_ERROR', 500, 'Server Error','Something went wrong, please try restarting the page, and try again', 'Api Call Failed');

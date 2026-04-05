@@ -20,8 +20,6 @@ export const serverImports = [
   { name: 'generateCsrfCookie', from: 'auth-h3client/v1' },
   { name: 'verifyCsrfCookie', from: 'auth-h3client/v1' },
   
-  { name: 'ensureAccessToken', from: 'auth-h3client/v1' },
-  { name: 'ensureRefreshCookie', from: 'auth-h3client/v1' },
   { name: 'ensureValidCredentials', from: 'auth-h3client/v1' },
   { name: 'OAuthTokensValidations', from: 'auth-h3client/v1' },
   
@@ -52,7 +50,6 @@ export const serverImports = [
   { name: 'signature', from: 'auth-h3client/v1' },
   
   { name: 'getAccessTokenMetaData', from: 'auth-h3client/v1' },
-  { name: 'getRefreshTokenMetaData', from: 'auth-h3client/v1' },
   { name: 'getCachedUserData', from: 'auth-h3client/v1' },
   { name: 'getOperationalConfig', from: 'auth-h3client/v1' },
   
