@@ -3,7 +3,6 @@ import { getLogger } from "@internal/shared";
 import { sendToServer } from "../utils/serverToServer.js";
 import throwError from "../middleware/error.js";
 import { cache as accessTokenCache } from "../utils/getAccessTokenMetaData.js";
-import { cache as refreshTokenCache } from "../utils/getRefreshTokenMetaData.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { defineDeduplicatedEventHandler } from '../utils/requestDedupHandler.js';
 
@@ -79,7 +78,6 @@ export default defineDeduplicatedEventHandler(async (event) => {
         deleteCookie(event, 'session', { path: '/', domain });
         deleteCookie(event, 'iat', { path: '/', domain });
         if (accessTokenCache.get(token)) accessTokenCache.del(token);
-        if (refreshTokenCache.get(token)) refreshTokenCache.del(token);
         log.info(`User logged out successfully`);
         const url = `${getRequestProtocol(event)}://${domain}`
 
