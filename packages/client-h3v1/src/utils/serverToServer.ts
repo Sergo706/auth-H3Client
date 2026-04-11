@@ -40,11 +40,8 @@ export async function sendToServer<T>(keepAlive: boolean, endpoint: string, meth
     const log = logger.child({
       service: 'utils',
       type: `BFF TO API`,
-      cookies: cookies,
       Endpoint: endpoint,
       Method: method,
-      body: body,
-      data: data,
       targetURL: targetURL.href,
       protocol: targetURL.protocol,
       host: targetURL.host,
@@ -72,6 +69,12 @@ export async function sendToServer<T>(keepAlive: boolean, endpoint: string, meth
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (body) headers['Content-Type'] = 'application/json';
 
+  log.debug({      
+      cookies: cookies,
+      body: body,
+      data: data,
+    }, '[DEBUG]'
+  )
   log.info(`Mapped. About to fetch`)
   const signal = AbortSignal.timeout(15000)
 try { 

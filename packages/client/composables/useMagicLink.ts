@@ -19,7 +19,6 @@ type Data = SuccessPath & {
 }
 /**
  * Composable to handle magic link verification flows.
- * Uses query parameters to align with the BFF's refactored logic.
  */
 export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> {
     const route = useRoute();
