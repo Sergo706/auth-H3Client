@@ -1,13 +1,11 @@
 import pino, { Logger } from 'pino';
 import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { getConfiguration } from '../config/config.js';
+import { getRoot } from './getRoot.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const LOG_DIR = process.env.CLIENT_LOG_DIR || path.resolve(__dirname, '..', '..', 'logs');
+const root = getRoot(process.cwd())
+const LOG_DIR = process.env.CLIENT_LOG_DIR || path.resolve(root, 'logs');
 if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true });
 
 const transport = pino.transport({

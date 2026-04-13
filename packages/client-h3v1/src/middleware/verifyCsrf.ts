@@ -1,4 +1,4 @@
-import { verifySignedCookie } from "@internal/shared";
+import { verifySignedCookie, isSame, fromB64 } from "@internal/shared";
 import { createError, defineEventHandler, getCookie, getHeader } from 'h3'
 import { getLogger } from "@internal/shared";
 
@@ -49,8 +49,12 @@ export const verifyCsrfCookie = defineEventHandler( async (event) => {
             status: 403,
             statusText: "Forbidden",
         })
-    }   
-    if (token !== payload.value) {
+    }
+
+    const expected = fromB64(payload.value);
+    const provided = fromB64(token);
+
+    if (!isSame(expected, provided)) {
         log.warn(`CSRF token mismatch`)
         throw createError({
             data: { date: new Date().toJSON(), code: 'TOKEN_INVALID' },

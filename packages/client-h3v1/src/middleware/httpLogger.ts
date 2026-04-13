@@ -2,7 +2,6 @@ import pino, { Level } from 'pino';
 import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
 import { randomUUID } from 'crypto';
-import { fileURLToPath } from 'url';
 import { 
   H3Event, 
   getRequestIP,
@@ -18,15 +17,13 @@ import {
 } from 'h3';
 import { getSafeUrl } from '../utils/getSafeUrl.js';
 import { getConfiguration } from "@internal/shared";
+import { getRoot } from '@internal/shared';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-
-const LOG_DIR = process.env.CLIENT_LOG_DIR || path.resolve(__dirname, '..', '..', 'logs');
+const root = getRoot(process.cwd())
+const LOG_DIR = process.env.CLIENT_LOG_DIR || path.resolve(root, 'logs');
 if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true });
 
-const transport = pino.transport({  
+const transport = pino.transport({
   targets: [
     {
       target: 'pino/file',
@@ -39,18 +36,25 @@ const transport = pino.transport({
   ]
 });
 
-export const httpLog = pino(
-  {
-    level: 'info',
-    timestamp: pino.stdTimeFunctions.isoTime,
-    mixin() { return { uptime: process.uptime() }; },
-    redact: {
-      paths: ['httpRequest.headers.authorization', 'httpRequest.headers.cookie'],
-      censor: '[SECRET]'
-    }
-  },
-  transport
-);
+let httpLog: pino.Logger | undefined;
+
+function getHttpLog(): pino.Logger {
+  if (httpLog) return httpLog;
+  const { logLevel } = getConfiguration();
+  httpLog = pino(
+    {
+      level: logLevel,
+      timestamp: pino.stdTimeFunctions.isoTime,
+      mixin() { return { uptime: process.uptime() }; },
+      redact: {
+        paths: ['httpRequest.headers.authorization', 'httpRequest.headers.cookie'],
+        censor: '[SECRET]'
+      }
+    },
+    transport
+  );
+  return httpLog;
+}
 
 function levelFor(status: number, hasError: boolean): Level {
   if (hasError || status >= 500) return 'error'
@@ -108,9 +112,7 @@ export const httpLogger = () => {
     const ip = getRequestIP(event) || ''
     const ua = event.headers.get('user-agent') || ''
     const fp = await getRequestFingerprint(event)
-    const logger = httpLog;
-  
-    event.context.log = logger.child({
+    event.context.log = getHttpLog().child({
       requestId,
       httpRequest: {
         method: event.method,
@@ -133,9 +135,7 @@ export const httpLogger = () => {
   app.options.onAfterResponse = async (event: H3Event) => {
       await prevOnAfterResponse?.(event, undefined);
       if (event.context.__skipLog) return;
-      const logger = httpLog;
-  
-       const log = (event.context.log as pino.Logger)  || logger;
+       const log = (event.context.log as pino.Logger) || getHttpLog();
        const ms = (performance.now() ?? Date.now()) - (event.context.time as number);
 
        const url = getSafeUrl(event);
@@ -177,12 +177,10 @@ export const httpLogger = () => {
 
     app.options.onError = async (error, event) => {
     event.context.error = error
-    const logger = httpLog;
-
     const status = error.statusCode ?? (error as any).status;
     const statusText = (error as any).statusMessage ?? (error as any).statusText;
     const ms = (performance.now() ?? Date.now()) - (event.context.time as number);
-    const log = (event.context.log as pino.Logger) || logger
+    const log = (event.context.log as pino.Logger) || getHttpLog()
 
     log.error(
       { httpError:
