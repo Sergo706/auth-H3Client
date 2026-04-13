@@ -31,19 +31,19 @@ export default defineNuxtModule<ModuleOptions>({
     addImports([
       {
         name: 'useAuthData',
-        from: 'auth-h3client/client'
+        from: '@riavzon/auth-h3client/client'
       },
       {
         name: 'getCsrfToken',
-        from: 'auth-h3client/client'
+        from: '@riavzon/auth-h3client/client'
       },
       {
         name: 'executeRequest',
-        from: 'auth-h3client/client'
+        from: '@riavzon/auth-h3client/client'
       },
       {
        name: 'useMagicLink',
-       from: 'auth-h3client/client'
+       from: '@riavzon/auth-h3client/client'
       }
     ]);
 
@@ -52,11 +52,11 @@ export default defineNuxtModule<ModuleOptions>({
     if (options.enableMiddleware !== false) {
       addServerHandler({
         middleware: true,
-        handler: 'auth-h3client/server/middleware'
+        handler: '@riavzon/auth-h3client/server/middleware'
       });
       addServerHandler({
         middleware: false,
-        handler: 'auth-h3client/server/routes',
+        handler: '@riavzon/auth-h3client/server/routes',
         method: 'get',
         route: options.authStatusUrl,
       });

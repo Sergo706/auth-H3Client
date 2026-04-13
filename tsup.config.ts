@@ -14,7 +14,7 @@ const serverConfig: Options = {
   dts: true,
   sourcemap: true,
   clean: false,  
-  splitting: true,
+  splitting: false,
   outDir: 'dist',
   external: [
     'node:crypto',
