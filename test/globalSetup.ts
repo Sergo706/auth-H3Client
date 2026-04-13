@@ -2,7 +2,6 @@ import { configuration, getLogger } from 'auth-h3client/v2';
 import { config } from './setup/configs/config.js';
 import { DB_CONFIG } from './setup/dbHooks.js';
 import mysql2 from 'mysql2/promise';
-import { createTablesForTesting } from './setup/setupTestDB.js';
 import { serviceToService } from "auth-h3client/v2";
 import { createMockEvent } from "./setup/utils/cookieJar.js";
 import { run } from './setup/utils/run.js'
@@ -68,7 +67,6 @@ export async function setup(project: TestProject) {
         await run ('rm -rf auth-logs')
         await run('docker compose -f docker-compose.test.yml up -d mysql-test')
         await waitForDatabase();
-        await createTablesForTesting();
         
         await run('docker compose -f docker-compose.test.yml up -d auth-test')
         await waitForAuth()

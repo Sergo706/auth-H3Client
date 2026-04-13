@@ -1,6 +1,6 @@
 # auth-H3Client
 
-H3 middleware, controllers, and utilities for integrating the front-end gateway with the [`auth`](https://github.com/Sergo706/auth) service. Pairing this package with an `auth` service instance (using its default or custom configuration) gives you end-to-end authentication flows with minimal wiring. H3 is used here to keep the edge gateway adaptable across environments, while the `auth` service itself runs on Express/Node.
+H3 middleware, controllers, and utilities for integrating the front-end gateway with the [`auth`](https://github.com/Sergo706/auth) service. Pairing this package with an `auth` service instance (using its default or custom configuration) gives you end-to-end authentication flows with minimal wiring. 
 
 ## Features
 
@@ -363,17 +363,6 @@ router.post(
 );
 ```
 
-## Running as a Standalone Instance
-
-The repository ships with a smoke-test server under `test/server.ts`. To explore the integration end-to-end:
-
-```bash
-npm run build
-node dist/test/server.js
-```
-
-Provide the configuration via `test/setup/config.ts` (environment variables for OAuth secrets, etc.). The test server exercises the default middlewares, static routes, and OAuth providers defined in that configuration.
-
 ## Utilities and Helpers
 
 - `serviceToService` (alias of `sendToServer`): wraps `fetch` with client headers, cookies, and optional HMAC signing.
@@ -384,25 +373,4 @@ Provide the configuration via `test/setup/config.ts` (environment variables for 
 
 Refer to the TSDoc comments across `src/` for parameter descriptions and usage samples.
 
-## Further reading
-
-- [Token rotation and metadata](docs/token-rotation.md)
-- [OAuth/OIDC flow](docs/oauth.md)
-- [MFA flows](docs/mfa-flow/overview.md) - Built-in and custom MFA implementation
-- [CSRF and visitor validation](docs/csrf-and-visitor.md)
-- [Routes and controllers](docs/routes-and-controllers.md)
-- [Server-to-server requests](docs/server-to-server.md)
-- [Logging and error handling](docs/logging-and-errors.md)
-- [H3 v1 vs v2 guide](docs/h3-v1-v2.md)
-- [Client package](docs/client.md) - Nuxt/Vue composables and utilities
-- [Configuration guide](docs/configuration.md) - Full options reference
-
-### Handler Wrappers
-
-- [defineAuthenticatedEventHandler](docs/wrappers/defineAuthenticatedEventHandler.md) - Require authentication
-- [defineOptionalAuthenticationEvent](docs/wrappers/defineOptionalAuth.md) - Optional authentication
-- [defineAuthenticatedEventPostHandlers](docs/wrappers/authenticatedPostHandler.md) - Auth + CSRF + POST
-- [defineVerifiedCsrfHandler](docs/wrappers/csrfVerifier.md) - CSRF protection
-- [getAuthStatusHandler](docs/wrappers/getAuthStatus.md) - Pre-built auth status endpoint
-- [getCachedUserData](docs/wrappers/getCachedUserData.md) - Low-level user data caching
-- [defineDeduplicatedEventHandler](docs/wrappers/defineDeduplicatedEventHandler.md) - Request serializing/deduplication
+Full docs available here https://docs.riavzon.com/docs/auth-h3client

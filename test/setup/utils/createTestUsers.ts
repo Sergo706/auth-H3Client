@@ -4,6 +4,8 @@ import { parseResponseContentType } from "auth-h3client/v2";
 import pino from "pino";
 import { ResponseSign } from "@internal/shared";
 import { getCanaryCookie } from "./getCanaryCookie.js";
+import mysql2 from 'mysql2/promise';
+import { DB_CONFIG } from "../dbHooks.js";
 
 
 export interface TestUser {
@@ -31,6 +33,16 @@ export async function createUser(email: string, password: string, name: string, 
                     value: canary
                 }
          ]
+
+         const connection = await mysql2.createConnection(DB_CONFIG as any);
+         try {
+             await connection.execute(
+                 `INSERT IGNORE INTO visitors (canary_id, ip_address, first_seen, last_seen) VALUES (?, ?, NOW(), NOW())`,
+                 [canary, '127.0.0.1']
+             );
+         } finally {
+             await connection.end();
+         }
          const data = {
             name,
             email,

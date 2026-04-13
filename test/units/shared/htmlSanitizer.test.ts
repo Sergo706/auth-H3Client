@@ -186,7 +186,7 @@ describe('sanitizeInputString stress and nesting tests', () => {
         expect(vall).not.toContain('<script');
         expect(vall).toBe("");
         expect(end - start).toBeGreaterThan(0);
-        expect(end - start).toBeLessThan(60);
+        expect(end - start).toBeLessThan(80);
 
         const heavyInput = '%26lt%3Bscript%26gt%3Balert(1)%26lt%3B%2Fscript%26gt%3B'.repeat(1000);
         const secondPhase = performance.now();

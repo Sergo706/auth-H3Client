@@ -25,9 +25,8 @@
         ipv4_address: 172.29.20.2 
         
   auth-test:
-    image: jwtauth-service:latest
-    pull_policy: never
-    entrypoint: ["node", "dist/service.js"]
+    image: sergio68/auth
+    entrypoint: ["node", "dist/service.mjs"]
     read_only: false
     environment:
       CONFIG_PATH: /app/configs/auth-config.json
@@ -36,9 +35,11 @@
     cap_drop: ["ALL"]
     user: 0:0
     volumes: 
-      - ./auth-logs/server:/app/logs:rw
-      - ./auth-logs/server/bot-detector:/app/node_modules/@riavzon/botdetector/logs:rw
+      - ./auth-logs/server:/app/auth-logs:rw
+      - ./auth-logs/server/bot-detector:/app/bot-detector-logs:rw
       - ./test/setup/configs/:/app/configs/:rw
+      - email-data:/app/dist/email-db:rw
+      - bot-detector-data:/app/node_modules/@riavzon/bot-detector/dist/_data-sources:rw
     pids_limit: 200
     depends_on:
       mysql-test:
@@ -52,7 +53,9 @@
         ipv4_address: 172.28.5.4  
       test_h3client_egress: 
         ipv4_address: 172.29.20.3 
-
+ volumes:
+  bot-detector-data:
+  email-data:
  networks: 
   test_backend_h3client: 
     internal: true
