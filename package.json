@@ -1,10 +1,35 @@
 {
-  "name": "auth-h3client",
+  "name": "@riavzon/auth-h3client",
   "version": "1.0.0",
-  "description": "",
+  "author": "Sergio contact@riavzon.com",
   "type": "module",
   "main": "./dist/v1.js",
   "types": "./dist/v1.d.ts",
+  "license": "Apache-2.0",
+  "description": "H3 middleware, routes and client utilities for the Riavzon Auth service - includes magic links, OAuth/OIDC helpers, CSRF issuance/verification, token management, and optional mTLS support.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sergo706/auth-H3Client"
+  },
+  "homepage": "https://github.com/Sergo706/auth-H3Client#readme",
+  "bugs": {
+    "url": "https://github.com/Sergo706/auth-H3Client/issues"
+  },
+  "keywords": [
+    "auth",
+    "authentication",
+    "h3",
+    "nuxt",
+    "magic-links",
+    "oauth",
+    "oidc",
+    "csrf",
+    "mfa",
+    "middleware",
+    "hmac",
+    "mtls",
+    "email"
+  ],
   "workspaces": [
     "packages/*"
   ],
@@ -84,17 +109,12 @@
   ],
   "scripts": {
     "build": "rm -rf dist && tsup",
-    "prepare": "npm run build",
-    "prepack": "npm run build",
     "test": "vitest run --no-coverage",
     "start": "node dist/test/server.js",
     "docs:dev": "vitepress dev",
     "docs:build": "typedoc --options ./typedoc.json && vitepress build",
     "docs:preview": "vitepress preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "peerDependencies": {
     "h3": "^1.15.4 || ^2.0.0-beta.4",
     "nitropack": "^2.13.1",

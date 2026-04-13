@@ -12,9 +12,7 @@ H3 middleware, controllers, and utilities for integrating the front-end gateway 
 ## Installation
 
 ```bash
-npm install auth-h3client
-# or
-yarn add auth-h3client
+npm install @riavzon/auth-h3client
 ```
 
 ## Nuxt 3+ Module
@@ -23,7 +21,7 @@ If you are using **Nuxt 3++**, use the dedicated module. It handles all configur
 
 1. Install:
    ```bash
-   npm install auth-h3client
+   npm install @riavzon/auth-h3client
    ```
 2. Add to `nuxt.config.ts`:
    ```ts
