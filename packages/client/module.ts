@@ -1,4 +1,4 @@
-import { defineNuxtModule, addImports, addServerHandler, addServerImports } from '@nuxt/kit';
+import { defineNuxtModule, addImports, addServerHandler, addServerImports,resolvePath } from '@nuxt/kit';
 import { serverImports } from './presets/serverImports.js';
 
 export interface ModuleOptions  {
@@ -52,11 +52,11 @@ export default defineNuxtModule<ModuleOptions>({
     if (options.enableMiddleware !== false) {
       addServerHandler({
         middleware: true,
-        handler: '@riavzon/auth-h3client/server/middleware'
+        handler: await resolvePath('@riavzon/auth-h3client/server/middleware')
       });
       addServerHandler({
         middleware: false,
-        handler: '@riavzon/auth-h3client/server/routes',
+        handler: await resolvePath('@riavzon/auth-h3client/server/routes'),
         method: 'get',
         route: options.authStatusUrl,
       });
