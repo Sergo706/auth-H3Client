@@ -33,3 +33,4 @@ jobs:
           
       - name: Publish to NPM
         run: npm publish --access public
+        
