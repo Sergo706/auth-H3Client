@@ -25,7 +25,7 @@ If you are using **Nuxt 3++**, use the dedicated module. It handles all configur
    ```
 2. Add to `nuxt.config.ts`:
    ```ts
-   modules: ['auth-h3client/module'],
+   modules: ['@riavzon/auth-h3client/module'],
    ```
 3. Read the [Nuxt Module Documentation](docs/module.md) for full configuration and usage.
 
@@ -33,16 +33,16 @@ If you are using **Nuxt 3++**, use the dedicated module. It handles all configur
 
 This package supports both H3 v1 and H3 v2. Choose the matching entry point for your H3 version:
 
-- H3 v1 (default): import from `auth-h3client` or `auth-h3client/v1` (peer: `h3@^1.15.4`).
-- H3 v2: import from `auth-h3client/v2` (peer: `h3@^2.0.0-beta.4`).
-- Client: import from `auth-h3client/client` for Nuxt/Vue composables (peer: `nuxt`, `vue`, `ofetch`).
+- H3 v1 (default): import from `@riavzon/auth-h3client` or `@riavzon/auth-h3client/v1` (peer: `h3@^1.15.4`).
+- H3 v2: import from `@riavzon/auth-h3client/v2` (peer: `h3@^2.0.0-beta.4`).
+- Client: import from `@riavzon/auth-h3client/client` for Nuxt/Vue composables (peer: `nuxt`, `vue`, `ofetch`).
 
 Quick wiring examples:
 
 - H3 v1
   ```ts
   import { createApp, createRouter } from 'h3'
-  import { configuration, httpLogger, isIPValid, botDetectorMiddleware, generateCsrfCookie, useAuthRoutes, magicLinksRouter, useOAuthRoutes } from 'auth-h3client/v1'
+  import { configuration, httpLogger, isIPValid, botDetectorMiddleware, generateCsrfCookie, useAuthRoutes, magicLinksRouter, useOAuthRoutes } from '@riavzon/auth-h3client/v1'
   configuration({ /* ... */ })
   const app = createApp()
   httpLogger()(app)
@@ -57,7 +57,7 @@ Quick wiring examples:
 - H3 v2
   ```ts
   import { createApp, createRouter } from 'h3'
-  import { configuration, httpLogger, isIPValid, botDetectorMiddleware, generateCsrfCookie, useAuthRoutes, magicLinksRouter, useOAuthRoutes } from 'auth-h3client/v2'
+  import { configuration, httpLogger, isIPValid, botDetectorMiddleware, generateCsrfCookie, useAuthRoutes, magicLinksRouter, useOAuthRoutes } from '@riavzon/auth-h3client/v2'
   configuration({ /* ... */ })
   const app = createApp()
   app.use(httpLogger)
@@ -76,7 +76,7 @@ See docs/h3-v1-v2.md for more details, including route-level middleware and hand
 Before using any exported handlers you must call the `configuration` function exactly once at boot. The settings mirror `Configuration` from `src/types/configSchema.ts`.
 
 ```ts
-import { configuration } from 'auth-h3client';
+import { configuration } from '@riavzon/auth-h3client';
 import { createStorage } from 'unstorage';
 import memoryDriver from 'unstorage/drivers/memory';
 
@@ -178,7 +178,7 @@ Below is a single, complete configuration object showing all fields. Items marke
 
 ```ts
 // config/auth-client.config.ts
-import type { Configuration } from 'auth-h3client/dist/types/configSchema';
+import type { Configuration } from '@riavzon/auth-h3client/dist/types/configSchema';
 import { createStorage } from 'unstorage';
 import memoryDriver from 'unstorage/drivers/memory';
 
@@ -303,7 +303,7 @@ import {
   useAuthRoutes,
   magicLinksRouter,
   useOAuthRoutes,
-} from 'auth-h3client';
+} from '@riavzon/auth-h3client';
 
 configuration(/* ...config object from above... */);
 
@@ -336,7 +336,7 @@ import {
   limitBytes,
   verifyCsrfCookie,
   ensureValidCredentials,
-} from 'auth-h3client';
+} from '@riavzon/auth-h3client';
 
 router.post(
   '/auth/login',
