@@ -86,7 +86,7 @@
     "build": "rm -rf dist && tsup",
     "prepare": "npm run build",
     "prepack": "npm run build",
-    "test": "vitest run --coverage",
+    "test": "vitest run --no-coverage",
     "start": "node dist/test/server.js",
     "docs:dev": "vitepress dev",
     "docs:build": "typedoc --options ./typedoc.json && vitepress build",
