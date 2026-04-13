@@ -114,7 +114,7 @@
     "docs:dev": "vitepress dev",
     "docs:build": "typedoc --options ./typedoc.json && vitepress build",
     "docs:preview": "vitepress preview",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "h3": "^1.15.4 || ^2.0.0-beta.4",
