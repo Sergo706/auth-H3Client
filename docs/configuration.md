@@ -215,29 +215,6 @@ Use this for providers like GitHub or Facebook that might not strictly follow OI
 
 ---
 
-## Telegram Logging (`telegram`)
-
-Send security alerts (like successful logins, bans, etc.) to a Telegram chat.
-
-**Enabled:**
-```ts
-telegram: {
-  enableTelegramLogger: true,
-  token: '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11',  // Bot token
-  chatId: '-1001234567890',                           // Chat ID
-  allowedUser: 'my_telegram_username'                 // User whitelist
-}
-```
-
-**Disabled:**
-```ts
-telegram: {
-  enableTelegramLogger: false
-}
-```
-
----
-
 ## Logging Level (`logLevel`)
 
 Controls the verbosity of the internal logger (Pino).
@@ -308,9 +285,6 @@ export const setupAuth = () => {
         enableFireWallBans: true,
         logLevel: 'debug',
         
-        telegram: {
-            enableTelegramLogger: false
-        },
         
         OAuthProviders: [
             {

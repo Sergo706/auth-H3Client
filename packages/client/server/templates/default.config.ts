@@ -44,8 +44,5 @@ export const configDefaults: Configuration = {
     },
     magicLinkRedirectPath: '/auth/verify',
     magicLinkBouncePath: '/auth/bounce',
-    telegram: {
-        enableTelegramLogger: false as const,
-    },
     logLevel: 'info' as const
 }

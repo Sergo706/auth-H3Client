@@ -246,17 +246,6 @@ Utilities to build robust and observable backend logic.
 
 ### Logging
 - **HTTP Logger**: Structured JSON logging via Pino. Includes request ID, duration, status, and IP.
-- **Telegram Alerts**: Send critical security alerts (e.g., multiple failed logins, banned IP) directly to a Telegram chat.
-
-```typescript
-import { sendTelegramMessage } from 'auth-h3client/v2';
-
-await sendTelegramMessage({
-  level: 'error',
-  message: 'Suspicious activity detected',
-  context: { ip: '1.2.3.4' }
-});
-```
 
 ### Input Sanitization
 

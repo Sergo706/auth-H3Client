@@ -183,24 +183,6 @@ export const configurationSchema = z.strictObject({
    magicLinkBouncePath: z.string().default('/auth/bounce'),
    /** Whether to enable automatic banning of suspicious IPs (requires server support) */
    enableFireWallBans: z.boolean(),
-   /**
-    * Telegram notification settings.
-    * Useful for receiving real-time security alerts (e.g., bans, errors).
-    */
-   telegram: z.discriminatedUnion("enableTelegramLogger", [
-      z.object({
-      enableTelegramLogger: z.literal(false),
-      token: z.string().optional(),
-      chatId: z.string().optional(),
-      allowedUser: z.string().optional()
-   }),
-   z.object({
-      enableTelegramLogger: z.literal(true),
-      token: z.string(),
-      chatId: z.string(),
-      allowedUser: z.string()
-   }),
-]),
    /** Minimum logging level for the client logger */
    logLevel: z.enum(['debug', 'info', 'warn', 'error', 'fatal'])
 }).strict()

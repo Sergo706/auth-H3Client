@@ -6,7 +6,7 @@ H3 middleware, controllers, and utilities for integrating the front-end gateway 
 
 - **Drop-in routes**: `useAuthRoutes`, `magicLinksRouter`, and `useOAuthRoutes` register login, signup, MFA, reset-password, and OAuth flows on any H3 router.
 - **Middlewares**: CSRF issuance/verification, body size limiting, visitor fingerprint validation, token rotation, structured logging, and more.
-- **Typed utilities**: Cookie helpers, PKCE generation, OAuth token verification, server-to-server fetch wrapper, Telegram logging, and mini cache implementation.
+- **Typed utilities**: Cookie helpers, PKCE generation, OAuth token verification, server-to-server fetch wrapper, and mini cache implementation.
 - **Config-driven**: Strongly typed configuration schema validated via `zod`, with optional OAuth provider metadata, HMAC signing, and TLS options.
 
 ## Installation
@@ -122,7 +122,6 @@ configuration({
       redirectUrlOnError: 'https://app.example.com/login',
     },
   ],
-  telegram: { enableTelegramLogger: false },
   logLevel: 'info',
 });
 ```
@@ -271,14 +270,6 @@ export const config: Configuration = {
     },
   ],
 
-  // Optional Telegram security notifications
-  telegram: {
-    enableTelegramLogger: false, // set to true to enable
-    // The following are required only when enableTelegramLogger is true
-    token: process.env.TELEGRAM_BOT_TOKEN!,   // optional when disabled
-    chatId: process.env.TELEGRAM_CHAT_ID!,    // optional when disabled
-    allowedUser: process.env.TELEGRAM_USER!,  // optional when disabled
-  },
 
   // Logger level used by internal pino
   logLevel: 'info', // 'debug' | 'info' | 'warn' | 'error' | 'fatal'
@@ -295,7 +286,6 @@ export const config: Configuration = {
 | `server.cryptoCookiesSecret` | Secret used to sign CSRF and state cookies. |
 | `onSuccessRedirect` | Default redirect URL after successful login/signup/MFA flows. |
 | `OAuthProviders` | Optional list of OAuth/OIDC providers with per-provider redirect behavior. |
-| `telegram` | Optional Telegram alerting configuration for security events. |
 | `logLevel` | Pino logger level (`debug`, `info`, `warn`, `error`, or `fatal`). |
 
 See `test/setup/config.ts` for a complete example with multiple OAuth providers.

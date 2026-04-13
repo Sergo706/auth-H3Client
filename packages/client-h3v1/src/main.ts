@@ -45,7 +45,6 @@ export { safeObjectMerge } from "@internal/shared";
 export { getAuthAgent } from "@internal/shared";
 export { signature } from "@internal/shared";
 export { sendToServer as serviceToService} from "./utils/serverToServer.js";
-export { sendLog as sendTelegramMessage } from "@internal/shared";
 export { verifyOAuthToken } from "@internal/shared";
 export {applyRotationResult} from "./utils/applyRotationResults.js"
 export {safeAction as lockAsyncAction} from "@internal/shared"

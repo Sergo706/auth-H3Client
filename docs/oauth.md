@@ -611,8 +611,6 @@ configuration({
   enableFireWallBans: true,
   logLevel: 'info',
   
-  telegram: { enableTelegramLogger: false },
-  
   OAuthProviders: [
     // Google (OIDC)
     {

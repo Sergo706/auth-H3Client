@@ -48,9 +48,6 @@ export const configDefaults: Configuration = {
     },
     onSuccessRedirect: `/`,
     enableFireWallBans: false,
-    telegram: {
-        enableTelegramLogger: false as const,
-    },
     logLevel: 'info' as const,
     OAuthProviders: [{
         kind: 'oidc',

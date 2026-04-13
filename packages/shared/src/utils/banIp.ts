@@ -1,5 +1,4 @@
 import { spawn } from 'child_process';
-import { sendLog } from './telegramLogger.js';
 import { getLogger } from './logger.js';
 const UFW = '/usr/sbin/ufw';
 
@@ -37,7 +36,6 @@ export function banIp(ip: string): Promise<void> {
       child.on('error', err => {
         clearTimeout(timer);
         log.error({msg: err.message},`- CRITICAL - UFW spawn failed`)
-        sendLog('- CRITICAL - UFW spawn failed', err.message);
         reject(err);
       });
 
@@ -62,14 +60,9 @@ export function banIp(ip: string): Promise<void> {
     })
     .then(() => {
       log.info(`Banned Detected Bot/Malicious User --- FRONTEND ---`)
-      sendLog(
-        'Banning Detected Bot/Malicious User --- FRONTEND ---',
-        `IP ${ip} banned}`
-      );
     })
     .catch((err: Error) => {
       log.error(`- CRITICAL - UFW ban failed\n ${err.message}`)
-      sendLog('- CRITICAL - UFW ban failed', err.message);
       throw err;
     });
 }

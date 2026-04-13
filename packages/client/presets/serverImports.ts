@@ -61,7 +61,6 @@ export const serverImports = [
   { name: 'throwHttpError', from: 'auth-h3client/v1' },
   { name: 'lockAsyncAction', from: 'auth-h3client/v1' },
   { name: 'getLogger', from: 'auth-h3client/v1' },
-  { name: 'sendTelegramMessage', from: 'auth-h3client/v1' },
   
   { name: 'getBaseUrl', from: 'auth-h3client/v1' },
   { name: 'parseResponseContentType', from: 'auth-h3client/v1' },

@@ -8,7 +8,6 @@ This document covers the logging infrastructure and error handling patterns in a
 - [HTTP Request Logger](#http-request-logger)
 - [Application Logger](#application-logger)
 - [Error Handling](#error-handling)
-- [Telegram Alerts](#telegram-alerts)
 - [Log Levels](#log-levels)
 - [Production Recommendations](#production-recommendations)
 
@@ -23,14 +22,12 @@ This document covers the logging infrastructure and error handling patterns in a
 3.  **Application Logger**: Records domain events inside handlers.
 4.  **Output Stream**:
     -   **Standard**: JSON logs to `stdout`.
-    -   **Security**: Critical events (bans, failed logins) are sent to **Telegram**.
 
 | Component | Purpose |
 |-----------|---------|
 | HTTP Logger | Request/response logging with timing |
 | Application Logger | Structured logging throughout handlers |
 | Error Helper | Standardized error responses |
-| Telegram Logger | Security alerts to Telegram |
 
 ---
 
@@ -314,23 +311,6 @@ And the log entry:
 
 ---
 
-## Telegram Alerts
-
-Security events can be sent to a Telegram chat for real-time monitoring.
-
-### Configuration
-
-```typescript
-configuration({
-  telegram: {
-    enableTelegramLogger: true,
-    token: '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11',
-    chatId: '-1001234567890',
-    allowedUser: 'my_telegram_username'
-  }
-});
-```
-
 ### What Gets Alerted
 
 | Event | Priority |
@@ -442,6 +422,6 @@ log.warn({
 
 ## See Also
 
-- [Configuration](./configuration.md) - Log level and Telegram settings
+- [Configuration](./configuration.md) - Log level and settings
 - [CSRF & Visitor](./csrf-and-visitor.md) - Security middleware
 - [defineAuthenticatedEventHandler](./wrappers/defineAuthenticatedEventHandler.md) - Auth wrapper with built-in error handling

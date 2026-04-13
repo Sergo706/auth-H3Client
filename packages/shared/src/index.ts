@@ -18,7 +18,6 @@ export * from './utils/pkce.js';
 export * from './utils/safeMerge.js';
 export * from './utils/serverAuth.js';
 export * from './utils/serverSignature.js';
-export * from './utils/telegramLogger.js';
 export * from './utils/verifyOAuthTokens.js';
 export * from './types/oidc.js';
 export * from './types/signup.js';

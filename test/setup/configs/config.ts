@@ -101,10 +101,6 @@ export const config: Configuration = {
       redirectUrlOnError: 'https://share-ad1ae22.com:3000/'
     }
 ],
-    telegram: {
-        enableTelegramLogger: false,
-    },
-
     enableFireWallBans: false,
     logLevel: 'info'
 }

@@ -54,7 +54,6 @@ export default defineNitroPlugin((nitroApp) => {
     onSuccessRedirect: '/dashboard',
     enableFireWallBans: false,
     logLevel: 'debug',
-    telegram: { enableTelegramLogger: false },
     
     // Optional: OAuth Providers
     OAuthProviders: [
