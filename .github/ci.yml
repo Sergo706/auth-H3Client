@@ -12,7 +12,7 @@ jobs:
   build-and-test:
     name: Build & Typecheck
     runs-on: ubuntu-latest
-
+ 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
