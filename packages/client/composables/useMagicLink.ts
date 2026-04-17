@@ -90,6 +90,7 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
          token: String(token),
          random: String(random),
          visitor: String(visitor),
-        ...resultValue,
+         reason: resultValue.reason.toLowerCase(),
+         link: resultValue.link.toLowerCase() as "Password Reset" | "MFA Code" | 'Custom MFA'
     };
 }
