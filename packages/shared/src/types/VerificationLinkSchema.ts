@@ -28,7 +28,7 @@ export const schema = z.object({
  */
 export const verificationLink = z.object({
     ...schema.shape,
-    visitor: z.coerce.number(),
+    visitor: z.string(),
     token: z.string()
 })
 
