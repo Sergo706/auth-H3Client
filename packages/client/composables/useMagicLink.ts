@@ -59,7 +59,7 @@ export async function useMagicLink(path?: string): Promise<Data | NotFoundPath> 
     const event = useRequestEvent();
     const fetcher = useRequestFetch();
     
-    const { error, data } = await useAsyncData(String(reason), async () => {
+    const { error, data } = await useAsyncData(`${reason}:${token}`, async () => {
         const result = await executeRequest<SuccessPath | NotFoundPath>(baseUrl, "GET", { random, token, reason, visitor }, {}, {}, { headers, event, fetcher })
         
         if (!result.ok) {

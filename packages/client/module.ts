@@ -24,7 +24,7 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     enableMiddleware: true,
-    authStatusUrl: '/auth/users/authStatus'
+    authStatusUrl: '/api/auth/users/authStatus'
   },
   async setup(options, nuxt) {
 
