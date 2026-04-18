@@ -114,7 +114,10 @@ if (!canary) {
          setResponseStatus(event, 200)
          return { 
             ok: true,
-            redirectTo: onSuccessRedirect 
+            date: new Date().toISOString(),
+            data: {
+                redirectTo: onSuccessRedirect 
+            }
           }
         }
         return sendRedirect(event, onSuccessRedirect, 303);
