@@ -109,7 +109,13 @@ if (!password) {
     if (sendData.status === 200 && json.success) {
         log.info(`User changed is password`);  
         setResponseStatus(event, 200)
-        return {ans: `Your password has been reset! Please login to your account to continue.`}
+        return {
+            ok: true,
+            date: new Date().toISOString(),
+            data: {
+                ans: `Your password has been reset! Please login to your account to continue.`
+            }
+        };
      };
 
     } catch(err) {
