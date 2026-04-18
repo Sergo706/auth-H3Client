@@ -87,7 +87,7 @@ if (!canary) {
           accessIat?: any; accessToken?: string 
         };
         const accessToken = json.accessToken;
-        const accessIat   = json.accessIat;
+        const accessIat = json.accessIat;
         log.info({serverResponse: json, code: serverResponse.status},'MFA verification completed.')
 
        if (setCookies && accessToken) {

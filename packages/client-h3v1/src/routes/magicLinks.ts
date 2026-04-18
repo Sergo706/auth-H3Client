@@ -47,7 +47,6 @@ export function magicLinksRouter(router: Router, prefix?: string) {
   router.get(p('/auth/verify-mfa'), verifyMfaGetPipeline);
 
   const verifyMfaPostPipeline = defineEventHandler(async (event) => {
-      await verifyMfaLink(event); 
       await checkCsrf(event);
       await contentType('application/json')(event);
       await limitBytes(1024)(event);

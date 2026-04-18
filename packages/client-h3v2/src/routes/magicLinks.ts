@@ -42,7 +42,7 @@ export function magicLinksRouter(router: H3, prefix?: string) {
         {middleware: [noStore, csrfToken]}
     )
     .post(p('/auth/verify-mfa'), sendCode, 
-        {middleware: [verifyMfaLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
+        {middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)]}
     );
 
 

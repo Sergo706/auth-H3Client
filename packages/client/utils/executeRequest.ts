@@ -103,14 +103,18 @@ export async function executeRequest<T>(
         if (!json) return { 
              ok: false,
              date: new Date().toISOString(),
-            reason: 'Server Error. Empty response body.' 
+             reason: 'Server Error. Empty response body.' 
         };
 
         if ('ok' in json && !json.ok) {
              return json as Results<T>;
         }
 
-        return json;
+        return {
+            ok: true,
+            date: new Date().toISOString(), 
+            data: json
+        };
 
     } catch (err) {
         return {
