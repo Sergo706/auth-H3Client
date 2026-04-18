@@ -8,11 +8,11 @@ export function bounceRouter(router: Router, prefix?: string) {
 
   const { magicLinkRedirectPath, magicLinkBouncePath } = getConfiguration();
   
-  router.get(p(magicLinkBouncePath), defineEventHandler((event) => {
+  router.get(p(magicLinkBouncePath), defineEventHandler(async (event) => {
     const { visitor, random, reason, token } = getQuery<VerificationLinkSchema>(event)
     
     const destination = `${magicLinkRedirectPath}?token=${en(token)}&reason=${en(reason)}&visitor=${en(visitor)}&random=${en(random)}`;
 
-    return safeRedirect(destination, event);
+    return await safeRedirect(destination, event);
   }));
 }

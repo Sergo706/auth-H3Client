@@ -12,6 +12,6 @@ export function bounceRouter(router: H3, prefix?: string) {
     
     const destination = `${magicLinkRedirectPath}?token=${en(token)}&reason=${en(reason)}&visitor=${en(visitor)}&random=${en(random)}`;
 
-    return safeRedirect(destination, event);
+    return safeRedirect(destination);
   }));
 }
