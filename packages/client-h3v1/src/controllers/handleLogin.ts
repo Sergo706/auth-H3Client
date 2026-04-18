@@ -1,7 +1,7 @@
 import { makeCookie } from "../utils/cookieGenerator.js";
 import { sendToServer } from '../utils/serverToServer.js';
 import { getLogger } from "@internal/shared";
-import { appendHeader, assertMethod, defineEventHandler, getHeader, getRequestIP, H3Error, sendRedirect, setResponseStatus } from "h3";
+import { appendHeader, assertMethod, defineEventHandler, getHeader, getRequestIP, getCookie, H3Error, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";
@@ -48,7 +48,13 @@ if (!email || !password) {
 }
 
 try {
-    const sendData = await sendToServer(false, `/login`, 'POST', event, true, undefined, {email, password});
+    const canaryCookie = [
+        {
+          label: `canary_id`,
+          value: getCookie(event, 'canary_id')
+        }
+      ]
+    const sendData = await sendToServer(false, `/login`, 'POST', event, true, canaryCookie, {email, password});
 
     if (!sendData) {
         throwError(log,event,'SERVER_ERROR', 500, 'Server Error', 'Server error please try again later', 'Api Call Failed')
