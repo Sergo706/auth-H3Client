@@ -7,8 +7,15 @@
         "declaration": false,
         "declarationMap": false,
         "noEmit": true,
+        "ignoreDeprecations": "6.0",
         "baseUrl": "..",
         "paths": {
+            "auth-h3client/v1": [
+                "./packages/client-h3v1/src/main.ts"
+            ],
+            "auth-h3client/v2": [
+                "./packages/client-h3v2/src/main.ts"
+            ],
             "@internal/shared": [
                 "./packages/shared/src/index.ts"
             ]

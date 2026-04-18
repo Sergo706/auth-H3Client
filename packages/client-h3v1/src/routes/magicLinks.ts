@@ -72,7 +72,6 @@ const resetGetPipeline = defineEventHandler(async (event) => {
   router.get(p('/auth/reset-password'), resetGetPipeline);
 
 const resetPostPipeline = defineEventHandler(async (event) => {
-      await verifyPasswordLink(event); 
       await checkCsrf(event);
       await contentType('application/json')(event);
       await limitBytes(1024)(event);

@@ -58,7 +58,7 @@ export function magicLinksRouter(router: H3, prefix?: string) {
     )
     
     .post(p("/auth/reset-password"), sendNewPassword,
-        {middleware: [verifyPasswordLink, checkCsrf, contentType('application/json'), limitBytes(1024)]}
+        {middleware: [checkCsrf, contentType('application/json'), limitBytes(1024)]}
     )
 
     router.post(p('/auth/change-email'), initChangeEmailFlow);
