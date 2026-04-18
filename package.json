@@ -1,6 +1,6 @@
 {
   "name": "@riavzon/auth-h3client",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "author": "Sergio contact@riavzon.com",
   "type": "module",
   "main": "./dist/v1.js",
