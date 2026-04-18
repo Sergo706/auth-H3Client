@@ -61,7 +61,7 @@ getLogger().child(
     const results = await parseResponseContentType(log, res) as LinkPasswordVerificationResponse;
 
 
-    if (res.ok && results && 'ok' in results && results.ok && res.status === 200) {
+    if (res.ok && results && 'ok' in results && results.ok && res.status === 200 && event.method === 'GET') {
         log.info(`Link verified with a GET reqs. context is set.`);
         return {
             ok: true,
@@ -70,7 +70,9 @@ getLogger().child(
         }
       }
 
- 
-    log.info( {...results},`link verification failed: invalid link`)
-    return notFoundHandler(event);
+    if (event.method === 'GET') {
+        log.info( {...results},`link verification failed: invalid link`)
+        return notFoundHandler(event);
+    }
+    return;
 })
