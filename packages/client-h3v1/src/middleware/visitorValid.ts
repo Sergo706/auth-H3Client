@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { createSignedCookie, safeAction } from "@internal/shared";
 import { verifySignedCookie } from "@internal/shared";
 import { getLogger} from "@internal/shared";
-import { getCookie, getRequestURL, H3Event, createError, parseCookies, getRequestIP, getRequestHeader } from "h3";
+import { getCookie, getRequestURL, H3Event, createError, parseCookies, getRequestIP, getRequestHeader, getHeader } from "h3";
 import { getConfiguration } from "@internal/shared";
 import { checkForBots } from "../utils/checkForBots.js";
 
@@ -47,7 +47,10 @@ export const validator = async (event: H3Event): Promise<any> => {
       const newUuid = crypto.randomBytes(32).toString("hex");
       const cookieValue = createSignedCookie(newUuid, 1000 * 60 * 60 * 2, 'normal');
       log.info({cookies: parseCookies(event)},`Sending request for /check`)
-
+      
+      const xReal = getHeader(event, 'x-real-ip')
+      const clientIp = xReal || getRequestIP(event, {xForwardedFor: true}) || undefined
+      
       if (canary || rawCookie) {
         const key = canary || rawCookie as string;
         return safeAction(key, 
@@ -55,7 +58,7 @@ export const validator = async (event: H3Event): Promise<any> => {
           await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.method, log, enableFireWallBans, canary)
       , 5000)
       } else {
-        return safeAction(`${getRequestIP(event)}:${getRequestHeader(event, 'User-Agent')}`, async () => 
+        return safeAction(`${clientIp}:${getRequestHeader(event, 'User-Agent')}`, async () => 
            await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.method, log, enableFireWallBans, canary)
         , 5000)
       }
