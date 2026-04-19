@@ -1,7 +1,7 @@
 import { getLogger, validateZodSchema, verificationLink, VerificationLinkSchema } from "@internal/shared";
 import { sendToServer } from "../utils/serverToServer.js";
 import { makeCookie } from "../utils/cookieGenerator.js";
-import { appendHeader, assertMethod, getCookie, getHeader, getQuery, getRouterParam, sendRedirect, setResponseStatus } from "h3";
+import { appendHeader, assertMethod, getCookie, getHeader, getQuery, sendRedirect, setResponseStatus } from "h3";
 import throwError from "../middleware/error.js";
 import { getOperationalConfig } from "../utils/getRemoteConfig.js";
 import { getConfiguration } from "@internal/shared";

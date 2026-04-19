@@ -31,16 +31,16 @@ getLogger().child(
    log.info('Entered Link Verifier')
     const canary = getCookie(event, 'canary_id');
 
-    const cookies = [{
-        label: 'canary_id',
-        value: canary
-    }]
-
     if (!canary) {
        log.warn('Invalid temp link token. Or canary is possibly undefined')
         throwError(log,event,'FORBIDDEN',401, "UnAuthorized", "Un Authorized",`Missing credentials`);
     }
     
+    const cookies = [{
+        label: 'canary_id',
+        value: canary
+    }]
+
     const validation = validateZodSchema(verificationLink, query, log);
 
     if ('valid' in validation) {

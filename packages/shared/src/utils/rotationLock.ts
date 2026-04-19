@@ -62,7 +62,7 @@ export async function safeAction<T>(token: string, action: () => Promise<T>, rec
          return result as T;
     }
     
-    log.info('No lock/cache found. Becoming leader.');
+    log.info(`No lock/cache found. Becoming leader. ${token}`);
     const promise = action();
     rotationLocks.set(token, promise);
 

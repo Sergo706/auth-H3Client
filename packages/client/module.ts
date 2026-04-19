@@ -9,7 +9,7 @@ export interface ModuleOptions  {
   enableMiddleware?: boolean;
     /**
    * default auth status url to use
-   * @default '/auth/users/authStatus'
+   * @default '/api/auth/users/authStatus'
    */
   authStatusUrl?: string;
 }

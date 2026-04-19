@@ -1,5 +1,5 @@
 import { sendToServer } from '../utils/serverToServer.js';
-import { getLogger, validateZodSchema, verificationLink, VerificationLinkSchema } from "@internal/shared";
+import { getLogger, parseResponseContentType, validateZodSchema, verificationLink, VerificationLinkSchema } from "@internal/shared";
 import { banIp } from "@internal/shared";
 import { appendHeader, assertMethod, getCookie, getHeader, getQuery, getRequestIP, getRouterParam, setResponseStatus } from 'h3';
 import throwError from '../middleware/error.js';
@@ -23,6 +23,18 @@ const canary = getCookie(event, 'canary_id');
 
 const log = getLogger().child({service: `auth`, branch: 'password-reset', reqID: event.context.rid, canary });
 
+log.info(`Entered sendNewPassword Post Route`)
+
+const contentType = getHeader(event, 'Content-Type')!;
+
+if (!contentType || contentType !== 'application/json') {
+    throwError(log, event, 'INVALID_CONTENT_TYPE', 400, 'Invalid Content-Type', 'Content-Type must be application/json', `Received: ${contentType}`);
+};
+
+if (!canary) {
+    throwError(log,event,'INVALID_CREDENTIALS',403,'FORBIDDEN', 'INVALID_CREDENTIALS', 'Invalid temp link token. Or canary is possibly undefined')
+}
+
 const validation = validateZodSchema(verificationLink, query, log);
 
  if ('valid' in validation) {
@@ -34,19 +46,6 @@ const validation = validateZodSchema(verificationLink, query, log);
         label: 'canary_id',
         value: canary
   }]
-
-log.info(`Entered sendNewPassword Post Route`)
-
-const contentType = getHeader(event, 'Content-Type')!;
-
-if (!contentType || contentType !== 'application/json') {
-  throwError(log, event, 'INVALID_CONTENT_TYPE', 400, 'Invalid Content-Type', 'Content-Type must be application/json', `Received: ${contentType}`);
-};
-
-if (!cookies) {
-   throwError(log,event,'INVALID_CREDENTIALS',403,'FORBIDDEN', 'INVALID_CREDENTIALS', 'Invalid temp link token. Or canary is possibly undefined')
-}
-
 
 const body = event.context.body as { password: string | undefined; confirmedPassword: string | undefined}
 
@@ -80,10 +79,10 @@ if (!password) {
         }
 
         log.info(`Got results, validating...`);  
-        const json = await sendData.json() as any;
+        const res = await parseResponseContentType(log, sendData);
 
     if (sendData.status === 400) {
-        throwError(log,event,'AUTH_SERVER_ERROR', 400, 'Error changing password', 'Error changing password', `error changing password ${json.error}`)
+        throwError(log,event,'AUTH_SERVER_ERROR', 400, 'Error changing password', 'Error changing password', `error changing password ${res.error ?? res}`)
     }
 
     if (sendData.status === 403) {
@@ -106,7 +105,7 @@ if (!password) {
         return { error: `To many attempts, please try again later.`};
     };
 
-    if (sendData.status === 200 && json.success) {
+    if (sendData.status === 200 && res.success) {
         log.info(`User changed is password`);  
         setResponseStatus(event, 200)
         return {

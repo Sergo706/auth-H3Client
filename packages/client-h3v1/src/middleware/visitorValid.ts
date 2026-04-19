@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { createSignedCookie, safeAction } from "@internal/shared";
 import { verifySignedCookie } from "@internal/shared";
 import { getLogger} from "@internal/shared";
-import { getCookie, getRequestURL, H3Event, createError, parseCookies } from "h3";
+import { getCookie, getRequestURL, H3Event, createError, parseCookies, getRequestIP, getRequestHeader } from "h3";
 import { getConfiguration } from "@internal/shared";
 import { checkForBots } from "../utils/checkForBots.js";
 
@@ -53,9 +53,11 @@ export const validator = async (event: H3Event): Promise<any> => {
         return safeAction(key, 
         async () => 
           await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.method, log, enableFireWallBans, canary)
-      )
+      , 5000)
       } else {
-       return await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.method, log, enableFireWallBans, canary)
+        return safeAction(`${getRequestIP(event)}:${getRequestHeader(event, 'User-Agent')}`, async () => 
+           await checkForBots({name: COOKIE_NAME, value: cookieValue}, event, event.method, log, enableFireWallBans, canary)
+        , 5000)
       }
 }
 };
