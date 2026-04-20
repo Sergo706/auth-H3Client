@@ -48,7 +48,6 @@ export async function executeRequest<T>(
 
         const headers: Record<string, string> = {
             ...customHeaders,
-            'X-Forwarded-For': customHeaders['x-forwarded-for'] ?? '127.0.0.1',
         };
 
         if (import.meta.client && token) {

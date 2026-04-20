@@ -50,7 +50,7 @@ getLogger().child(
     const { visitor, random, reason, token } = validation.data;
     const url = `/auth/verify-mfa/?visitor=${visitor}&token=${encodeURIComponent(token)}&random=${encodeURIComponent(random)}&reason=${reason}`
 
-    const res = await safeAction(canary, async () => { 
+    const res = await safeAction(`${canary}:${random}${visitor}`, async () => { 
         return await sendToServer(false, url,'GET', event, false, cookies)
     })
 
