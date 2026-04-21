@@ -35,7 +35,7 @@ describe('Ask for Mfa flow', () => {
     it('should perform only 1 call for many calls without rate limiting', async () => {
             const random = crypto.randomBytes(128)
             const log = getLogger().child({service: 'testing'})  
-            const user = inject('testUser')
+            const user = await createUser('jimmy@gmail.com', 'CorrectPassword123!', 'Jimmy', log);
             const serverCookies = parseCookies(user.serverCookies);
 
             const event = createMockEvent({
