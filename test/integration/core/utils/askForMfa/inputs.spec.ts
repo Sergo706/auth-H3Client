@@ -4,6 +4,7 @@ import { inject, expect,it,describe, beforeAll } from "vitest";
 import { parseCookies } from "../../../../setup/utils/parseRawCookies.js";
 import crypto from 'node:crypto';
 import { getLogger } from "auth-h3client/v2";
+import { createUser } from "../../../../setup/utils/createTestUsers.js";
 
     
 describe('should reject on bad data inputs', () => {
@@ -86,7 +87,7 @@ describe('should reject on bad data inputs', () => {
                     "session": serverCookies["session"],
                  }
             })
-
+            await new Promise(resolve => setTimeout(resolve, 5000));
             const resultsForMixedCanary = await askForMfaFlow(event, log, crypto.randomUUID(), random)
             expect(resultsForMixedCanary).toHaveProperty('date')
             expect(resultsForMixedCanary.ok).toBe(false) 
@@ -118,7 +119,7 @@ describe('should reject on bad data inputs', () => {
         it('should allow direct access token passing', async () => {
             const random = crypto.randomBytes(128)
             const log = getLogger().child({service: 'testing'})  
-            const user = inject('testUser')
+            const user = await createUser('sergeyriavzon@gmail.com', 'CorrectPassword123!', 'Sergey', log);
             const serverCookies = parseCookies(user.serverCookies);
 
             const event = createMockEvent({
@@ -127,7 +128,7 @@ describe('should reject on bad data inputs', () => {
                 "session": serverCookies["session"],
             }
         })
-            await new Promise(r => setTimeout(r, 1000))
+            await new Promise(r => setTimeout(r, 5000))
 
             const results = await askForMfaFlow(event, log, crypto.randomUUID(), random, user.accessToken)
             expect(results).toHaveProperty('date')

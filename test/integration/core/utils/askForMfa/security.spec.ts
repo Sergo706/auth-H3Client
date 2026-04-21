@@ -4,6 +4,7 @@ import { inject, expect,it,describe} from "vitest";
 import { parseCookies } from "../../../../setup/utils/parseRawCookies.js";
 import crypto from 'node:crypto';
 import { getLogger } from "auth-h3client/v2";
+import { createUser } from "../../../../setup/utils/createTestUsers.js";
 
 
 
@@ -11,7 +12,7 @@ describe('Security', () => {
         it('should trigger rate limiting', async () => {
             const random = crypto.randomBytes(128)
             const log = getLogger().child({service: 'testing'})  
-            const user = inject('anotherUser')
+            const user = await createUser('alice@gmail.com', 'CorrectPassword123!', 'Alice', log);
             const serverCookies = parseCookies(user.serverCookies);
 
             const event = createMockEvent({

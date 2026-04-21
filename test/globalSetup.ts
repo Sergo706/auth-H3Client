@@ -6,8 +6,8 @@ import { serviceToService } from "auth-h3client/v2";
 import { createMockEvent } from "./setup/utils/cookieJar.js";
 import { run } from './setup/utils/run.js'
 import { createUser, TestUser } from './setup/utils/createTestUsers.js';
-
 import type { TestProject } from 'vitest/node'
+import { getCanaryCookie } from './setup/utils/getCanaryCookie.js';
 
 let testUser: TestUser;
 let anotherUser: TestUser;
@@ -34,6 +34,15 @@ async function waitForAuth() {
     const event = createMockEvent({
               url: '/login'
     });
+
+      const canary = await getCanaryCookie(event)
+      const cookies = [
+                {
+                    label: `canary_id`,
+                    value: canary
+                }
+         ];
+
       console.log(`Waiting for auth...`);
       const retryInterval = 3000;
       for (let i = 0; i < maxRetries; i++) {
@@ -44,7 +53,7 @@ async function waitForAuth() {
                 'POST', 
                 event, 
                 true, 
-                undefined, 
+                cookies, 
                 { email: 'sergo998826@gmail.com', password: 'CorrectPassword123!' }
             );
             if (response) {
@@ -73,6 +82,7 @@ export async function setup(project: TestProject) {
         const log = getLogger().child({service: 'setup'});
 
         testUser = await createUser('sergo998826@gmail.com', 'CorrectPassword123!', 'John', log);
+        await new Promise(resolve => setTimeout(resolve, 5000));
         anotherUser = await createUser('f42367195@gmail.com', 'CorrectPassword123!', 'Jane', log);
         project.provide('testUser', testUser)
         project.provide('anotherUser', anotherUser)
