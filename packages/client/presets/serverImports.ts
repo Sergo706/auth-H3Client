@@ -14,6 +14,12 @@ export const serverImports = [
   { name: 'defineOptionalAuthenticationEvent', from: '@riavzon/auth-h3client/v1' },
   { name: 'defineVerifiedCsrfHandler', from: '@riavzon/auth-h3client/v1' },
   { name: 'defineAuthenticatedEventPostHandlers', from: '@riavzon/auth-h3client/v1' },
+
+  { name: 'defineAuthenticatePublicApi', from: '@riavzon/auth-h3client/v1' },
+  { name: 'getApiListsController', from: '@riavzon/auth-h3client/v1' },
+  { name: 'defineApiManagementHandler', from: '@riavzon/auth-h3client/v1' },
+  { name: 'defineByteLimiterHandler', from: '@riavzon/auth-h3client/v1' },  
+  
   { name: 'defineDeduplicatedEventHandler', from: '@riavzon/auth-h3client/v1' },
   { name: 'getAuthStatusHandler', from: '@riavzon/auth-h3client/v1' },
   

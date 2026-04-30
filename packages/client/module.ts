@@ -12,6 +12,15 @@ export interface ModuleOptions  {
    * @default '/api/auth/users/authStatus'
    */
   authStatusUrl?: string;
+  /**
+   * The `getApiListsController` route configuration option. disabled if omitted
+   */
+  registerApiRoute?: {
+    /**
+     * The path the controller will be registered on.
+     */
+    path: string
+  }
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -56,10 +65,19 @@ export default defineNuxtModule<ModuleOptions>({
       });
       addServerHandler({
         middleware: false,
-        handler: await resolvePath('@riavzon/auth-h3client/server/routes'),
+        handler: await resolvePath('@riavzon/auth-h3client/server/auth-status'),
         method: 'get',
         route: options.authStatusUrl,
       });
+
+      if(options.registerApiRoute) {
+         addServerHandler({
+            middleware: false,
+            handler: await resolvePath('@riavzon/auth-h3client/server/api-lists'),
+            method: 'get',
+            route: options.registerApiRoute.path,
+         });
+      }
     }
 
   }

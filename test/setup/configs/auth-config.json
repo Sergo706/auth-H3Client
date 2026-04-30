@@ -104,6 +104,341 @@
             "byPassAnomaliesFor": 10800000
         }
     },
+    "rate_limiters": {
+        "apiTokensLimiters": {
+            "operationRateLimits": {
+                "newTokenCreationLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "revokeTokensLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "getMetadataTokenLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "rotationRateLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "ipRestrictionUpdate": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "privilegeUpdate": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                }
+            },
+            "consumptionRateLimiter": {
+                "inMemoryBlockOnConsumed": 15,
+                "points": 15,
+                "duration": 60,
+                "blockDuration": 2,
+                "inMemoryBlockDuration": 15
+            },
+            "generalUnionLimiter": {
+                "burstLimiter": {
+                    "inMemoryBlockOnConsumed": 500,
+                    "points": 500,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "slowLimiter": {
+                    "inMemoryBlockOnConsumed": 1000,
+                    "points": 1000,
+                    "duration": 3600,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                }
+            }
+        },
+        "signupLimiters": {
+            "unionLimiters": {
+                "uniLimiterIp": {
+                    "ipLimit": {
+                        "inMemoryBlockOnConsumed": 100,
+                        "points": 100,
+                        "duration": 60,
+                        "blockDuration": 1,
+                        "inMemoryBlockDuration": 1
+                    },
+                    "slowIpLimit": {
+                        "inMemoryBlockOnConsumed": 100,
+                        "points": 100,
+                        "duration": 60,
+                        "blockDuration": 1,
+                        "inMemoryBlockDuration": 1
+                    }
+                },
+                "uniLimiterComposite": {
+                    "compositeKeyLimit": {
+                        "inMemoryBlockOnConsumed": 100,
+                        "points": 100,
+                        "duration": 60,
+                        "blockDuration": 1,
+                        "inMemoryBlockDuration": 1
+                    },
+                    "slowCompositeKeyLimit": {
+                        "inMemoryBlockOnConsumed": 100,
+                        "points": 100,
+                        "duration": 60,
+                        "blockDuration": 1,
+                        "inMemoryBlockDuration": 1
+                    }
+                }
+            },
+            "emailLimit": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            }
+        },
+        "loginLimiters": {
+            "unionLimiter": {
+                "burstLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "slowLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                }
+            },
+            "ipLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            },
+            "emailLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            }
+        },
+        "tokenLimiters": {
+            "unionLimiters": {
+                "refreshAccessTokenLimiter": {
+                    "accessTokenBrute": {
+                        "inMemoryBlockOnConsumed": 100,
+                        "points": 100,
+                        "duration": 60,
+                        "blockDuration": 1,
+                        "inMemoryBlockDuration": 1
+                    },
+                    "accessTokenSlow": {
+                        "inMemoryBlockOnConsumed": 100,
+                        "points": 100,
+                        "duration": 60,
+                        "blockDuration": 1,
+                        "inMemoryBlockDuration": 1
+                    }
+                },
+                "refreshTokenLimiterUnion": {
+                    "refreshTokenBrute": {
+                        "inMemoryBlockOnConsumed": 100,
+                        "points": 100,
+                        "duration": 60,
+                        "blockDuration": 1,
+                        "inMemoryBlockDuration": 1
+                    },
+                    "refreshTokenSlow": {
+                        "inMemoryBlockOnConsumed": 100,
+                        "points": 100,
+                        "duration": 60,
+                        "blockDuration": 1,
+                        "inMemoryBlockDuration": 1
+                    }
+                }
+            },
+            "refreshTokenLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            }
+        },
+        "linkVerificationLimiter": {
+            "unionLimiter": {
+                "burstLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "slowLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                }
+            }
+        },
+        "oauthLimiters": {
+            "unionLimiter": {
+                "ipLimiterBrute": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "ipLimiterSlow": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                }
+            },
+            "subLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            },
+            "compositeKeyLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            }
+        },
+        "tempPostRoutesLimiters": {
+            "unionLimiters": {
+                "limit": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "slowLimit": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                }
+            },
+            "ipLimit": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            }
+        },
+        "initPasswordResetLimiters": {
+            "unionLimiters": {
+                "limit": {
+                    "inMemoryBlockOnConsumed": 50,
+                    "points": 50,
+                    "duration": 60,
+                    "blockDuration": 3,
+                    "inMemoryBlockDuration": 3
+                },
+                "longLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                }
+            },
+            "ipLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            },
+            "emailLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            }
+        },
+        "emailMfaLimiters": {
+            "unionLimiters": {
+                "limit": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                },
+                "longLimiter": {
+                    "inMemoryBlockOnConsumed": 100,
+                    "points": 100,
+                    "duration": 60,
+                    "blockDuration": 1,
+                    "inMemoryBlockDuration": 1
+                }
+            },
+            "ipLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            },
+            "userIdLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            },
+            "globalEmailLimiter": {
+                "inMemoryBlockOnConsumed": 100,
+                "points": 100,
+                "duration": 60,
+                "blockDuration": 1,
+                "inMemoryBlockDuration": 1
+            }
+        }
+    },
     "email": {
         "resend_key": "1234",
         "email": "noreply@test.com"

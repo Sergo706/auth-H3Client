@@ -1,3 +1,5 @@
+import { createSignedCookie } from '@internal/shared';
+import { randomBytes } from 'crypto';
 import { mockEvent, type H3Event } from 'h3';
 
 /**
@@ -12,6 +14,13 @@ export interface MockEventOptions {
   method?: string;
   /** Full URL or path (default: 'http://localhost/') */
   url?: string;
+  /** Ip address to mock */
+  ipAddress?: string;
+  /** The body this event sends */
+  body?: string | Record<string | number, unknown>; 
+  /** Include the api key header? */
+  apiKey?: string
+  params?: Record<string, string>; 
 }
 
 /**
@@ -26,20 +35,31 @@ export function createMockEvent(options: MockEventOptions = {}): H3Event {
     headers = {},
     cookies = {},
     method = 'GET',
-    url = 'http://localhost/'
+    url = 'http://localhost/',
+    ipAddress = "172.29.20.1",
+    apiKey
   } = options;
 
   const parsedUrl = new URL(url.startsWith('/') ? `http://localhost${url}` : url);
-  const clientIp: string = '172.29.20.1';
+  
+  const clientIp: string = ipAddress;
 
-  const cookieString: string = Object.entries(cookies)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('; ');
+  const rawToken = randomBytes(32).toString('hex');
+  const ttl = 1000 * 60 * 30
+  const signedToken = createSignedCookie(rawToken, ttl, 'csrf')
+  const csrfCookieName = '__Host-csrf'
+
+
+ const cookieEntries = Object.entries(cookies).map(([key, value]) => `${key}=${value}`);
+ cookieEntries.push(`${csrfCookieName}=${signedToken}`);
+ const cookieString = cookieEntries.join('; ');
+
 
   const defaultHeaders: Record<string, string> = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
     'X-Forwarded-For': clientIp,
     'X-Real-IP': clientIp,
+    'X-CSRF-Token': signedToken, 
     'Referer': `${parsedUrl.protocol}//${parsedUrl.host}/`,
     'Origin': `${parsedUrl.protocol}//${parsedUrl.host}`,
     'Host': parsedUrl.host,
@@ -56,9 +76,12 @@ export function createMockEvent(options: MockEventOptions = {}): H3Event {
     'Sec-Fetch-Site': 'same-origin',
     'Sec-Fetch-Mode': 'navigate',
     'Sec-Fetch-Dest': 'document',
+    'Content-Type': options.body ? 'application/json' : 'text/plain'
   };
 
   const normalizedDefaultHeaders: Record<string, string> = {};
+  if (apiKey) normalizedDefaultHeaders['X-API-KEY'] = apiKey;
+
   for (const [key, value] of Object.entries(defaultHeaders)) {
     normalizedDefaultHeaders[key.toLowerCase()] = value;
   }
@@ -68,11 +91,20 @@ export function createMockEvent(options: MockEventOptions = {}): H3Event {
     normalizedOptionsHeaders[key.toLowerCase()] = value;
   }
 
-  return mockEvent(url, {
+
+
+  const event =  mockEvent(url, {
     method,
     headers: {
       ...normalizedDefaultHeaders,
       ...normalizedOptionsHeaders
-    }
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined
   });
+
+  if (options.params) {
+    event.context.params = options.params;
+  } 
+
+  return event;
 }

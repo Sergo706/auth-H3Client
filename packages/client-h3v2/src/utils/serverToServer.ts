@@ -29,7 +29,7 @@ type Cookies = Cookie | Cookie[];
  * @example
  * const res = await sendToServer(true, '/auth/login', 'POST', event, true, cookies, payload);
  */
-export async function sendToServer<T>(keepAlive: boolean, endpoint: string, method: string, event: H3Event, body: boolean, cookies?: Cookies, data?: object, token?: string): Promise<Response|void> {
+export async function sendToServer<T>(keepAlive: boolean, endpoint: string, method: string, event: H3Event, body: boolean, cookies?: Cookies, data?: object, token?: string, apiToken?: string): Promise<Response|void> {
     const config = getConfiguration()
     const agent = getAuthAgent(keepAlive)
     const logger = getLogger()
@@ -69,6 +69,7 @@ export async function sendToServer<T>(keepAlive: boolean, endpoint: string, meth
   
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (body) headers['Content-Type'] = 'application/json';
+  if (apiToken) headers['X-API-KEY'] = apiToken;
 
   log.debug({      
       cookies: cookies,

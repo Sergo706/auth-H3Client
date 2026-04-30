@@ -64,10 +64,15 @@
       "import": "./dist/server/middleware.js",
       "default": "./dist/server/middleware.js"
     },
-    "./server/routes": {
-      "types": "./dist/server/routes.d.ts",
-      "import": "./dist/server/routes.js",
-      "default": "./dist/server/routes.js"
+    "./server/auth-status": {
+      "types": "./dist/server/auth-status.d.ts",
+      "import": "./dist/server/auth-status.js",
+      "default": "./dist/server/auth-status.js"
+    },
+    "./server/api-lists": {
+      "types": "./dist/server/api-lists.d.ts",
+      "import": "./dist/server/api-lists.js",
+      "default": "./dist/server/api-lists.js"
     },
     "./server/templates": {
       "types": "./dist/server/templates.d.ts",

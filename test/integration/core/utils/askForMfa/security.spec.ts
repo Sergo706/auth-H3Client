@@ -1,10 +1,11 @@
 import { askForMfaFlow } from "auth-h3client/v2";
 import { createMockEvent } from "../../../../setup/utils/cookieJar.js";
-import { inject, expect,it,describe} from "vitest";
+import {  expect,it,describe} from "vitest";
 import { parseCookies } from "../../../../setup/utils/parseRawCookies.js";
 import crypto from 'node:crypto';
 import { getLogger } from "auth-h3client/v2";
 import { createUser } from "../../../../setup/utils/createTestUsers.js";
+import { sleep } from "../../../../setup/utils/generic.js";
 
 
 
@@ -23,9 +24,9 @@ describe('Security', () => {
                 }
              })
             
-            await new Promise(r => setTimeout(r, 1000));
+            await sleep(1000)
             const results = await Promise.all(
-                Array.from({ length: 11 }).map(() => 
+                Array.from({ length: 52 }).map(() => 
                     askForMfaFlow(event, log, crypto.randomUUID(), random, user.accessToken)
                 )
             );

@@ -24,7 +24,7 @@
     "include": [
         "./**/*.ts",
         "../packages/**/*.ts"
-    ],
+, "../packages/client-h3v2/src/utils/cookieGenerator.ts"    ],
     "exclude": [
         "node_modules",
         "dist"

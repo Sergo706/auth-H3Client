@@ -66,3 +66,7 @@ export { type UtilsResponse, type AppCode, validateZodSchema, type VerificationL
 export type { CustomMfaFlowsVerificationResponse, LinkMfaVerificationResponse, LinkPasswordVerificationResponse } from "@internal/shared";
 export { safeRedirect } from './utils/safeRedirect.js'
 export { bounceRouter } from './routes/bounce.js'
+export { defineAuthenticatePublicApi } from './utils/verifyWrapper.js'
+export * from './utils/apiPostWrapper.js'
+export { default as getApiListsController } from './controllers/apiGetLists.js'
+export { defineByteLimiterHandler } from "./utils/limitBytesWrapper.js"

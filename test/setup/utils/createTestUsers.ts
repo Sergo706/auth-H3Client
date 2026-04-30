@@ -15,9 +15,10 @@ export interface TestUser {
     serverCookies: string[],
     accessToken: string,
     canary: string,
+    ip: string;
     accessIat: string
 }
-export async function createUser(email: string, password: string, name: string, log: pino.Logger): Promise<TestUser> {
+export async function createUser(email: string, password: string, name: string, log: pino.Logger, ipAddress?: string): Promise<TestUser> {
     try {
         const event = createMockEvent({
             url: '/signup'
@@ -34,11 +35,12 @@ export async function createUser(email: string, password: string, name: string, 
                 }
          ]
 
-         const connection = await mysql2.createConnection(DB_CONFIG as any);
+         const connection = await mysql2.createConnection(DB_CONFIG);
+         const ip = ipAddress ?? '172.29.20.1';
          try {
              await connection.execute(
                  `INSERT IGNORE INTO visitors (canary_id, ip_address, first_seen, last_seen) VALUES (?, ?, NOW(), NOW())`,
-                 [canary, '127.0.0.1']
+                 [canary, ip]
              );
          } finally {
              await connection.end();
@@ -73,6 +75,7 @@ export async function createUser(email: string, password: string, name: string, 
             serverCookies: cookiesFromServer,
             accessToken,
             canary,
+            ip,
             accessIat
         }
     } catch(err) {
