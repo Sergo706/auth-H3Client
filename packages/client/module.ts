@@ -63,21 +63,22 @@ export default defineNuxtModule<ModuleOptions>({
         middleware: true,
         handler: await resolvePath('@riavzon/auth-h3client/server/middleware')
       });
-      addServerHandler({
-        middleware: false,
-        handler: await resolvePath('@riavzon/auth-h3client/server/auth-status'),
-        method: 'get',
-        route: options.authStatusUrl,
-      });
+    }
+    
+    addServerHandler({
+      middleware: false,
+      handler: await resolvePath('@riavzon/auth-h3client/server/auth-status'),
+      method: 'get',
+      route: options.authStatusUrl,
+    });
 
-      if(options.registerApiRoute) {
-         addServerHandler({
-            middleware: false,
-            handler: await resolvePath('@riavzon/auth-h3client/server/api-lists'),
-            method: 'get',
-            route: options.registerApiRoute.path,
-         });
-      }
+    if(options.registerApiRoute) {
+       addServerHandler({
+          middleware: false,
+          handler: await resolvePath('@riavzon/auth-h3client/server/api-lists'),
+          method: 'get',
+          route: options.registerApiRoute.path,
+       });
     }
 
   }
