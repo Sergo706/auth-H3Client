@@ -120,7 +120,7 @@ const { code, state:stateFromIdP, error, iss } = OAuthQuery.parse(input);
       params.delete('client_secret');
     }
 
-     const actionLockKey = getCookie(event, 'canary_id') || state.payload.session;
+     const actionLockKey = `oauth-token:${provided}:${String(stateFromIdP)}`;
      const { tokens, ok, status } = await safeAction(actionLockKey, async () => {
        const res = await fetch(tokenEndpoint, {
         method: "POST",

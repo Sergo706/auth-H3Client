@@ -31,9 +31,13 @@ export const defineDeduplicatedEventHandler = <T extends EventHandlerRequest, D>
             const token = getCookie(event, '__Secure-a');
             const canary = getCookie(event, 'canary_id');
 
-            const key = lockKey || session || token || canary || 'anon';
+            const baseKey = session || token || canary || 'anon';
 
-            if (key !== 'anon') {
+            if (baseKey !== 'anon') {
+                const requestMethod = event.method || 'GET';
+                const requestPath = (event.path || event.node.req?.url || 'request').split('?')[0];
+                const key = lockKey || `${requestMethod}:${requestPath}:${baseKey}`;
+
                 return await safeAction(key, async () => {
                     return await handler(event);
                 });
