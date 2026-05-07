@@ -70,5 +70,4 @@ export { defineAuthenticatePublicApi } from './utils/verifyWrapper.js'
 export * from './utils/apiPostWrapper.js'
 export { default as getApiListsController } from './controllers/apiGetLists.js'
 export { newApiTokenSchema, privilegeQ, reqParams, ipRestrictionUpdate, tokenId} from "@internal/shared";
-export type * from '@internal/shared';
 export { defineByteLimiterHandler } from "./utils/limitBytesWrapper.js"
