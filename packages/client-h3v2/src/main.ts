@@ -1,3 +1,4 @@
+import './h3.d.ts';
 export { configuration, getConfiguration } from "@internal/shared";
 export { default as loginHandler } from "./controllers/handleLogin.js";
 export { default as logoutHandler } from "./controllers/handleLogout.js";

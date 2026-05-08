@@ -2,7 +2,9 @@
   "name": "@internal/client-h3v1",
   "private": true,
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.d.ts"
+  ],
   "dependencies": {
     "@internal/shared": "*"
   },
