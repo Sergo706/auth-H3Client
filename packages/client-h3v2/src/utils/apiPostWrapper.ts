@@ -1,6 +1,6 @@
 import { defineHandler, EventHandler, EventHandlerRequest, getCookie } from "h3";
 import { defineAuthenticatedEventPostHandlers } from "./authenticatedPostHandler.js";
-import { Cookies, CreationSuccess, getLogger, newApiTokenSchema, parseResponseContentType, privilegeQ, reqParams, Results, safeAction, validateZodSchema, ipRestrictionUpdate, AllValidTokensList, ActionManagerResult, tokenId, InternalUnion } from "@internal/shared";
+import { Cookies, CreationSuccess, getLogger, newApiTokenSchema, parseResponseContentType, privilegeQ, reqParams, Results, safeAction, validateZodSchema, ipRestrictionUpdate, AllValidTokensList, ActionManagerResult, tokenId, InternalUnion, ApiTokenRotationSuccess, SingleTokenMeta } from "@internal/shared";
 import z from "zod";
 import throwError from "../middleware/error.js";
 import { sendToServer } from "./serverToServer.js";
@@ -362,7 +362,7 @@ return defineByteLimiterHandler(
                     }
                }
 
-               event.context.extensiveMetadata = parsedRes.data;
+               event.context.extensiveMetadata = parsedRes.data as Extract<InternalUnion, SingleTokenMeta>;
                return handler(event);
 
             }
@@ -416,7 +416,7 @@ return defineByteLimiterHandler(
                     }
                }
 
-               event.context.rotate = parsedRes.data;
+               event.context.rotate = parsedRes.data as Extract<InternalUnion, ApiTokenRotationSuccess>;
                return handler(event);
 
             }
