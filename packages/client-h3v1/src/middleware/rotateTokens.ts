@@ -93,7 +93,7 @@ export async function ensureValidCredentials(event: H3Event) {
     }
 
     const rotateAndApply = async () => {
-        const result = await safeAction(refresh, rotateBoth);
+        const result = await safeAction(`${refresh}:rotate:tokens`, rotateBoth);
         return applyRotationResult(event, result, domain, accessTokenTTL);
     };
 
@@ -103,7 +103,7 @@ export async function ensureValidCredentials(event: H3Event) {
     }
 
     try {
-        const meta = await safeAction(refresh, () => getMetadata(log, false, currentToken, refresh, canary, event), 5000);
+        const meta = await safeAction(`${refresh}:metadata:rotate`, () => getMetadata(log, false, currentToken, refresh, canary, event), 5000);
         
         if ("serverError" in meta && meta.serverError) {
             log.info('Meta resolved with an error; rotating both tokens');

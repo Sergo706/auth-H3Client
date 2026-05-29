@@ -95,7 +95,7 @@ import { applyRotationResult } from "../utils/applyRotationResults.js";
     };
 
     const rotateAndApply = async () => {
-        const result = await safeAction(refresh, rotateBoth);
+        const result = await safeAction(`${refresh}:rotate:tokens`, rotateBoth);
         return applyRotationResult(event, result, domain, accessTokenTTL);
     };
 
@@ -105,7 +105,7 @@ import { applyRotationResult } from "../utils/applyRotationResults.js";
     }
 
     try {
-        const meta = await safeAction(refresh, () => getMetadata(log, false, currentToken, refresh, canary, event))
+        const meta = await safeAction(`${refresh}:metadata:rotate`, () => getMetadata(log, false, currentToken, refresh, canary, event))
         if ('serverError' in meta && meta.serverError) {
             log.info('Meta resolved with an error; rotating both tokens');
             cache.del(currentToken);

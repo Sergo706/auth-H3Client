@@ -1,4 +1,4 @@
-import type { ServerResponse, LimitedMetaData, CreationSuccess, ActionManagerResult, VerifySuccessResponse, InternalUnion  } from '@internal/shared';
+import type { ServerResponse, ApiTokenRotationSuccess, LimitedMetaData, CreationSuccess, VerifySuccessResponse, InternalUnion, SingleTokenMeta  } from '@internal/shared';
 import 'h3';
 
 declare module 'h3' {
