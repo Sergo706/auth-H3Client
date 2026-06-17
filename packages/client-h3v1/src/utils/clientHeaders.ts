@@ -1,4 +1,4 @@
-import { getHeader, getRequestHost, getRequestIP, getRequestProtocol, getRequestURL, type H3Event } from 'h3'
+import { getHeader, getHeaders, getRequestHost, getRequestIP, getRequestProtocol, getRequestURL, type H3Event } from 'h3'
 
 /**
  * Builds a sanitized set of client headers to forward to upstream auth services.
@@ -19,6 +19,7 @@ export function clientHeaders( event: H3Event ): Record<string, string | undefin
       const get = (name: string) => getHeader(event, name) ?? undefined;
 
 return {
+     ...getHeaders(event),
     'User-Agent': get('User-Agent') ?? '',
     'X-Forwarded-For': clientIp,
     'X-Real-IP': clientIp,

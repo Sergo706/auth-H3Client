@@ -20,6 +20,7 @@ export function clientHeaders( event: H3Event ): Record<string, string | undefin
       const get = (name: string) => h.get(name) ?? undefined;
 
 return {
+    ...Object.fromEntries(h.entries()),
     'User-Agent': h.get('User-Agent') ?? '',
     'X-Forwarded-For': clientIp,
     'X-Real-IP': clientIp,
