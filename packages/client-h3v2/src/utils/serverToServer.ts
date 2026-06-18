@@ -63,22 +63,25 @@ export async function sendToServer<T>(keepAlive: boolean, endpoint: string, meth
   const headers: Record<string, string | undefined> = {
     ...authHeaders,
     ...clientHeaders(event),
-    Cookie: identifiers,
-    Accept: 'application/json'
   };
+
+  if (identifiers) {
+        headers['cookie'] = identifiers;
+    } else if (headers['cookie'] === 'undefined') {
+        delete headers['cookie'];
+  }
+
+  if (!headers['accept']) {
+      headers['accept'] = 'application/json';
+  }
   
   if (token) headers['Authorization'] = `Bearer ${token}`;
   if (body) headers['Content-Type'] = 'application/json';
   if (apiToken) headers['X-API-KEY'] = apiToken;
 
-  log.debug({      
-      cookies: cookies,
-      body: body,
-      data: data,
-    }, '[DEBUG]'
-  )
-  
-  log.info(`Mapped. About to fetch`)
+  log.debug({ cookies, body, data }, '[DEBUG]')
+   
+  log.debug(`Mapped. About to fetch`)
   const signal = AbortSignal.timeout(15000)
 try { 
    const response = await fetch(targetURL, {

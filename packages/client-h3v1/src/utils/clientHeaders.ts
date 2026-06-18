@@ -15,36 +15,31 @@ export function clientHeaders( event: H3Event ): Record<string, string | undefin
     const protocol = getRequestProtocol(event, {xForwardedProto: true})
     const host = getRequestHost(event, {xForwardedHost: true});
     const url = getRequestURL(event,{xForwardedHost: true, xForwardedProto:true});
+    
+      const rawHeaders = getHeaders(event);
+      const finalHeaders: Record<string, string> = {};
 
-      const get = (name: string) => getHeader(event, name) ?? undefined;
-      const headers = {
-          ...getHeaders(event),
-          'user-agent': get('User-Agent') ?? '',
-          'x-forwarded-for': clientIp,
-          'x-real-ip': clientIp,
-          "referer": `${protocol}://${host}`,
-          "origin":  get("Origin") || "",
-          "host": get("host"),
-          "x-original-path": url.toString(),
-          "x-forwarded-host": get("X-Forwarded-Host") || "",
-          "x-forwarded-proto": protocol,
-          'x-client-tls-version': get('x-client-tls-version'),
-          'x-client-cipher': get('x-client-cipher'),
-          "date": get("date") || new Date().toISOString() || "",
-          "cookie": get("cookie") || "",
-          "accept-language": get("accept-language") || "",
-          "accept": get("Accept") || "",
-          "sec-fetch-user": get("sec-fetch-user") || "",
-          "sec-fetch-site": get("sec-fetch-site") || "",
-          "sec-fetch-mode": get("sec-fetch-mode") || "",
-          "sec-fetch-dest": get("sec-fetch-dest") || "",
-      };
-
-      const finalHeaders: Record<string, string | undefined> = {};
-      for (const [k, v] of Object.entries(headers)) {
-          if (v) {
-              finalHeaders[k.toLowerCase()] = String(v);
+      for (const [key, value] of Object.entries(rawHeaders)) {
+          if (value !== undefined && value !== null && value !== '') {
+              finalHeaders[key.toLowerCase()] = Array.isArray(value) ? value.join(', ') : String(value);
           }
+      }
+
+      if (clientIp) {
+          finalHeaders['x-forwarded-for'] = clientIp;
+          finalHeaders['x-real-ip'] = clientIp;
+      }
+      
+      finalHeaders['x-original-path'] = url.toString();
+      finalHeaders['x-forwarded-host'] = finalHeaders['x-forwarded-host'] || host;
+      finalHeaders['x-forwarded-proto'] = protocol;
+
+      if (!finalHeaders['referer']) {
+        finalHeaders['referer'] = `${protocol}://${host}`;
+      }
+
+      if (!finalHeaders['date']) {
+           finalHeaders['date'] = new Date().toISOString();
       }
       return finalHeaders;
 }
