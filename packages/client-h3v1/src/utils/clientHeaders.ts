@@ -41,5 +41,8 @@ export function clientHeaders( event: H3Event ): Record<string, string | undefin
       if (!finalHeaders['date']) {
            finalHeaders['date'] = new Date().toISOString();
       }
+      delete finalHeaders['content-length'];
+      delete finalHeaders['content-type'];
+      delete finalHeaders['accept'];
       return finalHeaders;
 }
