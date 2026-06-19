@@ -43,6 +43,7 @@ export function clientHeaders( event: H3Event ): Record<string, string | undefin
            finalHeaders['date'] = new Date().toISOString();
       }
       delete finalHeaders['content-length'];
+      delete finalHeaders['x-api-key'];
       delete finalHeaders['content-type'];
       delete finalHeaders['accept'];
       return finalHeaders;
